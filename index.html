@@ -366,22 +366,61 @@
             });
         }
 
-        function toggleWrongState(num, event) {
-            event.stopPropagation();
-            if (wrongWordsSet.has(num)) wrongWordsSet.delete(num);
-            else wrongWordsSet.add(num);
-            applyFilter();
+// [수정된 오답 토글 함수] - 전체 필터를 다시 먹이지 않고 현재 카드만 동적으로 변경합니다.
+function toggleWrongState(num, event) {
+    event.stopPropagation(); // 카드가 다시 뒤집히는 현상 방지
+    
+    const cardFront = document.querySelector(`#quiz-card-${num} .flip-card-front`);
+    const btnWrong = document.querySelector(`#quiz-card-${num} .btn-wrong-toggle`);
+    const studyCard = document.getElementById(`study-card-${num}`); // 학습 모드 동기화용
+    
+    if (wrongWordsSet.has(num)) {
+        // 오답 취소 처리
+        wrongWordsSet.delete(num);
+        if (cardFront) cardFront.classList.remove('is-wrong');
+        if (btnWrong) {
+            btnWrong.classList.remove('marked');
+            btnWrong.innerText = '체크 ❌ 몰라요';
         }
-
-        function shuffleCards() {
-            window.speechSynthesis.cancel();
-            for (let i = quizWords.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
-            }
-            renderQuizCards(quizWords);
+    } else {
+        // 오답 등록 처리
+        wrongWordsSet.add(num);
+        if (cardFront) cardFront.classList.add('is-wrong');
+        if (btnWrong) {
+            btnWrong.classList.add('marked');
+            btnWrong.innerText = '❌ 오답 취소하기';
         }
+    }
+    
+    // 퀴즈 화면은 그대로 두고, 나중에 학습 모드로 탭을 넘겼을 때를 대비해 배경색 데이터만 슬쩍 갱신해 둡니다.
+    if (studyCard) {
+        const isWrong = wrongWordsSet.has(num);
+        studyCard.className = 'card' + (isWrong ? ' is-wrong' : '');
+        const hanziBox = studyCard.querySelector('.hanzi');
+        if (hanziBox) {
+            // ❌ 표시가 중복으로 붙지 않게 기본 텍스트 추출 후 가공
+            const cleanText = hanziBox.innerText.replace('❌', '').trim();
+            hanziBox.innerText = cleanText + (isWrong ? ' ❌' : '');
+        }
+    }
+}
 
+// [수정된 섞기 함수] - 섞을 때 뒤집혀 있던 카드들을 원래대로 다 엎은 뒤 순서를 섞습니다.
+function shuffleCards() {
+    window.speechSynthesis.cancel();
+    
+    // 1. 먼저 모든 카드를 앞면이 보이게 원상복구 (뒤집힌 채 섞이면 헷갈리므로)
+    document.querySelectorAll('.flip-card').forEach(card => card.classList.remove('flipped'));
+    
+    // 2. 약간의 딜레이를 주어 카드가 복구되는 애니메이션이 끝난 후 배열을 섞고 다시 그립니다.
+    setTimeout(() => {
+        for (let i = quizWords.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
+        }
+        renderQuizCards(quizWords);
+    }, 150);
+}
         function resetCards() {
             window.speechSynthesis.cancel();
             document.querySelectorAll('.flip-card').forEach(card => card.classList.remove('flipped'));
