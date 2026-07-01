@@ -30,12 +30,12 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* 홈 메인 허브 스타일 */
+        /* 홈 메인 허브 스타일 - 기존 링크 카드 배치 형태 유지 */
         .hub-container { max-width: 900px; margin: 60px auto; padding: 0 24px; text-align: center; }
         .hub-title { font-size: 42px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.04em; background: linear-gradient(to right, #4f46e5, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hub-subtitle { font-size: 16px; color: var(--text-sub); margin-bottom: 48px; font-weight: 500; }
         .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-        .hub-card { background: var(--bg-card); border-radius: 20px; padding: 32px 24px; text-align: center; text-decoration: none; color: inherit; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border-color); position: relative; overflow: hidden; }
+        .hub-card { background: var(--bg-card); border-radius: 20px; padding: 32px 24px; text-align: center; text-decoration: none; color: inherit; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border-color); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .hub-card:hover { transform: translateY(-6px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: transparent; }
         .hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; }
         .hub-card.schedule::before { background: linear-gradient(to right, #ff7b7b, #ff6b6b); }
@@ -65,13 +65,13 @@
         .view.active { display: block; }
         .zh-font { font-family: var(--font-zh); font-weight: 600; }
 
-        /* 학습 모드 고급 카드 */
+        /* 학습 모드 카드 */
         .card { background: var(--bg-card); border-radius: 20px; padding: 28px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01); border: 1px solid var(--border-color); transition: all 0.25s ease; position: relative; }
         .card.active { background-color: #fefcf0; border-color: var(--accent-yellow); box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.05); }
         .card.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.05); }
         .card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px; }
         .hanzi-box { flex-grow: 1; overflow: hidden; }
-        .hanzi { font-size: 38px; color: var(--text-main); font-weight: 700; letter-spacing: 0px; }
+        .hanzi { font-size: 38px; color: var(--text-main); font-weight: 700; }
         .pinyin { color: #2563eb; font-size: 18px; font-weight: 700; margin-top: 6px; font-family: var(--font-family); }
         .ko-pron { color: var(--text-sub); font-size: 14px; font-weight: 400; margin-left: 6px; }
         .play-btn { background-color: #10b981; color: white; border: none; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2); }
@@ -80,7 +80,7 @@
         .meaning { font-size: 22px; font-weight: 800; color: #dc2626; margin-bottom: 8px; letter-spacing: -0.03em; }
         .hanja { font-size: 13px; color: var(--text-sub); background: #f1f5f9; display: inline-block; padding: 4px 10px; border-radius: 8px; font-weight: 600; border: 1px solid var(--border-color); }
         
-        .tip-box { background: #fffdf2; padding: 14px 18px; border-left: 4px solid var(--accent-yellow); border-radius: 8px; margin-bottom: 16px; border-top: 1px solid #fef3c7; border-right: 1px solid #fef3c7; border-bottom: 1px solid #fef3c7; }
+        .tip-box { background: #fffdf2; padding: 14px 18px; border-left: 4px solid var(--accent-yellow); border-radius: 8px; margin-bottom: 16px; border: 1px solid #fef3c7; border-left: 4px solid var(--accent-yellow); }
         .tip-item { font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 6px; }
         .tip-item:last-child { margin-bottom: 0; }
         
@@ -90,18 +90,18 @@
         .ex-mean { font-size: 14px; color: var(--text-sub); margin-top: 4px; font-weight: 500; }
 
         /* 제어 하단 바 */
-        .bottom-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 16px 24px; box-sizing: border-box; box-shadow: 0 -10px 25px -5px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-color); }
+        .bottom-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 16px 24px; box-shadow: 0 -10px 25px -5px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid var(--border-color); }
         .speed-control { text-align: center; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: var(--text-main); }
         .speed-control input[type=range] { vertical-align: middle; width: 50%; margin-left: 12px; accent-color: var(--primary); }
         .btn-group { display: flex; justify-content: center; gap: 12px; max-width: 600px; margin: 0 auto; }
-        .btn-group button { flex: 1; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .btn-group button { flex: 1; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; color: white; cursor: pointer; transition: all 0.2s; }
         #mainPlayBtn { background-color: var(--primary); } 
         #mainPlayBtn:hover { background-color: var(--primary-hover); }
         #mainPlayBtn.paused { background-color: var(--accent-yellow); } 
         #stopBtn { background-color: #64748b; max-width: 120px; }
         #stopBtn:hover { background-color: #475569; }
 
-        /* 퀴즈 모드 고도화 패널 */
+        /* 퀴즈 모드 */
         .quiz-controls { text-align: center; margin-bottom: 24px; display: flex; justify-content: center; gap: 12px; }
         .btn-quiz { background-color: #2563eb; color: white; border: none; border-radius: 12px; padding: 14px; flex: 1; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
         .btn-quiz:hover { background-color: #1d4ed8; }
@@ -117,11 +117,11 @@
         .flip-card-front .wrong-badge { position: absolute; top: 10px; right: 12px; font-size: 16px; display: none; }
         .flip-card-front.is-wrong .wrong-badge { display: block; }
         .flip-card-front .hanzi { font-size: clamp(28px, 6vw, 44px); color: var(--text-main); }
-        .flip-card-front .hint { font-size: 12px; color: var(--primary); margin-top: 24px; font-weight: 700; background: #e0e7ff; padding: 6px 12px; border-radius: 20px; letter-spacing: -0.01em; }
+        .flip-card-front .hint { font-size: 12px; color: var(--primary); margin-top: 24px; font-weight: 700; background: #e0e7ff; padding: 6px 12px; border-radius: 20px; }
         
         .flip-card-back { background-color: #fffdf5; border-color: #fef08a; transform: rotateY(180deg); justify-content: flex-start; padding-top: 24px; position: relative; }
         .flip-card-back .back-hanzi { font-size: 24px; color: #334155; margin-bottom: 6px; font-weight: 700; }
-        .flip-card-back .meaning { font-size: 19px; font-weight: 800; color: #dc2626; margin-bottom: 6px; letter-spacing: -0.02em; }
+        .flip-card-back .meaning { font-size: 19px; font-weight: 800; color: #dc2626; margin-bottom: 6px; }
         .flip-card-back .pinyin { font-size: 14px; color: #2563eb; font-weight: 700; margin-bottom: 16px; }
         
         .quiz-ex-box { background-color: #ffffff; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #fef08a; box-sizing: border-box; margin-bottom: 44px; }
@@ -129,13 +129,13 @@
         .quiz-ex-box .ex-pinyin { font-size: 12px; color: #4b5563; margin-top: 4px; }
         .quiz-ex-box .ex-mean { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
         
-        .btn-wrong-toggle { position: absolute; bottom: 12px; width: calc(100% - 28px); background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 0; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-wrong-toggle { position: absolute; bottom: 12px; width: calc(100% - 28px); background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 0; font-size: 13px; font-weight: 700; cursor: pointer; }
         .btn-wrong-toggle.marked { background: var(--accent-red); color: white; border-color: transparent; }
     </style>
 </head>
 <body>
 
-    <!-- [1] 메인 홈 허브 뷰 -->
+    <!-- [1] 메인 홈 허브 뷰 - 기존 직관적인 링크 카드 형태로 완벽 복구 -->
     <div id="hubMainView" class="hub-container">
         <div class="hub-title">BONG HUB</div>
         <div class="hub-subtitle">원하는 서비스 포털이나 학습 단어장을 선택해 주세요.</div>
@@ -147,7 +147,7 @@
                 <p>데일리 학원 시간표와 실시간 주간 동선 일정을 안전하게 관리하는 전용 공간포털입니다.</p>
             </a>
 
-            <!-- HSK 모듈식 포털 카드 -->
+            <!-- HSK 모듈식 포털 카드 링크 -->
             <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(1)">
                 <h3>🇨🇳 HSK 1급</h3>
                 <p>기초 150단어 완전 마스터<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
@@ -169,7 +169,7 @@
         <div class="header-wrap">
             <div class="header-top">
                 <button class="btn-home" onclick="goBackToHub()">⬅ 홈으로</button>
-                <h2 id="hskTitleDisplay">HSK 단어 시스템</h2>
+                <h2 id="hskTitleDisplay">HSK 단어 최고화 시스템</h2>
             </div>
             
             <div class="filter-container">
@@ -216,7 +216,6 @@
         let quizWords = [];
         let currentLevel = 1;
 
-        // JSON 데이터 포트 포워딩 호출
         function loadHskData(level) {
             currentLevel = level;
             wrongWordsSet.clear(); 
@@ -410,7 +409,6 @@
             });
         }
 
-        // [오류 해결 로직] 퀴즈 카드 정렬 상태 유지 처리 함수
         function toggleWrongState(num, event) {
             event.stopPropagation();
             
@@ -434,7 +432,6 @@
                 }
             }
             
-            // 학습 탭 실시간 동화 버퍼 처리
             if (studyCard) {
                 const isWrong = wrongWordsSet.has(num);
                 studyCard.className = 'card' + (isWrong ? ' is-wrong' : '');
@@ -454,6 +451,7 @@
                     const j = Math.floor(Math.random() * (i + 1));
                     [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
                 }
+                document.getElementById('dayFilter').value = 'all'; // 섞기 진행 시 전체보기 디폴트 보정
                 renderQuizCards(quizWords);
             }, 160);
         }
@@ -463,7 +461,6 @@
             document.querySelectorAll('.flip-card').forEach(card => card.classList.remove('flipped'));
         }
 
-        // 오디오 스레드 제어 시스템
         let isAutoPlaying = false, isPaused = false, autoIndex = 0, autoStep = 0, wakeLock = null;
         function getSpeed() { return parseFloat(document.getElementById('speedSlider').value); }
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
