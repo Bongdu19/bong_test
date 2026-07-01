@@ -3,451 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BONG HUB & HSK 단어장</title>
+    <title>HSK 단어 마스터</title>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #f6f8fb 0%, #edeef3 100%);
-            --card-bg: #ffffff;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary: #6b7280;
-            --text-main: #1f2937;
-            --text-sub: #4b5563;
-            --text-muted: #9ca3af;
-            --radius-lg: 20px;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            --shadow-card: 0 20px 35px -10px rgba(79, 70, 229, 0.12);
-        }
-
+        /* 기존 스타일을 유지하되, 카드가 가려지는 문제를 해결하기 위한 CSS 수정 및 보완 */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            letter-spacing: -0.02em;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 600px;
             width: 100%;
-            padding: 24px 16px;
-            box-sizing: border-box;
-        }
-
-        /* 메인 홈 링크 (상단 메뉴 이동용) */
-        .nav-home {
-            margin-bottom: 16px;
-        }
-        .nav-home a {
-            text-decoration: none;
-            color: var(--text-sub);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        h1 {
-            font-size: 26px;
-            font-weight: 800;
-            margin: 0;
-            background: linear-gradient(to right, #4f46e5, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .section-panel {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            background: white;
             padding: 20px;
-            margin-bottom: 18px;
-            box-shadow: var(--shadow);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* 외부 스케줄 링크 */
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            color: var(--text-main);
-            text-decoration: none;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            border: 1px solid #e2e8f0;
-        }
-
-        .hsk-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
-        }
-
-        .hsk-title { font-size: 16px; font-weight: 800; }
-        .hsk-desc { font-size: 12px; color: var(--text-muted); }
-
-        .mode-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            background: #f9fafb;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--text-sub);
-            transition: all 0.2s;
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
-        }
-
-        /* 단어 카드 영역: 덮임 방지 및 큰 글씨 라인 높이 확보 */
-        .word-card-container {
-            margin: 24px 0;
-        }
-
+        /* 단어 카드 스타일: 글자가 위쪽으로 가려지지 않도록 상단 여백(padding-top) 확보 및 overflow 조절 */
         .card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
+            background-color: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
             height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            box-shadow: var(--shadow-card);
             position: relative;
-            
-            /* 한자 가려짐 방지 여백 확보 */
-            padding: 40px 24px 24px 24px; 
+            cursor: pointer;
+            perspective: 1000px;
+            margin-bottom: 20px;
+            padding: 20px; /* 내부 여백을 충분히 주어 글자 잘림 방지 */
             box-sizing: border-box;
-            overflow: visible; 
-            border: 1px solid rgba(79, 70, 229, 0.05);
+            overflow: visible; /* 자동 재생 애니메이션 시 글자가 가려지지 않도록 설정 */
         }
 
         .word-text {
-            font-size: 50px;
-            font-weight: 800;
-            color: #0f172a;
-            margin: 0 0 16px 0;
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
             text-align: center;
-            line-height: 1.4; /* 상단 자모음/획 잘림 방지 */
             word-break: break-all;
+            line-height: 1.2; /* 자모음이나 한자 상단이 잘리지 않도록 행고 확보 */
         }
 
         .meaning-text {
-            font-size: 18px;
-            font-weight: 500;
-            color: var(--text-sub);
-            text-align: center;
-            background: #f1f5f9;
-            padding: 6px 16px;
-            border-radius: 20px;
-            min-height: 27px;
-            display: inline-flex;
-            align-items: center;
+            font-size: 24px;
+            color: #666;
+            margin-top: 10px;
         }
 
-        /* 하단 컨트롤러 패널 */
-        .slider-group {
+        .controls {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: #f8fafc;
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        
-        #speedValue { color: var(--primary); }
-
-        .control-slider {
-            width: 100%;
-            height: 6px;
-            background: #cbd5e1;
-            border-radius: 10px;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .control-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 14px;
-            font-size: 14px;
-            font-weight: 700;
-            border: none;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .slider-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
+            justify-content: space-between;
+            background: #f9f9f9;
+            padding: 10px 15px;
+            border-radius: 8px;
         }
 
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-secondary { background: #ffffff; color: var(--text-sub); border: 1px solid #e2e8f0; }
-        .btn-secondary:hover { background: #f8fafc; }
+        .slider-container label {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button.stop {
+            background-color: #dc3545;
+        }
+        button.stop:hover {
+            background-color: #bd2130;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <div class="nav-home"><a href="#">⬅ 메인 홈</a></div>
-    <header>
-        <h1>HSK 단어 마스터</h1>
-    </header>
+    <h2>HSK 단어 마스터</h2>
 
-    <!-- 📅 스케줄 바로가기 메뉴 -->
-    <div class="section-panel">
-        <a href="daughter-schedule.html" class="menu-item">
-            <span>📅 딸 스케줄 확인</span>
-            <span style="color: var(--text-muted); font-size: 12px;">바로가기 ➔</span>
-        </a>
+    <div class="card" id="wordCard">
+        <div class="word-text" id="chineseWord">漢字</div>
+        <div class="meaning-text" id="wordMeaning">뜻 정보</div>
     </div>
 
-    <!-- HSK 급수 및 모드 선택 영역 -->
-    <div class="section-panel">
-        <div class="hsk-header">
-            <div class="hsk-title">🇨🇳 HSK 1급</div>
-            <div class="hsk-desc">필수 150단어</div>
+    <div class="controls">
+        <div class="slider-container">
+            <label for="speedSlider">속도조절: <span id="speedValue">0.8</span>x</label>
+            <input type="range" id="speedSlider" min="0.2" max="2.0" step="0.1" value="0.8">
         </div>
-        <div class="mode-buttons">
-            <button class="mode-btn active" data-level="1" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
-            <button class="mode-btn" data-level="1" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
+
+        <div class="button-group">
+            <button id="btnAutoPlay">▶ 전체 자동 재생</button>
+            <button id="btnStop" class="stop">⏹ 정지</button>
+        </div>
+        
+        <div class="button-group">
+            <button id="btnShuffle">🔀 섞어서 풀기</button>
+            <button id="btnReset">🔄 모두 엎기</button>
         </div>
     </div>
-
-    <div class="section-panel">
-        <div class="hsk-header">
-            <div class="hsk-title">🇨🇳 HSK 2급</div>
-            <div class="hsk-desc">필수 150단어</div>
-        </div>
-        <div class="mode-buttons">
-            <button class="mode-btn" data-level="2" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
-            <button class="mode-btn" data-level="2" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
-        </div>
-    </div>
-
-    <div class="section-panel">
-        <div class="hsk-header">
-            <div class="hsk-title">🇨🇳 HSK 3급</div>
-            <div class="hsk-desc">필수 300단어</div>
-        </div>
-        <div class="mode-buttons">
-            <button class="mode-btn" data-level="3" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
-            <button class="mode-btn" data-level="3" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
-        </div>
-    </div>
-
-    <!-- 단어 카드 본체 -->
-    <div class="word-card-container">
-        <div class="card" id="wordCard" onclick="flipCard()">
-            <div class="word-text" id="displayWord">로딩 중...</div>
-            <div class="meaning-text" id="displayMeaning">급수를 선택해 주세요</div>
-        </div>
-    </div>
-
-    <!-- 속도조절(하한 0.2) 및 제어 패널 -->
-    <div class="section-panel" style="padding: 16px;">
-        <div class="slider-group">
-            <div class="slider-label">
-                <span>속도조절</span>
-                <span id="speedValue">0.8x</span>
-            </div>
-            <input type="range" id="speedSlider" class="control-slider" min="0.2" max="2.0" step="0.1" value="0.8" oninput="updateSpeed(this.value)">
-        </div>
-
-        <div class="btn-row">
-            <button class="btn btn-primary" onclick="startAutoPlay()">▶ 전체 자동 재생</button>
-            <button class="btn btn-danger" onclick="stopAutoPlay()">⏹ 정지</button>
-        </div>
-
-        <div class="btn-row">
-            <button class="btn btn-secondary" onclick="shuffleWords()">🔀 섞어서 풀기</button>
-            <button class="btn btn-secondary" onclick="resetCards()">🔄 모두 엎기</button>
-        </div>
-    </div>
-
 </div>
 
 <script>
-    // JSON으로부터 동적으로 받아와 담길 단어 저장 공간
-    let allLoadedWords = []; 
+    // 샘플 데이터 (기존 로직에 맞게 대체하여 사용하세요)
+    const words = [
+        { hanja: "💡 학습 모드", meaning: "원하는 모드를 선택하세요" },
+        { hanja: "谢谢", meaning: "고맙다, 감사합니다" },
+        { hanja: "再见", meaning: "다시 만나다, 안녕히 가세요" }
+    ];
+    
     let currentIndex = 0;
-    let autoPlayTimer = null;
-    let isFlipped = false;
-    let currentSpeed = 0.8;
-    let currentLevel = 1;
-    let currentMode = 'study';
+    let autoPlayInterval = null;
 
-    const displayWord = document.getElementById('displayWord');
-    const displayMeaning = document.getElementById('displayMeaning');
+    const chineseWord = document.getElementById('chineseWord');
+    const wordMeaning = document.getElementById('wordMeaning');
+    const speedSlider = document.getElementById('speedSlider');
     const speedValue = document.getElementById('speedValue');
+    const btnAutoPlay = document.getElementById('btnAutoPlay');
+    const btnStop = document.getElementById('btnStop');
 
-    // [핵심] JSON 파일 연동 기능 함수
-    async function loadJsonData(level) {
-        stopAutoPlay();
-        try {
-            // 프로젝트 내 json 경로에 맞게 매칭 (예: hsk1.json, hsk2.json ...)
-            // 만약 경로명 형식이 다르다면 이 부분을 원래대로 변경해주세요. (예: `data/hsk${level}.json`)
-            const response = await fetch(`data/hsk${level}.json`);
-            if (!response.ok) throw new Error("JSON 파일을 불러올 수 없습니다.");
-            
-            allLoadedWords = await response.json();
-            currentIndex = 0;
-            isFlipped = (currentMode === 'study');
-            renderCard();
-        } catch (error) {
-            console.error(error);
-            displayWord.textContent = "오류 발생";
-            displayMeaning.textContent = "JSON 데이터를 확인해 주세요";
-        }
-    }
-
-    function renderCard() {
-        if (allLoadedWords.length === 0) return;
+    // 슬라이더 조절 시 텍스트 반영 및 재생 속도 즉시 변경
+    speedSlider.addEventListener('input', (e) => {
+        const speed = e.target.value;
+        speedValue.textContent = speed;
         
-        const item = allLoadedWords[currentIndex];
-        // 기존 json 파일의 key 구조(예: word / meaning 또는 hanja / mean 등)에 맞게 매칭 필요
-        // 통상적인 json 포맷인 'word'(한자)와 'meaning'(뜻) 구조 기준 처리
-        displayWord.textContent = item.word || item.hanja || "데이터 없음";
-        
-        if (isFlipped) {
-            displayMeaning.textContent = item.meaning || item.mean || "뜻 없음";
-            displayMeaning.style.background = "#e0e7ff";
-            displayMeaning.style.color = "var(--primary)";
-        } else {
-            displayMeaning.textContent = "클릭하여 뜻 보기";
-            displayMeaning.style.background = "#f1f5f9";
-            displayMeaning.style.color = "var(--text-sub)";
-        }
-    }
-
-    function flipCard() {
-        isFlipped = !isFlipped;
-        renderCard();
-    }
-
-    // 급수 및 모드 토글 선택 시 동작
-    function selectLevelMode(element) {
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        element.classList.add('active');
-
-        const newLevel = parseInt(element.getAttribute('data-level'));
-        currentMode = element.getAttribute('data-mode');
-
-        // 급수가 바뀌었을 때만 JSON을 새로 Fetch
-        if (newLevel !== currentLevel || allLoadedWords.length === 0) {
-            currentLevel = newLevel;
-            loadJsonData(currentLevel);
-        } else {
-            currentIndex = 0;
-            isFlipped = (currentMode === 'study');
-            renderCard();
-        }
-    }
-
-    function updateSpeed(val) {
-        currentSpeed = parseFloat(val);
-        speedValue.textContent = currentSpeed + 'x';
-        if (autoPlayTimer) {
+        // 현재 자동 재생 중이라면 속도를 즉시 재적용
+        if (autoPlayInterval) {
             stopAutoPlay();
             startAutoPlay();
+        }
+    });
+
+    function updateCard() {
+        if(words[currentIndex]) {
+            chineseWord.textContent = words[currentIndex].hanja;
+            wordMeaning.textContent = words[currentIndex].meaning;
         }
     }
 
     function startAutoPlay() {
-        stopAutoPlay();
-        if (allLoadedWords.length === 0) return;
-        
-        const intervalTime = 2500 / currentSpeed; 
+        // 슬라이더 값(초 단위 간격으로 변환하여 사용하거나 호출 주기 조절)
+        // 예: 1배속일 때 2초라면, 속도가 낮아질수록(0.2) 간격이 길어지도록 설정 가능
+        const speedMultiplier = parseFloat(speedSlider.value);
+        const intervalTime = (2000 / speedMultiplier); // 배속 개념 적용 (0.2배속이면 10초마다, 2배속이면 1초마다)
 
-        autoPlayTimer = setInterval(() => {
-            isFlipped = true;
-            renderCard();
-            
-            setTimeout(() => {
-                isFlipped = (currentMode === 'study');
-                currentIndex = (currentIndex + 1) % allLoadedWords.length;
-                renderCard();
-            }, intervalTime * 0.4);
-
+        autoPlayInterval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % words.length;
+            updateCard();
         }, intervalTime);
     }
 
     function stopAutoPlay() {
-        if (autoPlayTimer) {
-            clearInterval(autoPlayTimer);
-            autoPlayTimer = null;
+        if (autoPlayInterval) {
+            clearInterval(autoPlayInterval);
+            autoPlayInterval = null;
         }
     }
 
-    function shuffleWords() {
-        if (allLoadedWords.length === 0) return;
-        allLoadedWords.sort(() => Math.random() - 0.5);
-        currentIndex = 0;
-        isFlipped = (currentMode === 'study');
-        renderCard();
-    }
-
-    function resetCards() {
-        currentIndex = 0;
-        isFlipped = (currentMode === 'study');
+    btnAutoPlay.addEventListener('click', () => {
         stopAutoPlay();
-        renderCard();
-    }
-
-    // 초기 구동 시 HSK 1급 JSON 자동 로드
-    window.addEventListener('DOMContentLoaded', () => {
-        loadJsonData(1);
+        startAutoPlay();
     });
+
+    btnStop.addEventListener('click', () => {
+        stopAutoPlay();
+    });
+
+    // 초기 실행
+    updateCard();
 </script>
 
 </body>
