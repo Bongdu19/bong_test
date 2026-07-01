@@ -2,182 +2,527 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>우리 딸 스마트 스케줄러</title>
     <style>
         :root {
-            --bg-main: #f1f5f9;
-            --card-bg: #ffffff;
-            --border-color: #cbd5e1;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --header-bg: #334155;
-            
-            --bg-school: #fef3c7;    --text-school: #92400e;
-            --bg-taekwondo: #d1fae5; --text-taekwondo: #065f46;
-            --bg-math: #dbeafe;      --text-math: #1e40af;
-            --bg-english: #f3e8ff;   --text-english: #5b21b6;
-            --bg-piano: #ffe4e6;     --text-piano: #9f1239;
-            --bg-woongjin: #e2e8f0;  --text-woongjin: #334155;
-            
-            --minute-height: 1.2px;
+            --primary-color: #ff7675;
+            --secondary-color: #74b9ff;
+            --bg-color: #f9f9f9;
+            --border-color: #dfe6e9;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: -0.02em; }
-        body { background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; padding: 8px; display: flex; flex-direction: column; align-items: center; }
-        .main-wrapper { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; padding: 10px; }
-        .calendar-container { display: grid; grid-template-columns: 42px repeat(5, 1fr); background: #ffffff; border-left: 1px solid var(--border-color); border-top: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
-        .grid-header { background-color: var(--header-bg); color: #ffffff; text-align: center; font-size: 12px; font-weight: 700; padding: 8px 0; border-right: 1px solid var(--border-color); border-bottom: 2px solid var(--header-bg); grid-row: 1; }
-        .grid-header.time-axis-title { background-color: #475569; font-size: 11px; }
-        .time-cell { grid-column: 1; font-size: 11px; color: var(--text-secondary); font-weight: bold; text-align: center; border-right: 1px solid var(--border-color); border-bottom: 1px solid #cbd5e1; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; background: #f8fafc; }
-        .empty-grid-cell { background: #ffffff; border-right: 1px solid #f1f5f9; border-bottom: none; }
-        .hour-boundary { border-bottom: 1px solid #e2e8f0 !important; }
-        .box-item { border-radius: 6px; padding: 4px 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; border: 1px solid rgba(0,0,0,0.02); margin: 1px 2px; z-index: 10; }
-        .box-title-row { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; }
-        .box-time { font-size: 9px; font-weight: 600; margin-top: 2px; line-height: 1.1; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .box-time span.end-time::before { content: '~ '; }
-        .item-school { background-color: var(--bg-school); color: var(--text-school); }
-        .item-taekwondo { background-color: var(--bg-taekwondo); color: var(--text-taekwondo); }
-        .item-math { background-color: var(--bg-math); color: var(--text-math); }
-        .item-english { background-color: var(--bg-english); color: var(--text-english); }
-        .item-piano { background-color: var(--bg-piano); color: var(--text-piano); }
-        .item-woongjin { background-color: var(--bg-woongjin); color: var(--text-woongjin); }
-        .action-row { display: flex; justify-content: flex-end; margin-top: 10px; }
-        .settings-btn { padding: 6px 12px; background-color: var(--header-bg); color: #ffffff; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-        .admin-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 12px; }
-        .admin-modal.active { display: flex; }
-        .modal-content { background: #f8fafc; width: 100%; max-width: 540px; max-height: 90vh; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .modal-header { background: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
-        .modal-header h2 { font-size: 15px; font-weight: 700; }
-        .modal-body { padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .card { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .card h3 { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
-        .form-group-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9; }
-        .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; }
-        .form-row-line label { width: 70px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
-        input[type="time"] { padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 125px; text-align: center; background: #ffffff; outline: none; }
-        input[type="time"]:focus { border-color: var(--text-secondary); }
-        input[type="number"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 42px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; }
-        input[type="number"]:focus { border-color: var(--text-secondary); }
-        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .duration-input { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-primary); }
-        .custom-toggle { font-size: 11px; color: #ef4444; display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 700; user-select: none; }
-        .checkbox-group { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
-        .checkbox-group label { display: flex; align-items: center; justify-content: center; background: #f1f5f9; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s; min-width: 40px; }
-        .checkbox-group label:has(input:checked) { background: #e2e8f0; color: var(--header-bg); }
-        .checkbox-group input { margin-right: 4px; cursor: pointer; }
-        .custom-rows-container { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed #e2e8f0; padding-top: 10px; }
-        .modal-footer { background: #ffffff; padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px;}
-        .save-btn { background-color: var(--header-bg); color: #ffffff; border: none; padding: 11px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
-        .file-action-row { display: flex; gap: 6px; width: 100%; }
-        .file-btn { flex: 1; padding: 8px; background: #e2e8f0; color: #334155; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;}
-        .close-x-btn { background: none; border: none; font-size: 20px; color: #94a3b8; cursor: pointer; padding: 4px; line-height: 1; }
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #2d3436;
+        }
+
+        /* 2. 스케줄러 위 타이틀 스타일 */
+        .scheduler-title-container {
+            text-align: center;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #fff5f5;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .scheduler-title-container h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #c0392b;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: #6c5ce7;
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+        }
+
+        /* 스케줄러 테이블 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+            vertical-align: top;
+            height: 80px;
+        }
+
+        th {
+            background-color: #f1f2f6;
+            font-weight: bold;
+            height: auto;
+        }
+
+        th:first-child, td:first-child {
+            width: 15%;
+            background-color: #f1f2f6;
+            font-weight: bold;
+            vertical-align: middle;
+            height: auto;
+        }
+
+        /* 학교 및 학원 컨텐츠 아이템 스타일 */
+        .schedule-item {
+            padding: 6px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: white;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .type-school {
+            background-color: var(--secondary-color);
+            border-left: 4px solid #0984e3;
+        }
+
+        .type-academy {
+            background-color: #ffb142;
+            border-left: 4px solid #cc8e35;
+        }
+
+        .item-time {
+            font-size: 10px;
+            opacity: 0.8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* 3. 관리자 페이지(모달) 정렬 깨짐 수정 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        /* 입력 폼 정렬 */
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            grid-gap: 10px;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .button-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* 기존 데이터 리스트 관리 */
+        .data-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .del-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div class="main-wrapper">
-        <div class="calendar-container" id="calendar-grid"></div>
-        <div class="action-row"><button class="settings-btn" onclick="openAdmin()">⚙ 설정</button></div>
+
+<div class="container">
+    <header>
+        <h1>우리 딸 스마트 스케줄러</h1>
+        <button class="btn" onclick="toggleModal(true)">⚙ 설정</button>
+    </header>
+
+    <div class="scheduler-title-container">
+        <h2>📅 이번 주 전체 학습 및 학원 일정</h2>
     </div>
-    <div class="admin-modal" id="admin-modal">
-        <div class="modal-content">
-            <div class="modal-header"><h2>시간표 세부 관리</h2><button class="close-x-btn" onclick="closeAdmin()">×</button></div>
-            <div class="modal-body"><div class="card" id="school-card-container"></div><div id="academy-admin-container"></div></div>
-            <div class="modal-footer">
-                <button class="save-btn" onclick="saveData()">브라우저에 임시 저장 및 반영</button>
-                <div class="file-action-row">
-                    <button class="file-btn" onclick="exportDataJSON()">⚙ 현재 설정 파일로 저장</button>
-                    <label class="file-btn">📂 설정 파일 불러오기<input type="file" id="import-file-input" style="display:none;" onchange="importDataJSON(this)"></label>
-                </div>
-            </div>
+
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>시간 / 요일</th>
+                    <th>월</th>
+                    <th>화</th>
+                    <th>수</th>
+                    <th>목</th>
+                    <th>금</th>
+                </tr>
+            </thead>
+            <tbody id="scheduler-body">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="admin-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>## 시간표 세부 관리</h2>
+            <button class="close-btn" onclick="toggleModal(false)">&times;</button>
         </div>
+
+        <form id="schedule-form" onsubmit="saveSchedule(event)">
+            <div class="form-group">
+                <label for="item-type">구분</label>
+                <select id="item-type" required>
+                    <option value="school">학교 컨텐츠</option>
+                    <option value="academy">학원</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="item-day">요일</label>
+                <select id="item-day" required>
+                    <option value="월">월요일</option>
+                    <option value="화">화요일</option>
+                    <option value="수">수요일</option>
+                    <option value="목">목요일</option>
+                    <option value="금">금요일</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="item-period">교시 / 시간대</label>
+                <select id="item-period" required>
+                    <option value="1">1교시 (09:00~)</option>
+                    <option value="2">2교시 (10:00~)</option>
+                    <option value="3">3교시 (11:00~)</option>
+                    <option value="4">4교시 (12:00~)</option>
+                    <option value="5">5교시 (13:00~)</option>
+                    <option value="6">6교시 (14:00~)</option>
+                    <option value="7">7교시 (15:00~)</option>
+                    <option value="8">8교시 (16:00~)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="item-title">내용 (과목명 또는 학원명)</label>
+                <input type="text" id="item-title" placeholder="예: 수학학원, 국어" required>
+            </div>
+            <div class="form-group">
+                <label for="item-time-detail">상세 시간 표시 (선택)</label>
+                <input type="text" id="item-time-detail" placeholder="예: 15:30 ~ 17:00">
+            </div>
+
+            <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 10px;">브라우저에 임시 저장 및 반영</button>
+        </form>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+        <h3>설정 데이터 백업</h3>
+        <div class="button-group">
+            <button type="button" class="btn btn-secondary" onclick="downloadConfig()">⚙ 현재 설정 파일로 저장</button>
+            <button type="button" class="btn btn-secondary" onclick="triggerFileInput()">📂 설정 파일 불러오기</button>
+        </div>
+        <input type="file" id="file-input" style="display:none;" accept=".json" onchange="uploadConfig(event)">
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+
+        <h3>등록된 일정 리스트</h3>
+        <div id="current-items-list">
+            </div>
     </div>
-    <script>
-        const defaultData = {
-            "school": { "name": "학교", "icon": "🎒", "class": "item-school", "isCustom": true, "common": { "time": "09:00", "pHour": 4, "pMin": 40, "days": ["월", "화", "수", "목", "금"] }, "custom": { "월": { "time": "09:00", "h": 3, "m": 50 }, "화": { "time": "09:00", "h": 4, "m": 40 }, "수": { "time": "09:00", "h": 4, "m": 40 }, "목": { "time": "09:00", "h": 4, "m": 40 }, "금": { "time": "09:00", "h": 5, "m": 20 } } },
-            "academies": {
-                "taekwondo": { "name": "태권도", "icon": "🥋", "class": "item-taekwondo", "isCustom": false, "common": { "time": "17:00", "pHour": 1, "pMin": 0, "days": ["월", "수", "금"] }, "custom": { "월": { "time": "17:00", "h": 1, "m": 0 }, "화": { "time": "", "h": 1, "m": 0 }, "수": { "time": "17:00", "h": 1, "m": 0 }, "목": { "time": "", "h": 1, "m": 0 }, "금": { "time": "17:00", "h": 1, "m": 0 } } },
-                "math": { "name": "수학", "icon": "➗", "class": "item-math", "isCustom": true, "common": { "time": "16:30", "pHour": 2, "pMin": 20, "days": ["화", "수", "목"] }, "custom": { "월": { "time": "", "h": 2, "m": 20 }, "화": { "time": "16:30", "h": 2, "m": 20 }, "수": { "time": "14:00", "h": 2, "m": 20 }, "목": { "time": "16:30", "h": 2, "m": 20 }, "금": { "time": "", "h": 2, "m": 20 } } },
-                "english": { "name": "영어", "icon": "🔤", "class": "item-english", "isCustom": true, "common": { "time": "14:05", "pHour": 1, "pMin": 30, "days": ["월", "화", "목", "금"] }, "custom": { "월": { "time": "14:05", "h": 1, "m": 30 }, "화": { "time": "14:05", "h": 1, "m": 30 }, "수": { "time": "", "h": 1, "m": 30 }, "목": { "time": "14:05", "h": 1, "m": 30 }, "금": { "time": "14:05", "h": 1, "m": 30 } } },
-                "piano": { "name": "피아노", "icon": "🎹", "class": "item-piano", "isCustom": false, "common": { "time": "16:00", "pHour": 0, "pMin": 50, "days": ["월"] }, "custom": { "월": { "time": "16:00", "h": 0, "m": 50 }, "화": { "time": "", "h": 0, "m": 50 }, "수": { "time": "", "h": 0, "m": 50 }, "목": { "time": "", "h": 0, "m": 50 }, "금": { "time": "", "h": 0, "m": 50 } } },
-                "woongjin": { "name": "웅진", "icon": "📚", "class": "item-woongjin", "isCustom": false, "common": { "time": "16:00", "pHour": 1, "pMin": 0, "days": ["금"] }, "custom": { "월": { "time": "", "h": 1, "m": 0 }, "화": { "time": "", "h": 1, "m": 0 }, "수": { "time": "", "h": 1, "m": 0 }, "목": { "time": "", "h": 1, "m": 0 }, "금": { "time": "16:00", "h": 1, "m": 0 } } }
-            }
+</div>
+
+<script>
+    // 상태 상수를 정의 (월~금만 지원)
+    const DAYS = ['월', '화', '수', '목', '금'];
+    const PERIODS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+
+    // 샘플 데이터 초기값 세팅 (기존 데이터가 없을 때 기본 노출용)
+    const defaultData = [
+        { id: 1, type: 'school', day: '월', period: '1', title: '국어', timeDetail: '' },
+        { id: 2, type: 'school', day: '화', period: '2', title: '수학', timeDetail: '' },
+        { id: 3, type: 'academy', day: '월', period: '6', title: '영어 학원', timeDetail: '14:30~16:00' },
+        { id: 4, type: 'academy', day: '수', period: '7', title: '피아노 학원', timeDetail: '15:00~16:00' },
+    ];
+
+    // LocalStorage에서 데이터를 로드하거나 기본 데이터 할당
+    let scheduleData = JSON.parse(localStorage.getItem('scheduler_config')) || defaultData;
+
+    // 모달 토글기능
+    function toggleModal(show) {
+        const modal = document.getElementById('admin-modal');
+        if (show) {
+            modal.classList.add('show');
+            renderAdminList();
+        } else {
+            modal.classList.remove('show');
+        }
+    }
+
+    // 1. 학교 컨텐츠와 다른 학원들이 모두 보이도록 렌더링 로직 구성
+    function renderSchedule() {
+        const tbody = document.getElementById('scheduler-body');
+        tbody.innerHTML = '';
+
+        PERIODS.forEach(period => {
+            const tr = document.createElement('tr');
+            
+            // 첫 번째 열: 교시 표시
+            const tdPeriod = document.createElement('td');
+            tdPeriod.innerText = `${period}교시`;
+            tr.appendChild(tdPeriod);
+
+            // 월, 화, 수, 목, 금 열 생성
+            DAYS.forEach(day => {
+                const td = document.createElement('td');
+                
+                // 💡 중요: 학교(school)와 학원(academy) 조건 모두를 필터링하여 포함시킴
+                const items = scheduleData.filter(item => item.day === day && item.period === period);
+
+                items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `schedule-item type-${item.type}`; // school 또는 academy 클래스 자동 지정
+                    
+                    let content = `<strong>${item.title}</strong>`;
+                    if (item.timeDetail) {
+                        content += `<span class="item-time">${item.timeDetail}</span>`;
+                    }
+                    itemDiv.innerHTML = content;
+                    td.appendChild(itemDiv);
+                });
+
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 신규 일정 저장 기능
+    function saveSchedule(e) {
+        e.preventDefault();
+        
+        const type = document.getElementById('item-type').value;
+        const day = document.getElementById('item-day').value;
+        const period = document.getElementById('item-period').value;
+        const title = document.getElementById('item-title').value;
+        const timeDetail = document.getElementById('item-time-detail').value;
+
+        const newItem = {
+            id: Date.now(),
+            type,
+            day,
+            period,
+            title,
+            timeDetail
         };
 
-        const STORAGE_KEY = 'daughter_schedule_v12';
-        let currentData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
-        
-        function openAdmin() { buildAdminForm(); document.getElementById('admin-modal').classList.add('active'); }
-        function closeAdmin() { document.getElementById('admin-modal').classList.remove('active'); }
-        function calculateEndTime(e,t,n){if(!e)return"";let[h,m]=e.split(":").map(Number),o=60*h+m+60*parseInt(t)+parseInt(n);return`${String(Math.floor(o/60)%24).padStart(2,"0")}:${String(o%60).padStart(2,"0")}`}
-        
-        function generateFormHtml(e,t){
-            let n=["월","화","수","목","금"],
-            o=n.map(n=>{let o=t.common.days.includes(n)?"checked":"";return`<label><input type="checkbox" class="day-cb-${e}" value="${n}" ${o}>${n}</label>`}).join(""),
-            a=n.map(n=>{let o=t.custom[n]||{time:"",h:1,m:0};return`<div class="form-row-line"><label>${n}요일</label><div class="duration-input"><input type="time" id="time-${e}-${n}" value="${o.time}"><input type="number" id="h-${e}-${n}" value="${o.h}">시간<input type="number" id="m-${e}-${n}" value="${o.m}">분</div></div>`}).join("");
-            return`<div class="card-header-row"><h3><span>${t.icon}</span><span>${t.name} 설정</span></h3><label class="custom-toggle"><input type="checkbox" id="toggle-${e}" ${t.isCustom?"checked":""} onchange="toggleFormLayer('${e}')"> 요일별 개별 설정</label></div><div id="common-box-${e}" style="display: ${t.isCustom?"none":"block"};"><div class="form-group-block"><div class="form-row-line"><label>시간/소요</label><div class="duration-input"><input type="time" id="time-${e}-common" value="${t.common.time}"><input type="number" id="h-${e}-common" value="${t.common.pHour}">시간<input type="number" id="m-${e}-common" value="${t.common.pMin}">분</div></div></div><div class="form-group-block"><div class="form-row-line"><label>요일 선택</label><div class="checkbox-group">${o}</div></div></div></div><div id="custom-box-${e}" style="display: ${t.isCustom?"block":"none"};" class="custom-rows-container">${a}</div>`;
+        scheduleData.push(newItem);
+        updateStorageAndRefresh();
+        document.getElementById('schedule-form').reset();
+        renderAdminList();
+    }
+
+    // 일정 삭제 기능
+    function deleteItem(id) {
+        scheduleData = scheduleData.filter(item => item.id !== id);
+        updateStorageAndRefresh();
+        renderAdminList();
+    }
+
+    // 로컬스토리지 저장 및 화면 동기화
+    function updateStorageAndRefresh() {
+        localStorage.setItem('scheduler_config', JSON.stringify(scheduleData));
+        renderSchedule();
+    }
+
+    // 모달 내부의 현재 등록된 아이템 목록 렌더링
+    function renderAdminList() {
+        const listContainer = document.getElementById('current-items-list');
+        listContainer.innerHTML = '';
+
+        if (scheduleData.length === 0) {
+            listContainer.innerHTML = '<p style="color: #999; font-size:14px;">등록된 일정이 없습니다.</p>';
+            return;
         }
-        
-        function buildAdminForm(){document.getElementById('school-card-container').innerHTML=generateFormHtml('school',currentData.school);const e=document.getElementById('academy-admin-container');e.innerHTML='';for(let t in currentData.academies){let n=document.createElement('div');n.className='card',n.innerHTML=generateFormHtml(t,currentData.academies[t]),e.appendChild(n)}}
-        function toggleFormLayer(e){let t=document.getElementById('toggle-'+e).checked;document.getElementById('common-box-'+e).style.display=t?'none':'block',document.getElementById('custom-box-'+e).style.display=t?'block':'none'}
-        
-        function pullFormData(e,t){
-            t.isCustom=document.getElementById(`toggle-${e}`).checked;
-            t.common.time=document.getElementById(`time-${e}-common`).value;
-            t.common.pHour=parseInt(document.getElementById(`h-${e}-common`).value)||0;
-            t.common.pMin=parseInt(document.getElementById(`m-${e}-common`).value)||0;
-            let n=[];document.querySelectorAll(`.day-cb-${e}:checked`).forEach(e=>n.push(e.value));t.common.days=n;
-            ["월","화","수","목","금"].forEach(n=>{
-                t.custom[n].time=document.getElementById(`time-${e}-${n}`).value;
-                t.custom[n].h=parseInt(document.getElementById(`h-${e}-${n}`).value)||0;
-                t.custom[n].m=parseInt(document.getElementById(`m-${e}-${n}`).value)||0;
-            });
+
+        // 최신순 정렬 노출
+        [...scheduleData].reverse().forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'data-list-item';
+            const typeText = item.type === 'school' ? '[학교]' : '[학원]';
+            div.innerHTML = `
+                <span>${typeText} ${item.day}요일 ${item.period}교시 - ${item.title}</span>
+                <button class="del-btn" onclick="deleteItem(${item.id})">삭제</button>
+            `;
+            listContainer.appendChild(div);
+        });
+    }
+
+    // 5. 설정파일 내려받기 기능 정상화
+    function downloadConfig() {
+        if (scheduleData.length === 0) {
+            alert('저장할 데이터가 없습니다.');
+            return;
         }
+        const dataStr = JSON.stringify(scheduleData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
         
-        function saveData(){pullFormData('school',currentData.school);for(let e in currentData.academies)pullFormData(e,currentData.academies[e]);localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData)),closeAdmin(),renderSchedule()}
-        function exportDataJSON(){pullFormData('school',currentData.school);for(let e in currentData.academies)pullFormData(e,currentData.academies[e]);let e=JSON.stringify(currentData,null,4),t=new Blob([e],{type:"text/plain;charset=utf-8"}),n=URL.createObjectURL(t),o=document.createElement('a');o.href=n,o.download="daughter_schedule.txt",o.click(),URL.revokeObjectURL(n)}
-        function importDataJSON(e){let t=e.files[0];if(!t)return;let n=new FileReader();n.onload=function(e){try{let t=JSON.parse(e.target.result);t.school&&t.academies?(currentData=t,localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData)),alert("설정 파일을 성공적으로 불러왔습니다!"),buildAdminForm(),renderSchedule()):alert("올바른 설정 파일 형식이 아닙니다.")}catch(e){alert("파일 파싱 실패.")}},n.readAsText(t)}
-        function getRowIndex(e,t){let[n,o]=e.split(':').map(Number),a=60*n+o-60*t;return a<0?0:Math.floor(a/10)}
-        
-        function renderSchedule(){
-            const e=['월','화','수','목','금'];let t=9,n=17;
-            e.forEach(e=>{
-                let o=currentData.school;
-                if(o.isCustom&&o.custom[e]?.time){
-                    let a=parseInt(o.custom[e].time.split(':')[0]),i=parseInt(calculateEndTime(o.custom[e].time,o.custom[e].h,o.custom[e].m).split(':')[0]);a<t&&(t=a),i>n&&(n=i)
-                }else if(!o.isCustom&&o.common.days.includes(e)&&o.common.time){
-                    let a=parseInt(o.common.time.split(':')[0]),i=parseInt(calculateEndTime(o.common.time,o.common.pHour,o.common.pMin).split(':')[0]);a<t&&(t=a),i>n&&(n=i)}
-                for(let a in currentData.academies){
-                    let i=currentData.academies[a];
-                    if(i.isCustom&&i.custom[e]?.time){
-                        let r=parseInt(i.custom[e].time.split(':')[0]),c=parseInt(calculateEndTime(i.custom[e].time,i.custom[e].h,i.custom[e].m).split(':')[0]);r<t&&(t=r),c>n&&(n=c)
-                    }else if(!i.isCustom&&i.common.days.includes(e)&&i.common.time){
-                        let r=parseInt(i.common.time.split(':')[0]),c=parseInt(calculateEndTime(i.common.time,i.common.pHour,i.common.pMin).split(':')[0]);r<t&&(t=r),c>n&&(n=c)
-                    }
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `스마트_스케줄러_설정파일_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // 5. 설정파일 올리기 기능 구현
+    function triggerFileInput() {
+        document.getElementById('file-input').click();
+    }
+
+    function uploadConfig(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsedData = JSON.parse(e.target.result);
+                
+                // 데이터 유효성 약식 검증 (배열 형태인지 확인)
+                if (Array.isArray(parsedData)) {
+                    scheduleData = parsedData;
+                    updateStorageAndRefresh();
+                    renderAdminList();
+                    alert('설정 파일을 정상적으로 불러와 반영했습니다.');
+                } else {
+                    alert('올바르지 않은 파일 구조입니다. 스케줄러 설정 JSON 파일을 선택해주세요.');
                 }
-            });
-            let o=n-t+1,a=6*o;const i=document.getElementById('calendar-grid');i.innerHTML='';let r=document.createElement('div');r.className='grid-header time-axis-title',r.innerText='시간',i.appendChild(r);e.forEach(e=>{let t=document.createElement('div');t.className='grid-header',t.innerText=e,i.appendChild(t)});let c=[];for(let e=0;e<a;e++)c[e]={axis:null,columns:[null,null,null,null,null]};
-            let l=(t_obj,n_school)=>{
-                e.forEach((e,o)=>{
-                    let a=!1,i='',r=0,c_min=0;
-                    if(t_obj.isCustom&&t_obj.custom[e]?.time?(i=t_obj.custom[e].time,r=t_obj.custom[e].h,c_min=t_obj.custom[e].m,a=!0):!t_obj.isCustom&&t_obj.common.days.includes(e)&&t_obj.common.time&&(i=t_obj.common.time,r=t_obj.common.pHour,c_min=t_obj.common.pMin,a=!0),a&&i){
-                        let l_idx=getRowIndex(i,t),s=60*r+c_min,d=Math.ceil(s/10),m=calculateEndTime(i,r,c_min);
-                        if(l_idx<a){c[l_idx].columns[o]={type:"event",span:d,name:n_school?"학교":t_obj.name,icon:t_obj.icon,class:t_obj.class,start:i,end:m};for(let e=1;e<d;e++)l_idx+e<a&&(c[l_idx+e].columns[o]={type:"occupied"})}
-                    }
-                })
-            };
-            l(currentData.school,!0);for(let e in currentData.academies)l(currentData.academies[e],!1);
-            for(let n_r=0;n_r<a;n_r++){
-                if(n_r%6==0){let e=t+n_r/6,o=document.createElement('div');o.className='time-cell',o.innerText=`${e}시`,o.style.gridRow=`${n_r+2} / span 6`,o.style.gridColumn='1',i.appendChild(o)}
-                for(let o_c=0;o_c<5;o_c++){
-                    let e=c[n_r].columns[o_c];
-                    if(null===e){let t=document.createElement('div');t.className='empty-grid-cell';(n_r+1)%6==0&&t.classList.add('hour-boundary');t.style.gridRow=`${n_r+2}`;t.style.gridColumn=`${o_c+2}`;i.appendChild(t)}
-                    else'event'===e.type&&((item=document.createElement('div')).className=`box-item ${e.class}`,item.style.gridRow=`${n_r+2} / span ${e.span}`,item.style.gridColumn=`${o_c+2}`,item.innerHTML=`<div class="box-title-row"><span>${e.icon}</span><span>${e.name}</span></div><div class="box-time"><span>${e.start}</span><span class="end-time">${e.end}</span></div>`,i.appendChild(item))
-                }
+            } catch (err) {
+                alert('파일을 읽는 중 오류가 발생했습니다. JSON 형식을 확인해 주세요.');
             }
-        }
-        window.onload=function(){renderSchedule()};
-    </script>
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // 동일 파일 재업로드 가능하도록 초기화
+    }
+
+    // 초기 실행시 화면 렌더링
+    window.onload = function() {
+        renderSchedule();
+    };
+</script>
 </body>
 </html>
