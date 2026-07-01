@@ -11,21 +11,18 @@
             --primary: #4f46e5;
             --primary-hover: #4338ca;
             --secondary: #6b7280;
-            --secondary-hover: #4b5563;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
             --text-main: #1f2937;
             --text-sub: #4b5563;
             --text-muted: #9ca3af;
             --radius-lg: 20px;
             --radius-md: 12px;
             --radius-sm: 8px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            --shadow-card: 0 20px 35px -10px rgba(79, 70, 229, 0.12), 0 10px 15px -5px rgba(0, 0, 0, 0.06);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 20px 35px -10px rgba(79, 70, 229, 0.12);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
             margin: 0;
@@ -44,7 +41,7 @@
             box-sizing: border-box;
         }
 
-        /* 내비게이션 & 헤더 */
+        /* 메인 홈 링크 (상단 메뉴 이동용) */
         .nav-home {
             margin-bottom: 16px;
         }
@@ -53,13 +50,6 @@
             color: var(--text-sub);
             font-weight: 600;
             font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: color 0.2s;
-        }
-        .nav-home a:hover {
-            color: var(--primary);
         }
 
         header {
@@ -70,24 +60,21 @@
         h1 {
             font-size: 26px;
             font-weight: 800;
-            color: var(--text-main);
             margin: 0;
             background: linear-gradient(to right, #4f46e5, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* 섹션 공통 카드 스타일 */
         .section-panel {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             padding: 20px;
             margin-bottom: 18px;
             box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* BONG HUB 링크 메뉴 */
+        /* 외부 스케줄 링크 */
         .menu-item {
             display: flex;
             align-items: center;
@@ -98,18 +85,9 @@
             padding: 16px;
             border-radius: var(--radius-md);
             font-weight: 700;
-            font-size: 15px;
             border: 1px solid #e2e8f0;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .menu-item:hover {
-            background: #f1f5f9;
-            border-color: #cbd5e1;
-            transform: translateY(-1px);
-        }
-
-        /* HSK 급수 섹션 */
         .hsk-header {
             display: flex;
             justify-content: space-between;
@@ -117,16 +95,8 @@
             margin-bottom: 12px;
         }
 
-        .hsk-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .hsk-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .hsk-title { font-size: 16px; font-weight: 800; }
+        .hsk-desc { font-size: 12px; color: var(--text-muted); }
 
         .mode-buttons {
             display: flex;
@@ -146,10 +116,6 @@
             transition: all 0.2s;
         }
 
-        .mode-btn:hover {
-            background: #f3f4f6;
-        }
-
         .mode-btn.active {
             background: var(--primary);
             color: white;
@@ -157,7 +123,7 @@
             box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
         }
 
-        /* 단어 카드 디자인 대폭 개선 */
+        /* 단어 카드 영역: 덮임 방지 및 큰 글씨 라인 높이 확보 */
         .word-card-container {
             margin: 24px 0;
         }
@@ -165,36 +131,30 @@
         .card {
             background: var(--card-bg);
             border-radius: var(--radius-lg);
-            height: 240px;
+            height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             box-shadow: var(--shadow-card);
-            transition: transform 0.25s, box-shadow 0.25s;
             position: relative;
             
-            /* 가려짐 전면 차단 */
+            /* 한자 가려짐 방지 여백 확보 */
             padding: 40px 24px 24px 24px; 
             box-sizing: border-box;
             overflow: visible; 
             border: 1px solid rgba(79, 70, 229, 0.05);
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 25px 45px -10px rgba(79, 70, 229, 0.18);
-        }
-
         .word-text {
-            font-size: 46px;
+            font-size: 50px;
             font-weight: 800;
             color: #0f172a;
             margin: 0 0 16px 0;
             text-align: center;
-            line-height: 1.4; /* 위 공간 여유 제공 */
-            letter-spacing: 0px;
+            line-height: 1.4; /* 상단 자모음/획 잘림 방지 */
+            word-break: break-all;
         }
 
         .meaning-text {
@@ -210,7 +170,7 @@
             align-items: center;
         }
 
-        /* 하단 컨트롤 패널 슬라이더 및 버튼 디자인 조정 */
+        /* 하단 컨트롤러 패널 */
         .slider-group {
             display: flex;
             flex-direction: column;
@@ -219,7 +179,6 @@
             background: #f8fafc;
             padding: 12px 16px;
             border-radius: var(--radius-md);
-            border: 1px solid #f1f5f9;
         }
 
         .slider-label {
@@ -227,12 +186,9 @@
             justify-content: space-between;
             font-weight: 700;
             font-size: 14px;
-            color: var(--text-sub);
         }
         
-        #speedValue {
-            color: var(--primary);
-        }
+        #speedValue { color: var(--primary); }
 
         .control-slider {
             width: 100%;
@@ -250,21 +206,12 @@
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
-            transition: transform 0.1s;
-        }
-        .control-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
         }
 
         .btn-row {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
-        }
-
-        .btn-row:last-child {
-            margin-bottom: 0;
         }
 
         .btn {
@@ -282,36 +229,10 @@
             gap: 6px;
         }
 
-        .btn-primary { 
-            background: var(--primary); 
-            color: white; 
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
-        }
-        .btn-primary:hover { 
-            background: var(--primary-hover); 
-            transform: translateY(-1px);
-        }
-        
-        .btn-danger { 
-            background: var(--danger); 
-            color: white;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-        }
-        .btn-danger:hover { 
-            background: var(--danger-hover); 
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary { 
-            background: #ffffff; 
-            color: var(--text-sub);
-            border: 1px solid #e2e8f0;
-        }
-        .btn-secondary:hover { 
-            background: #f8fafc;
-            color: var(--text-main);
-            border-color: #cbd5e1;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-secondary { background: #ffffff; color: var(--text-sub); border: 1px solid #e2e8f0; }
+        .btn-secondary:hover { background: #f8fafc; }
     </style>
 </head>
 <body>
@@ -323,7 +244,7 @@
         <h1>HSK 단어 마스터</h1>
     </header>
 
-    <!-- 📅 BONG HUB 메뉴 링크 -->
+    <!-- 📅 스케줄 바로가기 메뉴 -->
     <div class="section-panel">
         <a href="daughter-schedule.html" class="menu-item">
             <span>📅 딸 스케줄 확인</span>
@@ -331,56 +252,55 @@
         </a>
     </div>
 
-    <!-- HSK 급수선택 모듈 피드 피드백 반영 리디자인 -->
+    <!-- HSK 급수 및 모드 선택 영역 -->
     <div class="section-panel">
         <div class="hsk-header">
             <div class="hsk-title">🇨🇳 HSK 1급</div>
-            <div class="hsk-desc">필수 150단어 마스터</div>
+            <div class="hsk-desc">필수 150단어</div>
         </div>
         <div class="mode-buttons">
-            <button class="mode-btn active" onclick="changeLevel(1, 'study')">📖 학습 모드</button>
-            <button class="mode-btn" onclick="changeLevel(1, 'quiz')">💡 퀴즈 모드</button>
+            <button class="mode-btn active" data-level="1" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
+            <button class="mode-btn" data-level="1" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
         </div>
     </div>
 
     <div class="section-panel">
         <div class="hsk-header">
             <div class="hsk-title">🇨🇳 HSK 2급</div>
-            <div class="hsk-desc">필수 150단어 완벽 정복</div>
+            <div class="hsk-desc">필수 150단어</div>
         </div>
         <div class="mode-buttons">
-            <button class="mode-btn" onclick="changeLevel(2, 'study')">📖 학습 모드</button>
-            <button class="mode-btn" onclick="changeLevel(2, 'quiz')">💡 퀴즈 모드</button>
+            <button class="mode-btn" data-level="2" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
+            <button class="mode-btn" data-level="2" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
         </div>
     </div>
 
     <div class="section-panel">
         <div class="hsk-header">
             <div class="hsk-title">🇨🇳 HSK 3급</div>
-            <div class="hsk-desc">필수 300단어 마스터</div>
+            <div class="hsk-desc">필수 300단어</div>
         </div>
         <div class="mode-buttons">
-            <button class="mode-btn" onclick="changeLevel(3, 'study')">📖 학습 모드</button>
-            <button class="mode-btn" onclick="changeLevel(3, 'quiz')">💡 퀴즈 모드</button>
+            <button class="mode-btn" data-level="3" data-mode="study" onclick="selectLevelMode(this)">📖 학습 모드</button>
+            <button class="mode-btn" data-level="3" data-mode="quiz" onclick="selectLevelMode(this)">💡 퀴즈 모드</button>
         </div>
     </div>
 
-    <!-- 단어 카드 파트 -->
+    <!-- 단어 카드 본체 -->
     <div class="word-card-container">
         <div class="card" id="wordCard" onclick="flipCard()">
-            <div class="word-text" id="displayWord">HSK 시작하기</div>
-            <div class="meaning-text" id="displayMeaning">메뉴나 재생을 선택하세요</div>
+            <div class="word-text" id="displayWord">로딩 중...</div>
+            <div class="meaning-text" id="displayMeaning">급수를 선택해 주세요</div>
         </div>
     </div>
 
-    <!-- 설정 및 컨트롤 패널 -->
+    <!-- 속도조절(하한 0.2) 및 제어 패널 -->
     <div class="section-panel" style="padding: 16px;">
         <div class="slider-group">
             <div class="slider-label">
                 <span>속도조절</span>
                 <span id="speedValue">0.8x</span>
             </div>
-            <!-- 속도조절 하한선 0.2 유지 -->
             <input type="range" id="speedSlider" class="control-slider" min="0.2" max="2.0" step="0.1" value="0.8" oninput="updateSpeed(this.value)">
         </div>
 
@@ -398,44 +318,80 @@
 </div>
 
 <script>
-    // 기존 핵심 데이터 구조 유지
-    let currentWords = [
-        { hanja: "📈 HSK 단어장", meaning: "원하는 급수의 모드를 클릭해 주세요" },
-        { hanja: "谢谢", meaning: "고맙다, 감사합니다" },
-        { hanja: "再见", meaning: "안녕히 가세요, 다시 만납시다" },
-        { hanja: "高兴", meaning: "기쁘다, 즐겁다" },
-        { hanja: "苹果", meaning: "사과" }
-    ];
-
+    // JSON으로부터 동적으로 받아와 담길 단어 저장 공간
+    let allLoadedWords = []; 
     let currentIndex = 0;
     let autoPlayTimer = null;
     let isFlipped = false;
     let currentSpeed = 0.8;
+    let currentLevel = 1;
+    let currentMode = 'study';
 
     const displayWord = document.getElementById('displayWord');
     const displayMeaning = document.getElementById('displayMeaning');
     const speedValue = document.getElementById('speedValue');
 
-    function renderCard() {
-        if (currentWords.length > 0 && currentWords[currentIndex]) {
-            const item = currentWords[currentIndex];
-            displayWord.textContent = item.hanja;
+    // [핵심] JSON 파일 연동 기능 함수
+    async function loadJsonData(level) {
+        stopAutoPlay();
+        try {
+            // 프로젝트 내 json 경로에 맞게 매칭 (예: hsk1.json, hsk2.json ...)
+            // 만약 경로명 형식이 다르다면 이 부분을 원래대로 변경해주세요. (예: `data/hsk${level}.json`)
+            const response = await fetch(`data/hsk${level}.json`);
+            if (!response.ok) throw new Error("JSON 파일을 불러올 수 없습니다.");
             
-            if (isFlipped) {
-                displayMeaning.textContent = item.meaning;
-                displayMeaning.style.background = "#e0e7ff";
-                displayMeaning.style.color = "var(--primary)";
-            } else {
-                displayMeaning.textContent = "클릭하여 뜻 보기";
-                displayMeaning.style.background = "#f1f5f9";
-                displayMeaning.style.color = "var(--text-sub)";
-            }
+            allLoadedWords = await response.json();
+            currentIndex = 0;
+            isFlipped = (currentMode === 'study');
+            renderCard();
+        } catch (error) {
+            console.error(error);
+            displayWord.textContent = "오류 발생";
+            displayMeaning.textContent = "JSON 데이터를 확인해 주세요";
+        }
+    }
+
+    function renderCard() {
+        if (allLoadedWords.length === 0) return;
+        
+        const item = allLoadedWords[currentIndex];
+        // 기존 json 파일의 key 구조(예: word / meaning 또는 hanja / mean 등)에 맞게 매칭 필요
+        // 통상적인 json 포맷인 'word'(한자)와 'meaning'(뜻) 구조 기준 처리
+        displayWord.textContent = item.word || item.hanja || "데이터 없음";
+        
+        if (isFlipped) {
+            displayMeaning.textContent = item.meaning || item.mean || "뜻 없음";
+            displayMeaning.style.background = "#e0e7ff";
+            displayMeaning.style.color = "var(--primary)";
+        } else {
+            displayMeaning.textContent = "클릭하여 뜻 보기";
+            displayMeaning.style.background = "#f1f5f9";
+            displayMeaning.style.color = "var(--text-sub)";
         }
     }
 
     function flipCard() {
         isFlipped = !isFlipped;
         renderCard();
+    }
+
+    // 급수 및 모드 토글 선택 시 동작
+    function selectLevelMode(element) {
+        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+
+        const newLevel = parseInt(element.getAttribute('data-level'));
+        currentMode = element.getAttribute('data-mode');
+
+        // 급수가 바뀌었을 때만 JSON을 새로 Fetch
+        if (newLevel !== currentLevel || allLoadedWords.length === 0) {
+            currentLevel = newLevel;
+            loadJsonData(currentLevel);
+        } else {
+            currentIndex = 0;
+            isFlipped = (currentMode === 'study');
+            renderCard();
+        }
     }
 
     function updateSpeed(val) {
@@ -449,6 +405,8 @@
 
     function startAutoPlay() {
         stopAutoPlay();
+        if (allLoadedWords.length === 0) return;
+        
         const intervalTime = 2500 / currentSpeed; 
 
         autoPlayTimer = setInterval(() => {
@@ -456,8 +414,8 @@
             renderCard();
             
             setTimeout(() => {
-                isFlipped = false;
-                currentIndex = (currentIndex + 1) % currentWords.length;
+                isFlipped = (currentMode === 'study');
+                currentIndex = (currentIndex + 1) % allLoadedWords.length;
                 renderCard();
             }, intervalTime * 0.4);
 
@@ -472,35 +430,24 @@
     }
 
     function shuffleWords() {
-        currentWords.sort(() => Math.random() - 0.5);
+        if (allLoadedWords.length === 0) return;
+        allLoadedWords.sort(() => Math.random() - 0.5);
         currentIndex = 0;
-        isFlipped = false;
+        isFlipped = (currentMode === 'study');
         renderCard();
     }
 
     function resetCards() {
         currentIndex = 0;
-        isFlipped = false;
+        isFlipped = (currentMode === 'study');
         stopAutoPlay();
         renderCard();
     }
 
-    function changeLevel(level, mode) {
-        // 급수 디자인 온오프 액티브 연동 로직
-        const eventBtn = event.currentTarget;
-        const parent = eventBtn.closest('.section-panel');
-        
-        // 전체 active 클래스 초기화 후 타겟 지정 활성화
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        eventBtn.classList.add('active');
-
-        currentIndex = 0;
-        isFlipped = (mode === 'study'); 
-        renderCard();
-    }
-
-    isFlipped = true;
-    renderCard();
+    // 초기 구동 시 HSK 1급 JSON 자동 로드
+    window.addEventListener('DOMContentLoaded', () => {
+        loadJsonData(1);
+    });
 </script>
 
 </body>
