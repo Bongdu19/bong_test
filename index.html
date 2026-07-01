@@ -14,7 +14,6 @@
             --primary-hover: #4f46e5;
             --accent-red: #ef4444;
             --accent-yellow: #f59e0b;
-            --accent-green: #10b981;
             --border-color: #e2e8f0;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             --font-zh: "PingFang SC", "Microsoft YaHei", "SimHei", sans-serif;
@@ -23,7 +22,7 @@
         body { 
             font-family: var(--font-family); 
             background-color: var(--bg-main); 
-            padding: 0 0 100px 0; 
+            padding: 0 0 85px 0; /* 하단 바 두께 축소에 맞춤 */
             margin: 0; 
             color: var(--text-main);
             letter-spacing: -0.02em;
@@ -31,117 +30,115 @@
         }
         
         /* 홈 메인 허브 스타일 */
-        .hub-container { max-width: 900px; margin: 40px auto; padding: 0 24px; text-align: center; }
-        .hub-title { font-size: 42px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; letter-spacing: -0.04em; background: linear-gradient(to right, #4f46e5, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hub-subtitle { font-size: 16px; color: var(--text-sub); margin-bottom: 32px; font-weight: 500; }
-        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-        .hub-card { background: var(--bg-card); border-radius: 20px; padding: 32px 24px; text-align: center; text-decoration: none; color: inherit; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02), 0 8px 10px -6px rgba(0,0,0,0.02); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid var(--border-color); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .hub-card:hover { transform: translateY(-6px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border-color: transparent; }
-        .hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px; }
+        .hub-container { max-width: 900px; margin: 30px auto; padding: 0 20px; text-align: center; }
+        .hub-title { font-size: 38px; font-weight: 800; color: var(--text-main); margin-bottom: 6px; letter-spacing: -0.04em; background: linear-gradient(to right, #4f46e5, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hub-subtitle { font-size: 15px; color: var(--text-sub); margin-bottom: 24px; font-weight: 500; }
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .hub-card { background: var(--bg-card); border-radius: 16px; padding: 24px 20px; text-align: center; text-decoration: none; color: inherit; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.25s ease; border: 1px solid var(--border-color); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .hub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.06); }
+        .hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; }
         .hub-card.schedule::before { background: linear-gradient(to right, #ff7b7b, #ff6b6b); }
         .hub-card.hsk::before { background: linear-gradient(to right, #6366f1, #ef4444); }
-        .hub-card h3 { margin: 0 0 12px 0; font-size: 22px; font-weight: 700; color: var(--text-main); }
-        .hub-card p { margin: 0; font-size: 14px; color: var(--text-sub); line-height: 1.6; }
-        .hub-card strong { display: inline-block; margin-top: 12px; font-size: 12px; color: var(--primary); background: #f0fdf4; padding: 4px 10px; border-radius: 8px; font-weight: 600; }
+        .hub-card h3 { margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
+        .hub-card p { margin: 0; font-size: 13px; color: var(--text-sub); line-height: 1.5; }
+        .hub-card strong { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--primary); background: #f0fdf4; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
 
-        /* HSK 상단 플로팅 바 컴팩트화 */
-        #hskViewContainer { display: none; max-width: 800px; margin: 0 auto; padding: 0 12px; }
-        .header-wrap { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; }
-        .btn-home { background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-        h2 { text-align: center; color: var(--text-main); margin: 0; font-size: 18px; font-weight: 800; flex-grow: 1; letter-spacing: -0.03em; }
+        /* [크기 축소] 상단 헤더 / 필터 슬림화 */
+        #hskViewContainer { display: none; max-width: 760px; margin: 0 auto; padding: 0 10px; }
+        .header-wrap { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-color); margin-bottom: 8px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; }
+        .btn-home { background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
+        h2 { text-align: center; color: var(--text-main); margin: 0; font-size: 16px; font-weight: 800; flex-grow: 1; }
         
-        .filter-container { text-align: center; padding-bottom: 8px; }
-        .filter-container select { padding: 6px 12px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 600; color: var(--text-main); background-color: #ffffff; outline: none; }
+        .filter-container { text-align: center; padding-bottom: 6px; }
+        .filter-container select { padding: 4px 10px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600; color: var(--text-main); background-color: #ffffff; outline: none; }
         
-        .tabs { display: flex; padding: 0 8px; gap: 4px; }
-        .tab { flex: 1; text-align: center; padding: 10px 0; font-weight: 700; color: var(--text-sub); cursor: pointer; background: #f8fafc; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none; font-size: 13px; }
+        .tabs { display: flex; padding: 0 4px; gap: 4px; }
+        .tab { flex: 1; text-align: center; padding: 8px 0; font-weight: 700; color: var(--text-sub); cursor: pointer; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1px solid var(--border-color); border-bottom: none; font-size: 13px; }
         .tab.active { color: var(--primary); background: #ffffff; position: relative; }
         .tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: #ffffff; }
 
-        .view { display: none; padding: 4px 0; }
+        .view { display: none; padding: 2px 0; }
         .view.active { display: block; }
         .zh-font { font-family: var(--font-zh); font-weight: 600; }
 
-        /* [학습 모드] 원래 세로형 복구 + 컴팩트 압축 레이아웃 */
-        .card { background: var(--bg-card); border-radius: 16px; padding: 14px 18px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid var(--border-color); transition: all 0.2s ease; position: relative; }
+        /* [학습 모드] 세로축 압축형 단어 카드 */
+        .card { background: var(--bg-card); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); border: 1px solid var(--border-color); transition: all 0.2s ease; position: relative; }
         .card.active { background-color: #fefcf0; border-color: var(--accent-yellow); }
         .card.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
         
-        /* 카드 헤더: 번호+한자 / 발음버튼 한줄 배치 */
-        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 8px; }
-        .hanzi-box { display: flex; flex-direction: column; gap: 2px; }
-        .hanzi { font-size: 42px; color: var(--text-main); font-weight: 800; line-height: 1; } /* 큰 글씨 유지 */
+        /* 1열: 번호 + 대왕한자 + 오답마크 / 우측 발음버튼 우측 정렬 */
+        .card-row-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .hanzi { font-size: 46px; color: var(--text-main); font-weight: 800; line-height: 1; } /* 대왕한자 확대 크기 유지 */
+        .play-btn { background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
         
-        /* 발음 영역과 독음을 한줄에 묶음 */
-        .pinyin-row { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
-        .pinyin { color: #2563eb; font-size: 18px; font-weight: 700; font-family: var(--font-family); }
-        .ko-pron { color: var(--text-sub); font-size: 14px; font-weight: 500; }
-        .play-btn { background-color: #10b981; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        /* 2열: 성조 병음과 독음 가로 결합 (세로줄 절약) */
+        .pinyin-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+        .pinyin { color: #2563eb; font-size: 20px; font-weight: 700; font-family: var(--font-family); } /* 읽기 쉽게 확대 */
+        .ko-pron { color: var(--text-sub); font-size: 15px; font-weight: 600; }
         
-        /* 뜻 및 부수 영역 */
-        .meaning-box { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .meaning { font-size: 24px; font-weight: 800; color: #dc2626; letter-spacing: -0.02em; } /* 큰 글씨 유지 */
-        .hanja { font-size: 12px; color: var(--text-sub); background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-weight: 600; border: 1px solid var(--border-color); }
+        /* 3열: 뜻과 한국어 한자 한줄 결합 */
+        .meaning-box { margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .meaning { font-size: 24px; font-weight: 800; color: #dc2626; line-height: 1.1; } /* 뜻 확대 크기 유지 */
+        .hanja { font-size: 11px; color: var(--text-sub); background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-weight: 600; border: 1px solid var(--border-color); }
         
-        /* 부수/팁 박스 슬림화 */
-        .tip-box { background: #fffdf2; padding: 6px 12px; border-left: 3px solid var(--accent-yellow); border-radius: 6px; border: 1px solid #fef3c7; border-left: 3px solid var(--accent-yellow); margin-bottom: 6px; }
-        .tip-item { font-size: 13px; color: #334155; line-height: 1.5; }
+        /* 4열: 부수 팁 상자 압축 (여백 최소화) */
+        .tip-box { background: #fffdf2; padding: 4px 10px; border-left: 3px solid var(--accent-yellow); border-radius: 4px; border: 1px solid #fef3c7; border-left: 3px solid var(--accent-yellow); margin-bottom: 4px; }
+        .tip-item { font-size: 13px; color: #334155; line-height: 1.4; }
         
-        /* 예문 상자 슬림화 */
-        .ex-box { background: #f8fafc; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); }
-        .ex-zh { font-size: 17px; color: var(--text-main); font-weight: 600; line-height: 1.3; }
-        .ex-pinyin-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; font-size: 13px; }
+        /* 5열: 예문 상자 패딩 압축 */
+        .ex-box { background: #f8fafc; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .ex-zh { font-size: 18px; color: var(--text-main); font-weight: 600; line-height: 1.2; }
+        .ex-pinyin-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; font-size: 13px; line-height: 1.2; }
         .ex-pinyin { color: #4b5563; font-weight: 500; }
         .ex-mean { color: var(--text-sub); font-weight: 500; }
 
-        /* 하단 제어 바 슬림화 */
-        .bottom-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); padding: 8px 16px; box-shadow: 0 -5px 20px rgba(0,0,0,0.04); z-index: 1000; border-top: 1px solid var(--border-color); }
-        .speed-control { text-align: center; margin-bottom: 6px; font-size: 12px; font-weight: 700; color: var(--text-main); }
-        .speed-control input[type=range] { vertical-align: middle; width: 50%; margin-left: 8px; accent-color: var(--primary); }
-        .btn-group { display: flex; justify-content: center; gap: 8px; max-width: 500px; margin: 0 auto; }
-        .btn-group button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; color: white; cursor: pointer; }
+        /* [크기 축소] 하단 자동 재생 바 슬림화 */
+        .bottom-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 6px 12px; box-shadow: 0 -3px 15px rgba(0,0,0,0.03); z-index: 1000; border-top: 1px solid var(--border-color); }
+        .speed-control { text-align: center; margin-bottom: 4px; font-size: 12px; font-weight: 700; color: var(--text-main); }
+        .speed-control input[type=range] { vertical-align: middle; width: 50%; margin-left: 6px; accent-color: var(--primary); }
+        .btn-group { display: flex; justify-content: center; gap: 8px; max-width: 450px; margin: 0 auto; }
+        .btn-group button { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; color: white; cursor: pointer; }
         #mainPlayBtn { background-color: var(--primary); } 
         #mainPlayBtn.paused { background-color: var(--accent-yellow); } 
-        #stopBtn { background-color: #64748b; max-width: 900px; flex: 0 0 80px; }
+        #stopBtn { background-color: #64748b; max-width: 70px; }
 
-        /* 퀴즈 모드 카드 레이아웃 축소 */
-        .quiz-controls { text-align: center; margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; }
-        .btn-quiz { background-color: #2563eb; color: white; border: none; border-radius: 10px; padding: 10px; flex: 1; font-size: 14px; font-weight: 700; cursor: pointer; }
-        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; padding-bottom: 40px; }
-        .flip-card { background-color: transparent; width: 100%; height: 260px; perspective: 1000px; cursor: pointer; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        /* [퀴즈 모드] 카드 레이아웃 압축 보정 */
+        .quiz-controls { text-align: center; margin-bottom: 10px; display: flex; justify-content: center; gap: 6px; }
+        .btn-quiz { background-color: #2563eb; color: white; border: none; border-radius: 8px; padding: 8px; flex: 1; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding-bottom: 30px; }
+        .flip-card { background-color: transparent; width: 100%; height: 250px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s ease; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); overflow: hidden; border: 1px solid var(--border-color); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.02); overflow: hidden; border: 1px solid var(--border-color); }
         
         .flip-card-front { background-color: #ffffff; }
         .flip-card-front.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
-        .flip-card-front .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
-        .flip-card-front .wrong-badge { position: absolute; top: 6px; right: 8px; font-size: 14px; display: none; }
+        .flip-card-front .index-num { position: absolute; top: 6px; left: 8px; font-size: 11px; color: #94a3b8; font-weight: 700; }
+        .flip-card-front .wrong-badge { position: absolute; top: 5px; right: 6px; font-size: 13px; display: none; }
         .flip-card-front.is-wrong .wrong-badge { display: block; }
         
-        /* 퀴즈 앞면 대왕한자 확대 조정 */
-        .flip-card-front .hanzi { font-size: 54px; color: var(--text-main); font-weight: 800; } 
-        .flip-card-front .hint { font-size: 11px; color: var(--primary); margin-top: 14px; font-weight: 700; background: #e0e7ff; padding: 4px 10px; border-radius: 20px; }
+        /* 퀴즈 앞면 대왕한자 초확대 */
+        .flip-card-front .hanzi { font-size: 56px; color: var(--text-main); font-weight: 800; } 
+        .flip-card-front .hint { font-size: 11px; color: var(--primary); margin-top: 10px; font-weight: 700; background: #e0e7ff; padding: 2px 8px; border-radius: 20px; }
         
-        /* 퀴즈 뒷면 슬림화 */
-        .flip-card-back { background-color: #fffdf5; border-color: #fef08a; transform: rotateY(180deg); justify-content: flex-start; padding-top: 14px; }
+        /* 퀴즈 뒷면 여백 원천 압축 */
+        .flip-card-back { background-color: #fffdf5; border-color: #fef08a; transform: rotateY(180deg); justify-content: flex-start; padding-top: 12px; }
         .flip-card-back .back-hanzi { font-size: 26px; color: #334155; margin-bottom: 2px; font-weight: 700; }
         .flip-card-back .meaning { font-size: 22px; font-weight: 800; color: #dc2626; margin-bottom: 2px; }
-        .flip-card-back .pinyin { font-size: 14px; color: #2563eb; font-weight: 700; margin-bottom: 6px; }
+        .flip-card-back .pinyin { font-size: 15px; color: #2563eb; font-weight: 700; margin-bottom: 4px; }
         
-        .quiz-ex-box { background-color: #ffffff; width: 100%; padding: 6px 10px; border-radius: 8px; border: 1px solid #fef08a; box-sizing: border-box; margin-bottom: 30px; text-align: left; }
+        .quiz-ex-box { background-color: #ffffff; width: 100%; padding: 4px 8px; border-radius: 6px; border: 1px solid #fef08a; box-sizing: border-box; margin-bottom: 25px; text-align: left; }
         .quiz-ex-box .ex-zh { font-size: 14px; color: var(--text-main); font-weight: 600; }
-        .quiz-ex-box .ex-pinyin { font-size: 12px; color: #4b5563; margin-top: 2px; }
-        .quiz-ex-box .ex-mean { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+        .quiz-ex-box .ex-pinyin { font-size: 12px; color: #4b5563; margin-top: 1px; }
+        .quiz-ex-box .ex-mean { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
         
-        .btn-wrong-toggle { position: absolute; bottom: 8px; width: calc(100% - 20px); background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 0; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-wrong-toggle { position: absolute; bottom: 6px; width: calc(100% - 16px); background: #f1f5f9; color: var(--text-sub); border: 1px solid var(--border-color); border-radius: 6px; padding: 6px 0; font-size: 12px; font-weight: 700; cursor: pointer; }
         .btn-wrong-toggle.marked { background: var(--accent-red); color: white; border-color: transparent; }
     </style>
 </head>
 <body>
 
-    <!-- [1] 메인 홈 허브 뷰 -->
     <div id="hubMainView" class="hub-container">
         <div class="hub-title">BONG HUB</div>
         <div class="hub-subtitle">원하는 서비스 포털이나 학습 단어장을 선택해 주세요.</div>
@@ -166,7 +163,6 @@
         </div>
     </div>
 
-    <!-- [2] 최적화 세로 보정형 통합 HSK 패널 -->
     <div id="hskViewContainer">
         <div class="header-wrap">
             <div class="header-top">
@@ -184,12 +180,10 @@
             </div>
         </div>
 
-        <!-- 학습 탭 뷰 -->
         <div id="viewStudy" class="view active">
             <div id="studyContainer"></div>
         </div>
 
-        <!-- 스마트 컨트롤 플레이 바 -->
         <div id="studyControls" class="bottom-controls">
             <div class="speed-control">
                 재생 속도: <span id="speedValue">0.8</span>x
@@ -201,7 +195,6 @@
             </div>
         </div>
 
-        <!-- 퀴즈 탭 뷰 -->
         <div id="viewQuiz" class="view">
             <div class="quiz-controls">
                 <button class="btn-quiz" onclick="shuffleCards()">🔀 카드 섞기</button>
@@ -322,12 +315,12 @@
             renderQuizCards(quizWords);
         }
 
-        // 컴팩트 세로형 보정 레이아웃 렌더러
+        // [구조 복구 및 슬림화] 한눈에 보이는 컴팩트 세로 카드 엔진
         function renderStudyCards(wordsArray) {
             const container = document.getElementById('studyContainer');
             container.innerHTML = '';
             if(wordsArray.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-sub); font-weight:700;">추출된 단어가 유실되었거나 없습니다.</div>';
+                container.innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-sub); font-weight:700;">단어가 없습니다.</div>';
                 return;
             }
             wordsArray.forEach((word, i) => {
@@ -336,37 +329,30 @@
                 card.className = 'card' + (isWrong ? ' is-wrong' : '');
                 card.id = 'study-card-' + word.num;
                 card.innerHTML = `
-                    <!-- 헤더 영역: 번호+한자 / 발음듣기 버튼 한줄 정렬 -->
-                    <div class="card-header">
-                        <div class="hanzi-box">
-                            <div class="hanzi zh-font">${word.num}. ${word.hanzi} <span class="wrong-mark" style="color:var(--accent-red); font-size:20px;">${isWrong ? '❌' : ''}</span></div>
-                        </div>
-                        <button class="play-btn" onclick="speakSingleStudyWord(${i})">🔊 발음 듣기</button>
+                    <div class="card-row-top">
+                        <div class="hanzi zh-font">${word.num}. ${word.hanzi} <span class="wrong-mark" style="color:var(--accent-red); font-size:18px;">${isWrong ? '❌' : ''}</span></div>
+                        <button class="play-btn" onclick="speakSingleStudyWord(${i})">🔊 발음</button>
                     </div>
                     
-                    <!-- 발음 라인: 성조 병음과 한국어 독음을 콤비 결합 -->
                     <div class="pinyin-row">
                         <div class="pinyin">${word.pinyin}</div>
                         <div class="ko-pron">[${word.koPron || ''}]</div>
                     </div>
                     
-                    <!-- 뜻과 한자 부수 라인 -->
                     <div class="meaning-box">
                         <div class="meaning">${word.meaning}</div>
                         <div class="hanja">${word.hanja || ''}</div>
                     </div>
                     
-                    <!-- 슬림 팁 박스 -->
                     <div class="tip-box">
                         <div class="tip-item">💡 <b>암기 팁:</b> ${word.pronTip || ''} ${word.charTip || ''}</div>
                     </div>
                     
-                    <!-- 슬림 예문 상사 -->
                     <div class="ex-box">
                         <div class="ex-zh zh-font">${word.exZh || ''}</div>
                         <div class="ex-pinyin-row">
                             <div class="ex-pinyin">${word.exPinyin || ''}</div>
-                            <div class="ex-mean">({word.exMeaning || ''})</div>
+                            <div class="ex-mean">(${word.exMeaning || ''})</div>
                         </div>
                     </div>
                 `;
@@ -378,7 +364,7 @@
             const container = document.getElementById('quizContainer');
             container.innerHTML = '';
             if(wordsArray.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-sub); font-weight:700;">세션 리스트가 비어 있습니다.</div>';
+                container.innerHTML = '<div style="text-align:center; padding: 40px 0; color:var(--text-sub); font-weight:700;">비어 있습니다.</div>';
                 return;
             }
             wordsArray.forEach((word) => {
@@ -389,10 +375,10 @@
                 card.innerHTML = `
                     <div class="flip-card-inner">
                         <div class="flip-card-front ${isWrong ? 'is-wrong' : ''}">
-                            <div class="index-num">INDEX. ${word.num}</div>
+                            <div class="index-num">No. ${word.num}</div>
                             <div class="wrong-badge">❌</div>
                             <div class="hanzi zh-font">${word.hanzi}</div>
-                            <div class="hint">👆 터치 패널 뒤집기</div>
+                            <div class="hint">👆 뒤집기 패널</div>
                         </div>
                         <div class="flip-card-back">
                             <div class="back-hanzi zh-font">${word.hanzi}</div>
