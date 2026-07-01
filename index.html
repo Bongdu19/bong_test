@@ -27,7 +27,6 @@
         body { background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; padding: 8px; display: flex; flex-direction: column; align-items: center; }
         .main-wrapper { width: 100%; max-width: 650px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; padding: 12px 10px 10px 10px; }
         
-        /* 스케줄러 메인 상단 타이틀 스타일 */
         .scheduler-title { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 12px; padding-left: 4px; border-left: 4px solid var(--header-bg); line-height: 1.2; }
         
         .calendar-container { display: grid; grid-template-columns: 42px repeat(5, 1fr); background: #ffffff; border-left: 1px solid var(--border-color); border-top: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
@@ -40,12 +39,14 @@
         .box-title-row { display: flex; align-items: center; justify-content: center; gap: 2px; font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; line-height: 1.2; }
         .box-time { font-size: 9px; font-weight: 600; margin-top: 2px; line-height: 1.1; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .box-time span.end-time::before { content: '~ '; }
+        
         .item-school { background-color: var(--bg-school); color: var(--text-school); }
         .item-taekwondo { background-color: var(--bg-taekwondo); color: var(--text-taekwondo); }
         .item-math { background-color: var(--bg-math); color: var(--text-math); }
         .item-english { background-color: var(--bg-english); color: var(--text-english); }
         .item-piano { background-color: var(--bg-piano); color: var(--text-piano); }
         .item-woongjin { background-color: var(--bg-woongjin); color: var(--text-woongjin); }
+        
         .action-row { display: flex; justify-content: flex-end; margin-top: 10px; }
         .settings-btn { padding: 6px 12px; background-color: var(--header-bg); color: #ffffff; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
         
@@ -55,24 +56,33 @@
         .modal-header { background: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         .modal-header h2 { font-size: 15px; font-weight: 700; }
         .modal-body { padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
         .card { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
         .card h3 { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
         .form-group-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9; }
-        .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; gap: 4px; }
+        
+        /* [개선 완료] 부모 박스가 쪼그라들지 않도록 단단히 고정하고 정렬 간격 일치 */
+        .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; gap: 6px; }
         .form-row-line label { width: 50px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
-        input[type="time"] { padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 125px; text-align: center; background: #ffffff; outline: none; }
+        
+        /* [박스 잘림 버그 해결] 인풋창 크기를 PC 시계 아이콘 유무에 유연하게 반응하도록 정렬 및 넓이 확장 */
+        input[type="time"] { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 130px; text-align: center; background: #ffffff; outline: none; flex-shrink: 0; }
         input[type="time"]:focus { border-color: var(--text-secondary); }
-        input[type="number"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 42px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; }
+        input[type="number"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 42px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; flex-shrink: 0; }
         input[type="number"]:focus { border-color: var(--text-secondary); }
         input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-        .duration-input { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-primary); }
+        
+        /* 소요시간 컴포넌트 정렬 가이드 */
+        .duration-input { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); width: 100%; white-space: nowrap; }
         .custom-toggle { font-size: 11px; color: #ef4444; display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 700; user-select: none; flex-shrink: 0; }
+        
         .checkbox-group { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
         .checkbox-group label { display: flex; align-items: center; justify-content: center; background: #f1f5f9; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s; min-width: 40px; }
         .checkbox-group label:has(input:checked) { background: #e2e8f0; color: var(--header-bg); }
         .checkbox-group input { margin-right: 4px; cursor: pointer; }
         .custom-rows-container { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed #e2e8f0; padding-top: 10px; }
+        
         .modal-footer { background: #ffffff; padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px;}
         .save-btn { background-color: var(--header-bg); color: #ffffff; border: none; padding: 11px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
         .file-action-row { display: flex; gap: 6px; width: 100%; }
@@ -92,10 +102,10 @@
             <div class="modal-header"><h2>시간표 세부 관리</h2><button class="close-x-btn" onclick="closeAdmin()">×</button></div>
             <div class="modal-body"><div class="card" id="school-card-container"></div><div id="academy-admin-container"></div></div>
             <div class="modal-footer">
-                <button class="save-btn" onclick="saveData()">브라우저에 임시 저장 및 반영</button>
+                <button class="save-btn" onclick="saveData()">화면에 설정 즉시 반영하기</button>
                 <div class="file-action-row">
-                    <button class="file-btn" onclick="exportDataJSON()">⚙ 현재 설정 파일로 저장</button>
-                    <label class="file-btn">📂 설정 파일 불러오기<input type="file" id="import-file-input" style="display:none;" onchange="importDataJSON(this)"></label>
+                    <button class="file-btn" onclick="exportDataJSON()">💾 내 컴퓨터에 백업 파일 다운로드</button>
+                    <label class="file-btn">📂 백업 파일 불러오기<input type="file" id="import-file-input" style="display:none;" onchange="importDataJSON(this)"></label>
                 </div>
             </div>
         </div>
@@ -112,8 +122,28 @@
             }
         };
 
-        const STORAGE_KEY = 'daughter_schedule_v12';
-        let currentData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+        const STORAGE_KEY = 'daughter_schedule_v13';
+        let currentData = defaultData;
+
+        async function loadServerData() {
+            try {
+                const response = await fetch('daughter_schedule.txt?t=' + new Date().getTime());
+                if (response.ok) {
+                    const serverData = await response.json();
+                    currentData = serverData;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
+                    console.log("서버 데이터 연동 성공");
+                } else {
+                    const local = localStorage.getItem(STORAGE_KEY);
+                    if(local) currentData = JSON.parse(local);
+                }
+            } catch (e) {
+                const local = localStorage.getItem(STORAGE_KEY);
+                if(local) currentData = JSON.parse(local);
+            }
+            renderSchedule();
+        }
+
         function openAdmin() { buildAdminForm(); document.getElementById('admin-modal').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-modal').classList.remove('active'); }
         function calculateEndTime(startTime, h, m) { if (!startTime) return ''; let [hh, mm] = startTime.split(":").map(Number), total = 60 * hh + mm + 60 * parseInt(h) + parseInt(m); return `${String(Math.floor(total / 60) % 24).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`; }
@@ -133,7 +163,7 @@
             targetObj.common.time = document.getElementById(`time-${key}-common`).value;
             targetObj.common.pHour = parseInt(document.getElementById(`h-${key}-common`).value) || 0;
             targetObj.common.pMin = parseInt(document.getElementById(`m-${key}-common`).value) || 0;
-            let checkedDays = []; document.querySelectorAll(`.day-cb-${key}:checked`).forEach(el => checkedDays.push(e.value || el.value)); targetObj.common.days = checkedDays;
+            let checkedDays = []; document.querySelectorAll(`.day-cb-${key}:checked`).forEach(node => checkedDays.push(node.value)); targetObj.common.days = checkedDays;
             ["월","화","수","목","금"].forEach(d => {
                 targetObj.custom[d].time = document.getElementById(`time-${key}-${d}`).value;
                 targetObj.custom[d].h = parseInt(document.getElementById(`h-${key}-${d}`).value) || 0;
@@ -143,7 +173,7 @@
         
         function saveData(){ pullFormData('school', currentData.school); for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)), closeAdmin(), renderSchedule(); }
         function exportDataJSON(){ pullFormData('school', currentData.school); for (let key in currentData.academies) pullFormData(key, currentData.academies[key]); let dataStr = JSON.stringify(currentData, null, 4), blob = new Blob([dataStr], {type:"text/plain;charset=utf-8"}), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url, a.download = "daughter_schedule.txt", a.click(), URL.revokeObjectURL(url); }
-        function importDataJSON(e){ let file = e.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(evt){ try { let parsed = JSON.parse(evt.target.result); if (parsed.school && parsed.academies) { currentData = parsed; localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)); alert("설정 파일을 성공적으로 불러왔습니다!"); buildAdminForm(); renderSchedule(); } else { alert("올바른 설정 파일 형식이 아닙니다."); } } catch(err){ alert("파일 파싱 실패."); } }, reader.readAsText(file); }
+        function importDataJSON(e){ let file = e.files[0]; if(!file) return; let reader = new FileReader(); reader.onload = function(evt){ try { let parsed = JSON.parse(evt.target.result); if (parsed.school && parsed.academies) { currentData = parsed; localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData)); alert("백업 설정을 정상적으로 불러왔습니다!"); buildAdminForm(); renderSchedule(); } else { alert("올바른 설정 파일 형식이 아닙니다."); } } catch(err){ alert("파일 파싱 실패."); } }, reader.readAsText(file); }
         function getRowIndex(timeStr, baseHour){ let [hh, mm] = timeStr.split(':').map(Number), diff = 60 * hh + mm - 60 * baseHour; return diff < 0 ? 0 : Math.floor(diff / 10); }
         
         function renderSchedule(){
@@ -205,7 +235,7 @@
                 }
             }
         }
-        window.onload = function() { renderSchedule(); };
+        window.onload = function() { loadServerData(); };
     </script>
 </body>
 </html>
