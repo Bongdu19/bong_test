@@ -55,33 +55,35 @@
         .modal-content { background: #f8fafc; width: 100%; max-width: 540px; max-height: 90vh; border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .modal-header { background: #fff; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
         .modal-header h2 { font-size: 15px; font-weight: 700; }
-        .modal-body { padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .modal-body { padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
-        .card { background: #fff; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .card { background: #fff; border-radius: 10px; padding: 12px 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .card-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
         .card h3 { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
-        .form-group-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #f1f5f9; }
+        .form-group-block { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; background: #f8fafc; padding: 8px; border-radius: 8px; border: 1px solid #f1f5f9; }
         
-        /* [개선 완료] 부모 박스가 쪼그라들지 않도록 단단히 고정하고 정렬 간격 일치 */
-        .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; gap: 6px; }
-        .form-row-line label { width: 50px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
+        /* -------------------------------------------
+           [모바일 가로폭 짤림 해결] 정렬 레이아웃 전면 수정
+        ------------------------------------------- */
+        .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; gap: 4px; justify-content: space-between; }
+        .form-row-line label { width: 36px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
         
-        /* [박스 잘림 버그 해결] 인풋창 크기를 PC 시계 아이콘 유무에 유연하게 반응하도록 정렬 및 넓이 확장 */
-        input[type="time"] { padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 130px; text-align: center; background: #ffffff; outline: none; flex-shrink: 0; }
+        /* 소요시간 및 시간 입력 컴포넌트 묶음 구조 최적화 */
+        .duration-input { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--text-primary); flex: 1; justify-content: flex-end; width: 100%; }
+
+        /* 인풋 가로폭을 축소하여 모바일 화면 안으로 완전 가둠 */
+        input[type="time"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 105px; text-align: center; background: #ffffff; outline: none; flex-shrink: 0; }
         input[type="time"]:focus { border-color: var(--text-secondary); }
-        input[type="number"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 42px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; flex-shrink: 0; }
+        input[type="number"] { padding: 5px 2px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 34px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; flex-shrink: 0; }
         input[type="number"]:focus { border-color: var(--text-secondary); }
-        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
         
-        /* 소요시간 컴포넌트 정렬 가이드 */
-        .duration-input { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-primary); width: 100%; white-space: nowrap; }
         .custom-toggle { font-size: 11px; color: #ef4444; display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 700; user-select: none; flex-shrink: 0; }
         
-        .checkbox-group { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
-        .checkbox-group label { display: flex; align-items: center; justify-content: center; background: #f1f5f9; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s; min-width: 40px; }
+        .checkbox-group { display: flex; gap: 4px; flex-wrap: wrap; width: 100%; }
+        .checkbox-group label { display: flex; align-items: center; justify-content: center; background: #f1f5f9; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-primary); transition: background 0.15s; min-width: 36px; }
         .checkbox-group label:has(input:checked) { background: #e2e8f0; color: var(--header-bg); }
-        .checkbox-group input { margin-right: 4px; cursor: pointer; }
-        .custom-rows-container { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed #e2e8f0; padding-top: 10px; }
+        .checkbox-group input { margin-right: 3px; cursor: pointer; }
+        .custom-rows-container { display: flex; flex-direction: column; gap: 6px; border-top: 1px dashed #e2e8f0; padding-top: 10px; width: 100%; }
         
         .modal-footer { background: #ffffff; padding: 12px 16px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 6px;}
         .save-btn { background-color: var(--header-bg); color: #ffffff; border: none; padding: 11px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
@@ -111,7 +113,8 @@
         </div>
     </div>
     <script>
-        const defaultData = {
+        // 예비용 로컬 기본 데이터 구조
+        const defaultFallbackData = {
             "school": { "name": "학교", "icon": "🎒", "class": "item-school", "isCustom": true, "common": { "time": "09:00", "pHour": 4, "pMin": 40, "days": ["월", "화", "수", "목", "금"] }, "custom": { "월": { "time": "09:00", "h": 3, "m": 50 }, "화": { "time": "09:00", "h": 4, "m": 40 }, "수": { "time": "09:00", "h": 4, "m": 40 }, "목": { "time": "09:00", "h": 4, "m": 40 }, "금": { "time": "09:00", "h": 5, "m": 20 } } },
             "academies": {
                 "taekwondo": { "name": "태권도", "icon": "🥋", "class": "item-taekwondo", "isCustom": false, "common": { "time": "17:00", "pHour": 1, "pMin": 0, "days": ["월", "수", "금"] }, "custom": { "월": { "time": "17:00", "h": 1, "m": 0 }, "화": { "time": "", "h": 1, "m": 0 }, "수": { "time": "17:00", "h": 1, "m": 0 }, "목": { "time": "", "h": 1, "m": 0 }, "금": { "time": "17:00", "h": 1, "m": 0 } } },
@@ -123,8 +126,9 @@
         };
 
         const STORAGE_KEY = 'daughter_schedule_v13';
-        let currentData = defaultData;
+        let currentData = defaultFallbackData;
 
+        // [핵심 강제 구조] 브라우저 저장소를 무시하고 무조건 서버의 txt 파일을 우선적으로 읽어오도록 순서 강제화
         async function loadServerData() {
             try {
                 const response = await fetch('daughter_schedule.txt?t=' + new Date().getTime());
@@ -132,12 +136,14 @@
                     const serverData = await response.json();
                     currentData = serverData;
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-                    console.log("서버 데이터 연동 성공");
+                    console.log("깃허브 서버 파일 강제 로드 성공");
                 } else {
+                    console.log("서버 파일 미발견. 캐시 로드");
                     const local = localStorage.getItem(STORAGE_KEY);
                     if(local) currentData = JSON.parse(local);
                 }
             } catch (e) {
+                console.log("네트워크 로드 우회. 로컬 캐시 적용");
                 const local = localStorage.getItem(STORAGE_KEY);
                 if(local) currentData = JSON.parse(local);
             }
