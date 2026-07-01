@@ -886,7 +886,8 @@
   {
     "num": 69,
     "hanzi": "哪儿",
-    "pinyin": "nǎr", koPron: "나얼",
+    "pinyin": "nǎr", 
+    "koPron": "나얼",
     "meaning": "어디",
     "hanja": "어느 곳(哪儿)",
     "pronTip": "나얼(nǎr)로 갈까? (어디로 갈까?)",
