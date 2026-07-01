@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BONG HUB & HSK 단어장</title>
+    <style>
+        /* 기본 오리지널 테마 베이스 */
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; padding: 0 0 100px 0; margin: 0; color: #333; }
+        
+        /* 홈 메인 허브 스타일 */
+        .hub-container { max-width: 800px; margin: 50px auto; padding: 20px; text-align: center; }
+        .hub-title { font-size: 32px; color: #2c3e50; font-weight: bold; margin-bottom: 10px; }
+        .hub-subtitle { color: #666; margin-bottom: 40px; }
+        .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .hub-card { background: white; border-radius: 15px; padding: 25px; text-align: center; text-decoration: none; color: inherit; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s ease; border: 1px solid #eaeaea; }
+        .hub-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .hub-card.schedule { border-top: 5px solid #ff6b6b; }
+        .hub-card.hsk { border-top: 5px solid #d32f2f; }
+        .hub-card h3 { margin: 0 0 10px 0; font-size: 20px; color: #2c3e50; }
+        .hub-card p { margin: 0; font-size: 14px; color: #666; line-height: 1.5; }
+
+        /* HSK 단어장 모드 스타일 (기본 숨김) */
+        #hskViewContainer { display: none; }
+        .header-wrap { background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-bottom: 1px solid #eee; }
+        .btn-home { background: #555; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        h2 { text-align: center; color: #d32f2f; margin: 0; font-size: 20px; font-weight: bold; flex-grow: 1; }
+        .filter-container { text-align: center; padding: 10px 0; }
+        .filter-container select { padding: 8px 12px; font-size: 15px; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; color: #333; outline: none; }
+        
+        .tabs { display: flex; border-top: 1px solid #eee; }
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-weight: bold; color: #757575; cursor: pointer; transition: 0.3s; background: #fafafa; border-bottom: 3px solid transparent; }
+        .tab.active { color: #d32f2f; background: #fff; border-bottom: 3px solid #d32f2f; }
+
+        .view { display: none; padding: 15px; }
+        .view.active { display: block; }
+        .zh-font { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; font-weight: 500; white-space: nowrap; }
+
+        /* 학습 모드 카드 */
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: 0.3s; position: relative; border: 2px solid transparent; }
+        .card.active { background-color: #fff8e1; border: 2px solid #ffc107; }
+        .card.is-wrong { border: 2px solid #ef5350; background-color: #ffebee; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #fce4ec; padding-bottom: 12px; margin-bottom: 12px; }
+        .hanzi-box { flex-grow: 1; overflow: hidden; }
+        .hanzi { font-size: 32px; color: #212121; }
+        .pinyin { color: #1976d2; font-size: 16px; font-weight: bold; margin-top: 4px; }
+        .ko-pron { color: #757575; font-size: 14px; }
+        .play-btn { background-color: #4CAF50; color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .meaning-box { margin-bottom: 12px; }
+        .meaning { font-size: 20px; font-weight: bold; color: #d32f2f; margin-bottom: 6px; }
+        .hanja { font-size: 13px; color: #616161; background: #e0e0e0; display: inline-block; padding: 3px 8px; border-radius: 12px; }
+        .tip-box { background: #fffde7; padding: 10px; border-left: 4px solid #fbc02d; border-radius: 4px; margin-bottom: 12px; }
+        .tip-item { font-size: 14px; color: #424242; line-height: 1.5; margin-bottom: 4px; }
+        .ex-box { background: #f5f5f5; padding: 12px; border-radius: 8px; }
+        .ex-zh { font-size: 16px; color: #212121; }
+        .ex-pinyin { font-size: 13px; color: #1976d2; margin-top: 4px; }
+        .ex-mean { font-size: 14px; color: #424242; intent: 4px; }
+
+        .bottom-controls { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(5px); padding: 15px; box-sizing: border-box; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; border-top: 1px solid #ddd; }
+        .speed-control { text-align: center; margin-bottom: 10px; font-size: 14px; font-weight: bold; }
+        .speed-control input[type=range] { vertical-align: middle; width: 60%; margin-left: 10px; }
+        .btn-group { display: flex; justify-content: center; gap: 10px; }
+        .btn-group button { flex: 1; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; color: white; cursor: pointer; }
+        #mainPlayBtn { background-color: #d32f2f; } 
+        #mainPlayBtn.paused { background-color: #ff9800; } 
+        #stopBtn { background-color: #555; max-width: 100px; }
+
+        /* 퀴즈 모드 */
+        .quiz-controls { text-align: center; margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; }
+        .btn-quiz { background-color: #1976d2; color: white; border: none; border-radius: 8px; padding: 12px; flex: 1; font-size: 15px; font-weight: bold; cursor: pointer; }
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding-bottom: 50px; }
+        .flip-card { background-color: transparent; width: 100%; height: 280px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px; box-sizing: border-box; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; }
+        .flip-card-front { background-color: #ffffff; border: 2px solid #e0e0e0; }
+        .flip-card-front.is-wrong { border: 2px solid #ef5350; background-color: #ffebee; }
+        .flip-card-front .index-num { position: absolute; top: 10px; left: 10px; font-size: 12px; color: #999; }
+        .flip-card-front .wrong-badge { position: absolute; top: 8px; right: 8px; font-size: 18px; display: none; }
+        .flip-card-front.is-wrong .wrong-badge { display: block; }
+        .flip-card-front .hanzi { font-size: clamp(24px, 7vw, 42px); color: #212121; }
+        .flip-card-front .hint { font-size: 13px; color: #1976d2; margin-top: 20px; font-weight: bold; background: #e3f2fd; padding: 5px 10px; border-radius: 15px; }
+        .flip-card-back { background-color: #fffde7; border: 2px solid #fbc02d; transform: rotateY(180deg); justify-content: flex-start; padding-top: 20px; position: relative; }
+        .flip-card-back .back-hanzi { font-size: 24px; color: #424242; margin-bottom: 5px; }
+        .flip-card-back .meaning { font-size: 18px; font-weight: bold; color: #d32f2f; margin-bottom: 5px; }
+        .flip-card-back .pinyin { font-size: 14px; color: #1976d2; font-weight: bold; margin-bottom: 15px; }
+        .quiz-ex-box { background-color: #ffffff; width: 100%; padding: 10px; border-radius: 8px; box-sizing: border-box; margin-bottom: 40px; }
+        .quiz-ex-box .ex-zh { font-size: 14px; color: #333; }
+        .quiz-ex-box .ex-pinyin { font-size: 12px; color: #1976d2; margin-top: 3px; }
+        .quiz-ex-box .ex-mean { font-size: 13px; color: #555; margin-top: 3px; }
+        .btn-wrong-toggle { position: absolute; bottom: 10px; width: calc(100% - 24px); background: #e0e0e0; color: #424242; border: none; border-radius: 6px; padding: 8px 0; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .btn-wrong-toggle.marked { background: #ef5350; color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="hubMainView" class="hub-container">
+        <div class="hub-title">BONG HUB</div>
+        <div class="hub-subtitle">원하는 페이지 및 학습 메뉴를 선택하세요.</div>
+        
+        <div class="hub-grid">
+            <a href="daughter-schedule.html" class="hub-card schedule">
+                <h3>📅 딸 스케줄 확인</h3>
+                <p>데일리 시간표와 주간 일정 관리 전용 페이지로 이동합니다.</p>
+            </a>
+
+            <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(1)">
+                <h3>🇨🇳 HSK 1급</h3>
+                <p>필수 150단어 최종 마스터<br><strong>[학습 모드 / 퀴즈 모드]</strong></p>
+            </div>
+            <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(2)">
+                <h3>🇨🇳 HSK 2급</h3>
+                <p>필수 150단어 완벽 정복<br><strong>[학습 모드 / 퀴즈 모드]</strong></p>
+            </div>
+            <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(3)">
+                <h3>🇨🇳 HSK 3급</h3>
+                <p>필수 300단어 최종 마스터<br><strong>[학습 모드 / 퀴즈 모드]</strong></p>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="hskViewContainer">
+        <div class="header-wrap">
+            <div class="header-top">
+                <button class="btn-home" onclick="goBackToHub()">⬅ 메인 홈</button>
+                <h2 id="hskTitleDisplay">HSK 단어 마스터</h2>
+            </div>
+            
+            <div class="filter-container">
+                <select id="dayFilter" onchange="applyFilter()"></select>
+            </div>
+
+            <div class="tabs">
+                <div id="tabBtnStudy" class="tab active" onclick="switchTab('study')">📖 학습 모드</div>
+                <div id="tabBtnQuiz" class="tab" onclick="switchTab('quiz')">💡 퀴즈 모드</div>
+            </div>
+        </div>
+
+        <div id="viewStudy" class="view active">
+            <div id="studyContainer"></div>
+        </div>
+
+        <div id="studyControls" class="bottom-controls">
+            <div class="speed-control">
+                속 speed: <span id="speedValue">0.8</span>x
+                <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.1" value="0.8" oninput="document.getElementById('speedValue').innerText = this.value">
+            </div>
+            <div class="btn-group">
+                <button id="mainPlayBtn" onclick="togglePlayPause()">▶ 전체 자동 재생</button>
+                <button id="stopBtn" onclick="stopStudyAudio()">⏹ 정지</button>
+            </div>
+        </div>
+
+        <div id="viewQuiz" class="view">
+            <div class="quiz-controls">
+                <button class="btn-quiz" onclick="shuffleCards()">🔀 섞어서 풀기</button>
+                <button class="btn-quiz" style="background-color: #ff9800;" onclick="resetCards()">🔄 모두 엎기</button>
+            </div>
+            <div id="quizContainer" class="quiz-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let allWords = [];          // 로드된 HSK 단어가 동적으로 저장될 배열
+        let wrongWordsSet = new Set();
+        let currentFilteredWords = [];
+        let quizWords = [];
+        let currentLevel = 1;
+
+        // 메인 홈 -> HSK 데이터 가져오기 (JSON 비동기 연결)
+        function loadHskData(level) {
+            currentLevel = level;
+            wrongWordsSet.clear(); 
+            
+            // GitHub Pages 환경에서 보관중인 json 파일 호출
+            fetch(`data/hsk${level}.json`)
+                .then(response => {
+                    if (!response.ok) throw new Error('데이터 파일을 찾을 수 없습니다.');
+                    return response.json();
+                })
+                .then(data => {
+                    allWords = data;
+                    setupFilterOptions(level);
+                    
+                    document.getElementById('hubMainView').style.display = 'none';
+                    document.getElementById('hskViewContainer').style.display = 'block';
+                    document.getElementById('hskTitleDisplay').innerText = `🇨🇳 HSK ${level}급 단어 최종 마스터`;
+                    
+                    switchTab('study');
+                    applyFilter();
+                })
+                .catch(error => {
+                    alert(`오류: ${error.message}\ndata/hsk${level}.json 파일이 저장소에 있는지 확인해주세요.`);
+                });
+        }
+
+        function goBackToHub() {
+            window.speechSynthesis.cancel();
+            stopStudyAudio();
+            document.getElementById('hskViewContainer').style.display = 'none';
+            document.getElementById('hubMainView').style.display = 'block';
+        }
+
+        // 급수별 단어 수에 맞춰 필터 셀렉트 박스 옵션을 동적으로 생성
+        function setupFilterOptions(level) {
+            const filter = document.getElementById('dayFilter');
+            filter.innerHTML = '';
+            
+            let options = `<option value="all">전체 보기 (1~${allWords.length}번)</option>`;
+            
+            if (level === 1 || level === 2) {
+                options += `
+                    <option value="part1">1일차 (1~35번)</option>
+                    <option value="part2">2일차 (36~70번)</option>
+                    <option value="part3">3일차 (71~110번)</option>
+                    <option value="part4">4일차 (111~150번)</option>
+                `;
+            } else if (level === 3) {
+                options += `
+                    <option value="part1">1일차 (1~35번)</option>
+                    <option value="part2">2일차 (36~70번)</option>
+                    <option value="part3">3일차 (71~110번)</option>
+                    <option value="part4">4일차 (111~150번)</option>
+                    <option value="part5">5일차 (151~190번)</option>
+                    <option value="part6">6일차 (191~230번)</option>
+                    <option value="part7">7일차 (231~270번)</option>
+                    <option value="part8">8일차 (271~${allWords.length}번)</option>
+                `;
+            }
+            options += `<option value="wrong">❌ 내 오답노트 모아보기</option>`;
+            filter.innerHTML = options;
+        }
+
+        function switchTab(tab) {
+            window.speechSynthesis.cancel();
+            stopStudyAudio();
+            document.getElementById('tabBtnStudy').classList.remove('active');
+            document.getElementById('tabBtnQuiz').classList.remove('active');
+            document.getElementById('viewStudy').classList.remove('active');
+            document.getElementById('viewQuiz').classList.remove('active');
+
+            if (tab === 'study') {
+                document.getElementById('tabBtnStudy').classList.add('active');
+                document.getElementById('viewStudy').classList.add('active');
+                document.getElementById('studyControls').style.display = 'block';
+            } else {
+                document.getElementById('tabBtnQuiz').classList.add('active');
+                document.getElementById('viewQuiz').classList.add('active');
+                document.getElementById('studyControls').style.display = 'none';
+            }
+        }
+
+        function getFilteredWords() {
+            const val = document.getElementById('dayFilter').value;
+            let mapped = allWords.map((w, i) => ({...w, num: i + 1}));
+            
+            if (val === 'part1') return mapped.slice(0, 35);
+            if (val === 'part2') return mapped.slice(35, 70);
+            if (val === 'part3') return mapped.slice(70, 110);
+            if (val === 'part4') return mapped.slice(110, 150);
+            if (val === 'part5') return mapped.slice(150, 190);
+            if (val === 'part6') return mapped.slice(190, 230);
+            if (val === 'part7') return mapped.slice(230, 270);
+            if (val === 'part8') return mapped.slice(270);
+            if (val === 'wrong') return mapped.filter(w => wrongWordsSet.has(w.num)); 
+            return mapped;
+        }
+
+        function applyFilter() {
+            window.speechSynthesis.cancel();
+            stopStudyAudio();
+            currentFilteredWords = getFilteredWords();
+            renderStudyCards(currentFilteredWords);
+            quizWords = [...currentFilteredWords];
+            renderQuizCards(quizWords);
+        }
+
+        function renderStudyCards(wordsArray) {
+            const container = document.getElementById('studyContainer');
+            container.innerHTML = '';
+            if(wordsArray.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding: 50px; color:#757575; font-weight:bold;">단어가 없습니다.<br>(퀴즈 모드에서 오답을 체크해 보세요!)</div>';
+                return;
+            }
+            wordsArray.forEach((word, i) => {
+                const card = document.createElement('div');
+                const isWrong = wrongWordsSet.has(word.num);
+                card.className = 'card' + (isWrong ? ' is-wrong' : '');
+                card.id = 'study-card-' + i;
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="hanzi-box">
+                            <div class="hanzi zh-font">${word.num}. ${word.hanzi} ${isWrong ? '❌' : ''}</div>
+                            <div class="pinyin">${word.pinyin} <span class="ko-pron">[${word.koPron || ''}]</span></div>
+                        </div>
+                        <button class="play-btn" onclick="speakSingleStudyWord(${i})">🔊 발음 듣기</button>
+                    </div>
+                    <div class="meaning-box">
+                        <div class="meaning">${word.meaning}</div>
+                        <div class="hanja">${word.hanja || ''}</div>
+                    </div>
+                    <div class="tip-box">
+                        <div class="tip-item">💡 <b>발음:</b> ${word.pronTip || '팁 준비 중'}</div>
+                        <div class="tip-item">✍️ <b>한자:</b> ${word.charTip || '팁 준비 중'}</div>
+                    </div>
+                    <div class="ex-box">
+                        <div class="ex-zh zh-font">${word.exZh || ''}</div>
+                        <div class="ex-pinyin">${word.exPinyin || ''}</div>
+                        <div class="ex-mean">${word.exMeaning || ''}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderQuizCards(wordsArray) {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+            if(wordsArray.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding: 50px; color:#757575; font-weight:bold;">해당되는 단어가 없습니다.</div>';
+                return;
+            }
+            wordsArray.forEach((word) => {
+                const isWrong = wrongWordsSet.has(word.num);
+                const card = document.createElement('div');
+                card.className = 'flip-card';
+                card.id = 'quiz-card-' + word.num;
+                card.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front ${isWrong ? 'is-wrong' : ''}">
+                            <div class="index-num">No. ${word.num}</div>
+                            <div class="wrong-badge">❌</div>
+                            <div class="hanzi zh-font">${word.hanzi}</div>
+                            <div class="hint">👆 터치하면 정답과 음성</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="back-hanzi zh-font">${word.hanzi}</div>
+                            <div class="meaning">${word.meaning}</div>
+                            <div class="pinyin">${word.pinyin} <span class="ko-pron">[${word.koPron || ''}]</span></div>
+                            <div class="quiz-ex-box">
+                                <div class="ex-zh zh-font">${word.exZh || ''}</div>
+                                <div class="ex-pinyin">${word.exPinyin || ''}</div>
+                                <div class="ex-mean">${word.exMeaning || ''}</div>
+                            </div>
+                            <button class="btn-wrong-toggle ${isWrong ? 'marked' : ''}" onclick="toggleWrongState(${word.num}, event)">
+                                ${isWrong ? '❌ 오답 취소하기' : '체크 ❌ 몰라요'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.onclick = function(e) {
+                    if(e.target.tagName === 'BUTTON') return;
+                    const isFlippingToBack = !this.classList.contains('flipped');
+                    this.classList.toggle('flipped');
+                    window.speechSynthesis.cancel(); 
+                    if (isFlippingToBack) {
+                        const speed = getSpeed();
+                        const u1 = new SpeechSynthesisUtterance(word.hanzi); u1.lang = 'zh-CN'; u1.rate = speed;
+                        const u2 = new SpeechSynthesisUtterance(word.meaning); u2.lang = 'ko-KR'; u2.rate = 1.0;
+                        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2);
+                    }
+                };
+                container.appendChild(card);
+            });
+        }
+
+        function toggleWrongState(num, event) {
+            event.stopPropagation();
+            if (wrongWordsSet.has(num)) wrongWordsSet.delete(num);
+            else wrongWordsSet.add(num);
+            applyFilter();
+        }
+
+        function shuffleCards() {
+            window.speechSynthesis.cancel();
+            for (let i = quizWords.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
+            }
+            renderQuizCards(quizWords);
+        }
+
+        function resetCards() {
+            window.speechSynthesis.cancel();
+            document.querySelectorAll('.flip-card').forEach(card => card.classList.remove('flipped'));
+        }
+
+        // 전체 재생/TTS 오디오 시스템 엔진 부분
+        let isAutoPlaying = false, isPaused = false, autoIndex = 0, autoStep = 0, wakeLock = null;
+        function getSpeed() { return parseFloat(document.getElementById('speedSlider').value); }
+        async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
+        function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); } }
+
+        function speakSingleStudyWord(index) {
+            stopStudyAudio(); 
+            const word = currentFilteredWords[index];
+            const speed = getSpeed();
+            const u1 = new SpeechSynthesisUtterance(word.hanzi); u1.lang = 'zh-CN'; u1.rate = speed;
+            const u2 = new SpeechSynthesisUtterance(word.meaning); u2.lang = 'ko-KR'; u2.rate = 1.0;
+            window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2);
+        }
+
+        function togglePlayPause() {
+            const btn = document.getElementById('mainPlayBtn');
+            if(currentFilteredWords.length === 0) return;
+            if (!isAutoPlaying) {
+                isAutoPlaying = true; isPaused = false; autoIndex = 0; autoStep = 0;
+                btn.innerText = '⏸ 일시정지'; btn.classList.add('paused');
+                requestWakeLock(); playNextStep(); return;
+            }
+            if (!isPaused) {
+                isPaused = true; btn.innerText = '▶ 재생 재개'; btn.classList.remove('paused');
+                window.speechSynthesis.cancel(); releaseWakeLock();
+            } else {
+                isPaused = false; btn.innerText = '⏸ 일시정지'; btn.classList.add('paused');
+                requestWakeLock(); playNextStep(); 
+            }
+        }
+
+        function playNextStep() {
+            if (!isAutoPlaying || isPaused) return;
+            if (autoIndex >= currentFilteredWords.length) { stopStudyAudio(); return; }
+
+            const word = currentFilteredWords[autoIndex];
+            const speed = getSpeed();
+            let text, lang, rate;
+
+            if (autoStep === 0) { text = word.hanzi; lang = 'zh-CN'; rate = speed; }
+            else if (autoStep === 1) { text = word.meaning; lang = 'ko-KR'; rate = 1.0; }
+            else if (autoStep === 2) { text = word.exZh || ''; lang = 'zh-CN'; rate = speed; }
+            else if (autoStep === 3) { text = word.exMeaning || ''; lang = 'ko-KR'; rate = 1.0; }
+
+            if (!text) {
+                autoStep = 0; autoIndex++; playNextStep(); return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang; utterance.rate = rate;
+
+            if (autoStep === 0) {
+                document.querySelectorAll('#studyContainer .card').forEach(c => c.classList.remove('active'));
+                const currentCard = document.getElementById('study-card-' + autoIndex);
+                if(currentCard) {
+                    currentCard.classList.add('active');
+                    currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            utterance.onend = () => {
+                if (!isAutoPlaying || isPaused) return;
+                autoStep++;
+                if (autoStep > 3) { autoStep = 0; autoIndex++; }
+                playNextStep(); 
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function stopStudyAudio() {
+            isAutoPlaying = false; isPaused = false; autoIndex = 0; autoStep = 0;
+            const btn = document.getElementById('mainPlayBtn');
+            btn.innerText = '▶ 전체 자동 재생'; btn.classList.remove('paused');
+            document.querySelectorAll('#studyContainer .card').forEach(c => c.classList.remove('active'));
+            window.speechSynthesis.cancel(); releaseWakeLock();
+        }
+    </script>
+</body>
+</html>
