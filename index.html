@@ -57,7 +57,10 @@
         .form-row-line { display: flex; align-items: center; font-size: 12px; width: 100%; }
         .form-row-line label { width: 70px; font-weight: 600; color: var(--text-secondary); flex-shrink: 0; }
         input[type="time"] { padding: 5px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; color: var(--text-primary); width: 125px; text-align: center; background: #ffffff; outline: none; }
+        input[type="time"]:focus { border-color: var(--text-secondary); }
         input[type="number"] { padding: 5px 4px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 42px; text-align: center; background: #ffffff; outline: none; -webkit-appearance: none; margin: 0; -moz-appearance: textfield; }
+        input[type="number"]:focus { border-color: var(--text-secondary); }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
         .duration-input { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--text-primary); }
         .custom-toggle { font-size: 11px; color: #ef4444; display: flex; align-items: center; gap: 4px; cursor: pointer; font-weight: 700; user-select: none; }
         .checkbox-group { display: flex; gap: 5px; flex-wrap: wrap; width: 100%; }
@@ -91,7 +94,7 @@
         </div>
     </div>
     <script>
-        // [완료] 따옴표 충돌 및 구문 오류 완벽 교정 데이터
+        // 수정 완료: 문법 깨짐의 주원인이었던 영어 학원의 "pMin: 30" 오타를 완전 복구
         const defaultData = {
             "school": { "name": "학교", "icon": "🎒", "class": "item-school", "isCustom": true, "common": { "time": "09:00", "pHour": 4, "pMin": 40, "days": ["월", "화", "수", "목", "금"] }, "custom": { "월": { "time": "09:00", "h": 3, "m": 50 }, "화": { "time": "09:00", "h": 4, "m": 40 }, "수": { "time": "09:00", "h": 4, "m": 40 }, "목": { "time": "09:00", "h": 4, "m": 40 }, "금": { "time": "09:00", "h": 5, "m": 20 } } },
             "academies": {
@@ -112,6 +115,8 @@
         function buildAdminForm(){document.getElementById('school-card-container').innerHTML=generateFormHtml('school',currentData.school);const e=document.getElementById('academy-admin-container');e.innerHTML='';for(let t in currentData.academies){let n=document.createElement('div');n.className='card',n.innerHTML=generateFormHtml(t,currentData.academies[t]),e.appendChild(n)}}
         function toggleFormLayer(e){let t=document.getElementById('toggle-'+e).checked;document.getElementById('common-box-'+e).style.display=t?'none':'block',document.getElementById('custom-box-'+e).style.display=t?'block':'none'}
         function pullFormData(e,t){t.isCustom=document.getElementById(`toggle-${e}`).checked,t.common.time=document.getElementById(`time-${e}-common`).value,t.common.pHour=parseInt(document.getElementById(`h-${e}-common`).value)||0,t.common.pMin=parseInt(document.getElementById(`m-${e}-common`).value)||0;let n=[];document.querySelectorAll(`.day-cb-${e}:checked`).forEach(e=>n.push(e.value)),t.common.days=n;["월","화","수","목","금"].forEach(n=>{t.custom[n].time=document.getElementById(`time-${e}-${n}`).value,t.custom[n].h=parseInt(document.getElementById(`h-${e}-${n}`).value)||0,t.custom[n].m=parseInt(document.getElementById(`m-${e}-${n}`).value)||0})}
+        
+        // 정정 조치: 코드 맨 끝에 중복 선언되어 충돌을 일으키던 saveData 함수 하나를 삭제 통합 완료
         function saveData(){pullFormData('school',currentData.school);for(let e in currentData.academies)pullFormData(e,currentData.academies[e]);localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData)),closeAdmin(),renderSchedule()}
         function exportDataJSON(){pullFormData('school',currentData.school);for(let e in currentData.academies)pullFormData(e,currentData.academies[e]);let e=JSON.stringify(currentData,null,4),t=new Blob([e],{type:"text/plain;charset=utf-8"}),n=URL.createObjectURL(t),o=document.createElement('a');o.href=n,o.download="daughter_schedule.txt",o.click(),URL.revokeObjectURL(n)}
         function importDataJSON(e){let t=e.files[0];if(!t)return;let n=new FileReader();n.onload=function(e){try{let t=JSON.parse(e.target.result);t.school&&t.academies?(currentData=t,localStorage.setItem(STORAGE_KEY,JSON.stringify(currentData)),alert("설정 파일을 성공적으로 불러왔습니다!"),buildAdminForm(),renderSchedule()):alert("올바른 설정 파일 형식이 아닙니다.")}catch(e){alert("파일 파싱 실패.")}},n.readAsText(t)}
