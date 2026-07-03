@@ -321,20 +321,15 @@
         }
 
         // 🎯 [새로 추가] meaning 텍스트 정제 함수
-        // 품사 (), 물결표 ~ 등 특수기호 제거
+        // 품사 [], 물결표 ~ 등 특수기호 제거
         function cleanMeaningForSpeech(meaningText) {
-            // 1. 괄호 안의 품사 정보 제거: "권(양사)" -> "권"
-            let cleaned = meaningText.replace(/\([^)]*\)/g, '').trim();
+            // 1. 대괄호와 그 안의 내용 제거: "[형용사] " -> ""
+            let cleaned = meaningText.replace(/\[[^\]]*\]/g, '').trim();
             
-            // 2. 물결표와 그 이후 내용 제거: "~이 아니다" -> "이 아니다"
+            // 2. 물결표와 그 이후 공백 제거: "~이 아니다" -> "이 아니다"
             cleaned = cleaned.replace(/^~\s*/, '').trim();
             
             return cleaned;
-        }
-
-        // 🎯 [새로 추가] 의미 있는 영어 부분 감지 함수
-        function containsEnglish(text) {
-            return /[a-zA-Z]/g.test(text);
         }
 
         // [학습 모드] 렌더러 수정 공정 - 상단 숫자 연한 회색 왼쪽 배치화 완료
@@ -461,11 +456,7 @@
                         // 🎯 [수정] meaning 정제 후 읽기 + 영어 감지
                         const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
                         const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
-                        if (containsEnglish(cleanedMeaning)) {
-                            u2.lang = 'en-US';
-                        } else {
-                            u2.lang = 'ko-KR'; 
-                        }
+                        u2.lang = 'ko-KR'; 
                         u2.rate = 1.0;
                         window.speechSynthesis.speak(u2);
                     }
@@ -552,11 +543,7 @@
             // 🎯 [수정] 한국어 뜻 - meaning 정제 + 영어 감지
             const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
             const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
-            if (containsEnglish(cleanedMeaning)) {
-                u2.lang = 'en-US';
-            } else {
-                u2.lang = 'ko-KR'; 
-            }
+            u2.lang = 'ko-KR'; 
             u2.rate = 1.0;
             window.speechSynthesis.speak(u2);
             
@@ -611,11 +598,7 @@
             else if (autoStep === 2) { 
                 // 🎯 [수정] meaning 정제 + 영어 감지
                 text = cleanMeaningForSpeech(word.meaning); 
-                if (containsEnglish(text)) {
-                    lang = 'en-US';
-                } else {
-                    lang = 'ko-KR'; 
-                }
+                lang = 'ko-KR'; 
                 rate = 1.0; 
             }
             else if (autoStep === 3) { text = word.exZh || ''; lang = 'zh-CN'; rate = speed; }
