@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BONG HUB & HSK 단어장</title>
+    <link rel="icon" href="data:,">
     <style>
         :root {
             --bg-main: #f8fafc;
@@ -119,14 +120,27 @@
         .btn-quiz { pointer-events: auto; background-color: #2563eb; color: white; border: none; border-radius: 50px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
         .btn-quiz:hover { transform: scale(1.04); }
         
-        .flip-card { background-color: transparent; width: 100%; height: 280px; perspective: 1000px; cursor: pointer; margin: 0; }
+        /* 📌 카드 덮임 및 깨짐 현상 수정을 위한 3D 플립 계층 구조 보완 */
+        .flip-card { background-color: transparent; width: 100%; height: 290px; perspective: 1000px; cursor: pointer; margin: 0; }
         .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s ease; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
         
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        /* 📌 뒷면이 앞면을 덮지 않도록 backface-visibility 및 가둠 장치(overflow) 최적화 */
+        .flip-card-front, .flip-card-back { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            -webkit-backface-visibility: hidden; 
+            backface-visibility: hidden; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+            border: 1px solid var(--border-color); 
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
         
         /* 퀴즈 앞면 */
-        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; }
+        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; z-index: 2; }
         .flip-card-front.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
         .flip-card-front .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-front .wrong-badge { position: absolute; top: 6px; right: 8px; font-size: 13px; display: none; }
@@ -135,7 +149,7 @@
         .flip-card-front .hint { font-size: 11px; color: var(--primary); margin-top: 10px; font-weight: 700; background: #e0e7ff; padding: 2px 8px; border-radius: 20px; }
         
         /* 퀴즈 뒷면 - 학습 모드 디자인과 매핑 및 크기 안정화 규격 보정 */
-        .flip-card-back { background-color: #ffffff; transform: rotateY(180deg); padding: 22px 12px 8px 12px; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; }
+        .flip-card-back { background-color: #ffffff; transform: rotateY(180deg); padding: 22px 12px 8px 12px; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; z-index: 1; }
         .flip-card-back .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-back .quiz-btn-wrap { margin-top: auto; padding-top: 4px; }
         .btn-wrong-toggle { width: 100%; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
@@ -149,10 +163,6 @@
         <div class="hub-subtitle">원하는 서비스 포털이나 학습 단어장을 선택해 주세요.</div>
         
         <div class="hub-grid">
-            <a href="daughter-schedule.html" class="hub-card schedule">
-                <h3>📅 딸 스케줄 확인</h3>
-                <p>데일리 학원 시간표와 실시간 주간 동선 일정을 안전하게 관리하는 전용 공간포털입니다.</p>
-            </a>
             <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(1)">
                 <h3>🇨🇳 HSK 1급</h3>
                 <p>기초 150단어 완전 마스터<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
@@ -320,19 +330,12 @@
             renderQuizCards(quizWords);
         }
 
-        // 🎯 [새로 추가] meaning 텍스트 정제 함수
-        // 품사 [], 물결표 ~ 등 특수기호 제거
         function cleanMeaningForSpeech(meaningText) {
-            // 1. 대괄호와 그 안의 내용 제거: "[형용사] " -> ""
             let cleaned = meaningText.replace(/\[[^\]]*\]/g, '').trim();
-            
-            // 2. 물결표와 그 이후 공백 제거: "~이 아니다" -> "이 아니다"
             cleaned = cleaned.replace(/^~\s*/, '').trim();
-            
             return cleaned;
         }
 
-        // [학습 모드] 렌더러 수정 공정 - 상단 숫자 연한 회색 왼쪽 배치화 완료
         function renderStudyCards(wordsArray) {
             const container = document.getElementById('studyContainer');
             container.innerHTML = '';
@@ -381,7 +384,6 @@
             });
         }
 
-        // [퀴즈 모드] 렌더러 수정 공정 - 뒤집었을 때 레이아웃 전면 보정 (숫자축 축소 및 팁 연동)
         function renderQuizCards(wordsArray) {
             const container = document.getElementById('quizContainer');
             container.innerHTML = '';
@@ -445,15 +447,13 @@
                     if (isFlippingToBack) {
                         const speed = getSpeed();
                         
-                        // [요구사항 반영] 퀴즈 모드 개별 클릭 시에도 중국어 두번 천천히 읽기 엔진 매핑
                         for (let k = 0; k < 2; k++) {
                             const u1 = new SpeechSynthesisUtterance(word.hanzi); 
                             u1.lang = 'zh-CN'; 
-                            u1.rate = Math.max(0.5, speed * 0.9); // 베이스 속도보다 살짝 유기적으로 감속
+                            u1.rate = Math.max(0.5, speed * 0.9);
                             window.speechSynthesis.speak(u1);
                         }
                         
-                        // 🎯 [수정] meaning 정제 후 읽기 + 영어 감지
                         const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
                         const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
                         u2.lang = 'ko-KR'; 
@@ -525,14 +525,12 @@
         async function requestWakeLock() { try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (err) {} }
         function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); } }
 
-        // [요구사항 반영] 단일 수동 발음 재생 시 중국어 병음(한자) 두번 천천히 읽기 최적화
         function speakSingleStudyWord(index) {
             stopStudyAudio(); 
             const word = currentFilteredWords[index];
             const speed = getSpeed();
-            const slowSpeed = Math.max(0.5, speed * 0.9); // 사용자가 고른 베이스 속도보다 조금 더 정속 제어
+            const slowSpeed = Math.max(0.5, speed * 0.9);
 
-            // 중국어 2회 반복
             for(let k = 0; k < 2; k++) {
                 const u1 = new SpeechSynthesisUtterance(word.hanzi); 
                 u1.lang = 'zh-CN'; 
@@ -540,14 +538,12 @@
                 window.speechSynthesis.speak(u1);
             }
             
-            // 🎯 [수정] 한국어 뜻 - meaning 정제 + 영어 감지
             const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
             const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
             u2.lang = 'ko-KR'; 
             u2.rate = 1.0;
             window.speechSynthesis.speak(u2);
             
-            // ✅ 예문 중국어
             if (word.exZh) {
                 const u3 = new SpeechSynthesisUtterance(word.exZh); 
                 u3.lang = 'zh-CN'; 
@@ -555,14 +551,12 @@
                 window.speechSynthesis.speak(u3);
             }
             
-            // ✅ 예문 한국어 뜻
             if (word.exMeaning) {
                 const u4 = new SpeechSynthesisUtterance(word.exMeaning); 
                 u4.lang = 'ko-KR'; 
                 u4.rate = 1.0;
                 window.speechSynthesis.speak(u4);
             }
-            
         }
 
         function togglePlayPause() {
@@ -582,7 +576,6 @@
             }
         }
 
-        // [요구사항 반영] 전체 자동재생 루프 내 중국어 스텝 분할 및 2회 천천히 재생 기믹 주입
         function playNextStep() {
             if (!isAutoPlaying || isPaused) return;
             if (autoIndex >= currentFilteredWords.length) { stopStudyAudio(); return; }
@@ -593,10 +586,8 @@
             
             let text, lang, rate;
 
-            // autoStep 구조 세분화: 0=중국어 1차, 1=중국어 2차, 2=한국어 뜻, 3=예문 중국어, 4=예문 뜻
             if (autoStep === 0 || autoStep === 1) { text = word.hanzi; lang = 'zh-CN'; rate = slowSpeed; }
             else if (autoStep === 2) { 
-                // 🎯 [수정] meaning 정제 + 영어 감지
                 text = cleanMeaningForSpeech(word.meaning); 
                 lang = 'ko-KR'; 
                 rate = 1.0; 
