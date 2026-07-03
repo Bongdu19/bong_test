@@ -1,3 +1,5 @@
+
+
 [
   {
     "num": 1,
@@ -337,9 +339,9 @@
     "exPinyin": "Dǎsǎo fángjiān.",
     "exMeaning": "방을 청소하다."
   },
-  {
+   {
     "num": 27,
-    "hanzi": "常",
+    "hanzi": "非常",
     "pinyin": "fēicháng",
     "koPron": "페이창",
     "meaning": "[부사] 아주, 대단히, Very",
@@ -349,7 +351,7 @@
     "exZh": "非常好。",
     "exPinyin": "Fēicháng hǎo.",
     "exMeaning": "아주 좋다."
-  },
+   },
   {
     "num": 28,
     "hanzi": "服务员",
@@ -1288,14 +1290,14 @@
   },
   {
     "num": 100,
-    "hanzi": "伤",
+    "hanzi": ""虽然...但是..."",
     "pinyin": "suīrán...dànshì...",
     "koPron": "쑤이란...딴스...",
     "meaning": "[접속사] 비록 ~하지만, ~하다, Although",
     "hanja": "비록 수(虽), 그럴 연(然), 다만 단(But), 옳을 시(是)",
     "pronTip": "쑤이란(suīrán) 그렇지만 딴스(dànshì) 할거야",
     "charTip": "입 구(口) 부수가 든 虽, 연화발(灬) 부수의 然, 사람 인(亻) 부수의 但, 해 일(日) 부수의 是가 만난 문장 대조 접속사 구문입니다.",
-    "exZh": "虽然下雨，하지만我去了。",
+    "exZh": "虽然下雨，但是我去了。",
     "exPinyin": "Suīrán xiàyǔ, dànshì wǒ qù le.",
     "exMeaning": "비록 비가 왔지만, 나는 갔다."
   },
@@ -1639,17 +1641,7 @@
   },
   {
     "num": 127,
-    "hanzi": "认",
-    "pinyin": "yě",
-    "koPron": "예",
-    "meaning": "[부사] ~도 또한, Also",
-    "hanja": "어조사 야",
-    "pronTip": "나도 예(yě)스!",
-    "charTip": "본래 땅 위를 구불구불 기어가는 사나운 뱀의 모양을 본뜬 새을(乙) 계열 부수 글자에서 조사로 가공되어 쓰입니다.",
-    "exZh": "我也是。",
-    "exPinyin": "Wǒ yě  shì.",
-    "exMeaning": "나도 그렇다."
-  },
+    
   {
     "num": 128,
     "hanzi": "一下",
@@ -1858,20 +1850,22 @@
     "exPinyin": "Kàn zhe.",
     "exMeaning": "보고 있다."
   },
-  {
+     {
     "num": 144,
     "hanzi": "真",
-    "pinyin": "zhên",
+    "pinyin": "zhēn",
     "koPron": "전",
     "meaning": "[부사] 정말, Real",
     "hanja": "참 진(真)",
     "pronTip": "전(zhēn)짜로?",
     "charTip": "눈 목(目) 부수가 중심에 있어 왜곡 없이 사물을 똑바로 목격하듯 거짓이나 군더더기 없는 명백한 진실 상태를 강조합니다.",
     "exZh": "真好。",
-    "exPinyin": "Zhên hǎo.",
+    "exPinyin": "Zhēn hǎo.",
     "exMeaning": "정말 좋다."
   },
-  {
+
+
+    {
     "num": 145,
     "hanzi": "正在",
     "pinyin": "zhèngzài",
