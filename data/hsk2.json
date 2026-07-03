@@ -1637,9 +1637,19 @@
     "exPinyin": "Wǒ yào qù.",
     "exMeaning": "나는 가려고 한다."
   },
-  {
+    {
     "num": 127,
-    
+    "hanzi": "也",
+    "pinyin": "yě",
+    "koPron": "예",
+    "meaning": "[부사] ~도 또한, Also",
+    "hanja": "어조사 야",
+    "pronTip": "나도 예(yě)스!",
+    "charTip": "본래 땅 위를 구불구불 기어가는 사나운 뱀의 모양을 본뜬 새을(乙) 계열 부수 글자에서 조사로 가공되어 쓰입니다.",
+    "exZh": "我也是。",
+    "exPinyin": "Wǒ yě shì.",
+    "exMeaning": "나도 그렇다."
+  },
   {
     "num": 128,
     "hanzi": "一下",
