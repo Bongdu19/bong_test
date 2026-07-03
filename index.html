@@ -76,7 +76,7 @@
         .play-btn { background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
         
         /* 2열: 성조 병음과 한글 독음 결합 */
-        .pinyin-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; padding-bottom: 4px; }
+        .pinyin-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; padding-bottom: 4px; }
         .pinyin { color: #2563eb; font-size: 20px; font-weight: 700; font-family: var(--font-family); } 
         .ko-pron { color: var(--text-sub); font-size: 15px; font-weight: 600; }
         .hanja { font-size: 13px; color: var(--text-sub); background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-weight: 600; border: 1px solid var(--border-color); }
@@ -343,13 +343,13 @@
                     <div class="pinyin-row">
                         <div class="pinyin">${word.pinyin}</div>
                         <div class="ko-pron">[${word.koPron || ''}]</div>
+                        <div class="hanja">${word.hanja || ''}</div>                        
                     </div>
                     
                     <div class="card-divider"></div>
                     
                     <div class="meaning-box">
                         <div class="meaning">${word.meaning}</div>
-                        <div class="hanja">${word.hanja || ''}</div>
                     </div>
                     
                     <div class="tip-box">
@@ -399,11 +399,11 @@
                             <div class="pinyin-row">
                                 <div class="pinyin" style="font-size:15px;">${word.pinyin}</div>
                                 <div class="ko-pron" style="font-size:12px;">[${word.koPron || ''}]</div>
+                                <div class="hanja" style="font-size:10px; padding:0px 4px;">${word.hanja || ''}</div>
                             </div>
                             <div class="card-divider" style="margin:2px 0 4px 0;"></div>
                             <div class="meaning-box">
                                 <div class="meaning" style="font-size:18px;">${word.meaning}</div>
-                                <div class="hanja" style="font-size:10px; padding:0px 4px;">${word.hanja || ''}</div>
                             </div>
                             
                             <div class="tip-box" style="padding: 3px 6px; margin-bottom: 4px; border-radius: 4px;">
@@ -517,7 +517,8 @@
             const word = currentFilteredWords[index];
             const speed = getSpeed();
             const slowSpeed = Math.max(0.5, speed * 0.9); // 사용자가 고른 베이스 속도보다 조금 더 정속 제어
-            
+
+            // 중국어 2회 반복
             for(let k = 0; k < 2; k++) {
                 const u1 = new SpeechSynthesisUtterance(word.hanzi); 
                 u1.lang = 'zh-CN'; 
@@ -525,10 +526,28 @@
                 window.speechSynthesis.speak(u1);
             }
             
+            // 한국어 뜻
             const u2 = new SpeechSynthesisUtterance(word.meaning); 
             u2.lang = 'ko-KR'; 
             u2.rate = 1.0;
             window.speechSynthesis.speak(u2);
+            
+            // ✅ 예문 중국어
+            if (word.exZh) {
+                const u3 = new SpeechSynthesisUtterance(word.exZh); 
+                u3.lang = 'zh-CN'; 
+                u3.rate = speed;
+                window.speechSynthesis.speak(u3);
+            }
+            
+            // ✅ 예문 한국어 뜻
+            if (word.exMeaning) {
+                const u4 = new SpeechSynthesisUtterance(word.exMeaning); 
+                u4.lang = 'ko-KR'; 
+                u4.rate = 1.0;
+                window.speechSynthesis.speak(u4);
+            }
+            
         }
 
         function togglePlayPause() {
