@@ -110,7 +110,7 @@
         .btn-quiz:hover { transform: scale(1.04); }
         
         .flip-card { background-color: transparent; width: 100%; height: 290px; perspective: 1000px; cursor: pointer; margin: 0; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s ease; transform-style: preserve-3d; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: left; transition: transform 0.5s ease; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
         
         .flip-card-front, .flip-card-back { 
@@ -126,7 +126,8 @@
             overflow: hidden; 
         }
         
-        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; z-index: 2; }
+        /* 퀴즈 모드 좌측 정렬을 위해 플렉스 아이템 정렬 속성 및 패딩 수정 */
+        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 20px; z-index: 2; }
         .flip-card-front.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
         .flip-card-front .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-front .wrong-badge { position: absolute; top: 6px; right: 8px; font-size: 13px; display: none; }
@@ -472,6 +473,8 @@
                         </div>
                     </div>
                 `;
+                
+                // 예문 읽어주기 추가 및 클릭 이벤트 수정
                 card.onclick = function(e) {
                     if(e.target.tagName === 'BUTTON') return;
                     const isFlippingToBack = !this.classList.contains('flipped');
@@ -480,6 +483,7 @@
                     if (isFlippingToBack) {
                         const speed = getSpeed();
                         
+                        // 1. 단어 발음
                         for (let k = 0; k < 2; k++) {
                             const u1 = new SpeechSynthesisUtterance(word.hanzi); 
                             u1.lang = 'zh-CN'; 
@@ -487,11 +491,28 @@
                             window.speechSynthesis.speak(u1);
                         }
                         
+                        // 2. 단어 뜻
                         const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
                         const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
                         u2.lang = 'ko-KR'; 
                         u2.rate = 1.0;
                         window.speechSynthesis.speak(u2);
+                        
+                        // 3. 예문 중국어 읽기
+                        if (word.exZh) {
+                            const u3 = new SpeechSynthesisUtterance(word.exZh); 
+                            u3.lang = 'zh-CN'; 
+                            u3.rate = speed;
+                            window.speechSynthesis.speak(u3);
+                        }
+                        
+                        // 4. 예문 한국어 뜻 읽기
+                        if (word.exMeaning) {
+                            const u4 = new SpeechSynthesisUtterance(word.exMeaning); 
+                            u4.lang = 'ko-KR'; 
+                            u4.rate = 1.0;
+                            window.speechSynthesis.speak(u4);
+                        }
                     }
                 };
                 container.appendChild(card);
