@@ -167,6 +167,7 @@
                 <p>핵심 300단어 입체 분석<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
             </div>
             
+            <!-- 부수로 공부하는 중국어단어 카드 추가 -->
             <div class="hub-card radical" style="cursor:pointer;" onclick="loadHskData('radical')">
                 <h3>🧩 부수로 공부하는 중국어단어</h3>
                 <p>어원과 스토리로 쉽게 외우는 단어장<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
@@ -296,8 +297,11 @@
                 `;
             } else if (level === 'radical') {
                 options += `
-                    <option value="part1">1일차 트랙 (1~35번)</option>
-                    <option value="part2">2일차 트랙 (36~끝번)</option>
+                    <option value="part1">1일차 子,女,足,目,心(1~40번)</option>
+                    <option value="part2">2일차 耳,月,水,火,土,石 (41~81번)</option>
+                    <option value="part3">3일차 金,雨,禾,竹,牛,羊,豕 (82~121번)</option>
+                    <option value="part4">4일차 鸟,鱼,角,皮,言,示,行,走 (122~161번)</option>
+                    <option value="part5">5일차 巾,门,刀,弓 (162~${allWords.length}번)</option>
                 `;
             } else if (level === 1 || level === 2) {
                 options += `
@@ -353,8 +357,11 @@
             if (val === 'all_part6') return mapped.slice(500);
 
             if (currentLevel === 'radical') {
-                if (val === 'part1') return mapped.slice(0, 35);
-                if (val === 'part2') return mapped.slice(35);
+                if (val === 'part1') return mapped.slice(0, 40);
+                if (val === 'part2') return mapped.slice(40, 81);
+                if (val === 'part3') return mapped.slice(81, 121);
+                if (val === 'part4') return mapped.slice(121, 161);
+                if (val === 'part5') return mapped.slice(161);
             } else {
                 if (val === 'part1') return mapped.slice(0, 35);
                 if (val === 'part2') return mapped.slice(35, 70);
