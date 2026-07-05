@@ -39,7 +39,8 @@
         .hub-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.06); }
         .hub-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; border-radius: 16px 16px 0 0; }
         .hub-card.hsk::before { background: linear-gradient(to right, #6366f1, #ef4444); }
-        .hub-card.hsk-all::before { background: linear-gradient(to right, #f59e0b, #ef4444); } /* 통합 카드는 다른 색상 부여 */
+        .hub-card.hsk-all::before { background: linear-gradient(to right, #f59e0b, #ef4444); } 
+        .hub-card.radical::before { background: linear-gradient(to right, #10b981, #3b82f6); } /* 부수 카드 전용 색상 */
         .hub-card h3 { margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: var(--text-main); }
         .hub-card p { margin: 0; font-size: 13px; color: var(--text-sub); line-height: 1.5; }
         .hub-card strong { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--primary); background: #f0fdf4; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
@@ -110,7 +111,7 @@
         .btn-quiz:hover { transform: scale(1.04); }
         
         .flip-card { background-color: transparent; width: 100%; height: 290px; perspective: 1000px; cursor: pointer; margin: 0; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: left; transition: transform 0.5s ease; transform-style: preserve-3d; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.5s ease; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
         
         .flip-card-front, .flip-card-back { 
@@ -126,17 +127,7 @@
             overflow: hidden; 
         }
         
-        /* 퀴즈 모드 앞면(문제)은 가운데 정렬 원복 */
-        .flip-card-front { 
-            background-color: #ffffff; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 10px; 
-            z-index: 2; 
-        }
+        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; z-index: 2; }
         .flip-card-front.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
         .flip-card-front .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-front .wrong-badge { position: absolute; top: 6px; right: 8px; font-size: 13px; display: none; }
@@ -144,8 +135,7 @@
         .flip-card-front .hanzi { font-size: 56px; color: var(--text-main); font-weight: 800; } 
         .flip-card-front .hint { font-size: 11px; color: var(--primary); margin-top: 10px; font-weight: 700; background: #e0e7ff; padding: 2px 8px; border-radius: 20px; }
         
-        /* 퀴즈 모드 뒷면(해설)은 요청하신 대로 좌측 정렬 유지 */
-        .flip-card-back { background-color: #ffffff; transform: rotateY(180deg); padding: 22px 12px 8px 12px; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; z-index: 1; }
+        .flip-card-back { background-color: #ffffff; transform: rotateY(180deg); padding: 22px 12px 8px 12px; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; z-index: 1; text-align: left; }
         .flip-card-back .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-back .quiz-btn-wrap { margin-top: auto; padding-top: 4px; }
         .btn-wrong-toggle { width: 100%; background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; }
@@ -175,6 +165,11 @@
             <div class="hub-card hsk" style="cursor:pointer;" onclick="loadHskData(3)">
                 <h3>🇨🇳 HSK 3급</h3>
                 <p>핵심 300단어 입체 분석<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
+            </div>
+            
+            <div class="hub-card radical" style="cursor:pointer;" onclick="loadHskData('radical')">
+                <h3>🧩 부수로 공부하는 중국어단어</h3>
+                <p>어원과 스토리로 쉽게 외우는 단어장<br><strong>학습 & 퀴즈 플립 엔진 통합형</strong></p>
             </div>
         </div>
     </div>
@@ -231,7 +226,6 @@
             currentLevel = level;
             wrongWordsSet.clear(); 
             
-            // 통합 데이터 로드 처리
             if (level === 'all') {
                 Promise.all([
                     fetch('./data/hsk1.json').then(res => res.json()),
@@ -239,7 +233,6 @@
                     fetch('./data/hsk3.json').then(res => res.json())
                 ])
                 .then(datasets => {
-                    // 3개 파일의 데이터를 하나의 배열로 합침
                     allWords = [...datasets[0], ...datasets[1], ...datasets[2]];
                     setupFilterOptions(level);
                     
@@ -254,8 +247,11 @@
                     alert(`오류: ${error.message}\ndata 폴더 안의 hsk1, 2, 3 json 파일을 모두 확인해 주세요.`);
                 });
             } else {
-                // 단일 레벨 로드 처리
-                fetch(`./data/hsk${level}.json`)
+                // 부수 단어장일 경우 radical.json 호출, 아닐경우 hsk 급수 호출
+                const fileName = level === 'radical' ? 'radical.json' : `hsk${level}.json`;
+                const titleName = level === 'radical' ? '부수로 공부하는 중국어 단어' : `HSK ${level}급 단어 최종 마스터`;
+
+                fetch(`./data/${fileName}`)
                     .then(response => {
                         if (!response.ok) throw new Error('서버에서 데이터셋을 로드하지 못했습니다.');
                         return response.json();
@@ -266,13 +262,13 @@
                         
                         document.getElementById('hubMainView').style.display = 'none';
                         document.getElementById('hskViewContainer').style.display = 'block';
-                        document.getElementById('hskTitleDisplay').innerText = `HSK ${level}급 단어 최종 마스터`;
+                        document.getElementById('hskTitleDisplay').innerText = titleName;
                         
                         switchTab('study');
                         applyFilter();
                     })
                     .catch(error => {
-                        alert(`오류: ${error.message}\ndata/hsk${level}.json 파일 구성을 확인해 주세요.`);
+                        alert(`오류: ${error.message}\ndata/${fileName} 파일 구성을 확인해 주세요.`);
                     });
             }
         }
@@ -297,6 +293,11 @@
                     <option value="all_part4">4일차 트랙 (301~400번)</option>
                     <option value="all_part5">5일차 트랙 (401~500번)</option>
                     <option value="all_part6">6일차 트랙 (501~${allWords.length}번)</option>
+                `;
+            } else if (level === 'radical') {
+                options += `
+                    <option value="part1">1일차 트랙 (1~35번)</option>
+                    <option value="part2">2일차 트랙 (36~끝번)</option>
                 `;
             } else if (level === 1 || level === 2) {
                 options += `
@@ -344,7 +345,6 @@
             const val = document.getElementById('dayFilter').value;
             let mapped = allWords.map((w, i) => ({...w, num: i + 1}));
             
-            // 통합 모드 필터 
             if (val === 'all_part1') return mapped.slice(0, 100);
             if (val === 'all_part2') return mapped.slice(100, 200);
             if (val === 'all_part3') return mapped.slice(200, 300);
@@ -352,15 +352,19 @@
             if (val === 'all_part5') return mapped.slice(400, 500);
             if (val === 'all_part6') return mapped.slice(500);
 
-            // 단일 급수 모드 필터
-            if (val === 'part1') return mapped.slice(0, 35);
-            if (val === 'part2') return mapped.slice(35, 70);
-            if (val === 'part3') return mapped.slice(70, 110);
-            if (val === 'part4') return mapped.slice(110, 150);
-            if (val === 'part5') return mapped.slice(150, 190);
-            if (val === 'part6') return mapped.slice(190, 230);
-            if (val === 'part7') return mapped.slice(230, 270);
-            if (val === 'part8') return mapped.slice(270);
+            if (currentLevel === 'radical') {
+                if (val === 'part1') return mapped.slice(0, 35);
+                if (val === 'part2') return mapped.slice(35);
+            } else {
+                if (val === 'part1') return mapped.slice(0, 35);
+                if (val === 'part2') return mapped.slice(35, 70);
+                if (val === 'part3') return mapped.slice(70, 110);
+                if (val === 'part4') return mapped.slice(110, 150);
+                if (val === 'part5') return mapped.slice(150, 190);
+                if (val === 'part6') return mapped.slice(190, 230);
+                if (val === 'part7') return mapped.slice(230, 270);
+                if (val === 'part8') return mapped.slice(270);
+            }
             if (val === 'wrong') return mapped.filter(w => wrongWordsSet.has(w.num)); 
             return mapped;
         }
@@ -392,6 +396,11 @@
                 const isWrong = wrongWordsSet.has(word.num);
                 card.className = 'card' + (isWrong ? ' is-wrong' : '');
                 card.id = 'study-card-' + word.num;
+                
+                // 데이터 종류(HSK, 부수)에 따른 팁 라벨 텍스트 변경
+                const tip1Label = (word.pronTip && word.pronTip.includes('부수')) ? '🧩 <b>부수 정보:</b>' : '💡 <b>발음 팁:</b>';
+                const tip2Label = (word.charTip && word.charTip.includes('+')) ? '✍️ <b>연상 스토리:</b>' : '✍️ <b>한자 팁:</b>';
+
                 card.innerHTML = `
                     <div class="index-num">No. ${word.num}</div>
                     <div class="card-row-top">
@@ -412,8 +421,8 @@
                     </div>
                     
                     <div class="tip-box">
-                        <div class="tip-item">💡 <b>발음 팁:</b> ${word.pronTip || '준비 중'}</div>
-                        <div class="tip-item">✍️ <b>한자 팁:</b> ${word.charTip || '준비 중'}</div>
+                        <div class="tip-item">${tip1Label} ${word.pronTip || '준비 중'}</div>
+                        <div class="tip-item">${tip2Label} ${word.charTip || '준비 중'}</div>
                     </div>
                     
                     <div class="ex-box">
@@ -441,6 +450,9 @@
                 card.className = 'flip-card';
                 card.id = 'quiz-card-' + word.num;
                 
+                const tip1Label = (word.pronTip && word.pronTip.includes('부수')) ? '🧩 <b>부수 정보:</b>' : '💡 <b>발음 팁:</b>';
+                const tip2Label = (word.charTip && word.charTip.includes('+')) ? '✍️ <b>연상 스토리:</b>' : '✍️ <b>한자 팁:</b>';
+
                 card.innerHTML = `
                     <div class="flip-card-inner">
                         <div class="flip-card-front ${isWrong ? 'is-wrong' : ''}">
@@ -464,8 +476,9 @@
                                 <div class="meaning" style="font-size:18px;">${word.meaning}</div>
                             </div>
                             
-                            <div class="tip-box" style="padding: 3px 6px; margin-bottom: 4px; border-radius: 4px;">
-                                <div class="tip-item" style="font-size: 11px;">✍️ ${word.charTip || '준비 중'}</div>
+                            <div class="tip-box" style="padding: 4px 8px; margin-bottom: 4px; border-radius: 4px;">
+                                <div class="tip-item" style="font-size: 11px; margin-bottom: 3px;">${tip1Label} ${word.pronTip || '준비 중'}</div>
+                                <div class="tip-item" style="font-size: 11px;">${tip2Label} ${word.charTip || '준비 중'}</div>
                             </div>
 
                             <div class="ex-box" style="padding:4px 8px; border-radius:6px;">
@@ -484,7 +497,6 @@
                     </div>
                 `;
                 
-                // 예문 읽어주기 추가 및 클릭 이벤트 수정
                 card.onclick = function(e) {
                     if(e.target.tagName === 'BUTTON') return;
                     const isFlippingToBack = !this.classList.contains('flipped');
@@ -493,7 +505,6 @@
                     if (isFlippingToBack) {
                         const speed = getSpeed();
                         
-                        // 1. 단어 발음
                         for (let k = 0; k < 2; k++) {
                             const u1 = new SpeechSynthesisUtterance(word.hanzi); 
                             u1.lang = 'zh-CN'; 
@@ -501,14 +512,12 @@
                             window.speechSynthesis.speak(u1);
                         }
                         
-                        // 2. 단어 뜻
                         const cleanedMeaning = cleanMeaningForSpeech(word.meaning);
                         const u2 = new SpeechSynthesisUtterance(cleanedMeaning); 
                         u2.lang = 'ko-KR'; 
                         u2.rate = 1.0;
                         window.speechSynthesis.speak(u2);
                         
-                        // 3. 예문 중국어 읽기
                         if (word.exZh) {
                             const u3 = new SpeechSynthesisUtterance(word.exZh); 
                             u3.lang = 'zh-CN'; 
@@ -516,7 +525,6 @@
                             window.speechSynthesis.speak(u3);
                         }
                         
-                        // 4. 예문 한국어 뜻 읽기
                         if (word.exMeaning) {
                             const u4 = new SpeechSynthesisUtterance(word.exMeaning); 
                             u4.lang = 'ko-KR'; 
@@ -570,7 +578,6 @@
                     const j = Math.floor(Math.random() * (i + 1));
                     [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
                 }
-                // 기존 문제 코드 주석(삭제) 처리: document.getElementById('dayFilter').value = 'all';
                 renderQuizCards(quizWords);
             }, 160);
         }
