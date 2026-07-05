@@ -126,8 +126,17 @@
             overflow: hidden; 
         }
         
-        /* 퀴즈 모드 좌측 정렬을 위해 플렉스 아이템 정렬 속성 및 패딩 수정 */
-        .flip-card-front { background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 20px; z-index: 2; }
+        /* 퀴즈 모드 앞면(문제)은 가운데 정렬 원복 */
+        .flip-card-front { 
+            background-color: #ffffff; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 10px; 
+            z-index: 2; 
+        }
         .flip-card-front.is-wrong { border-color: var(--accent-red); background-color: #fef2f2; }
         .flip-card-front .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-front .wrong-badge { position: absolute; top: 6px; right: 8px; font-size: 13px; display: none; }
@@ -135,6 +144,7 @@
         .flip-card-front .hanzi { font-size: 56px; color: var(--text-main); font-weight: 800; } 
         .flip-card-front .hint { font-size: 11px; color: var(--primary); margin-top: 10px; font-weight: 700; background: #e0e7ff; padding: 2px 8px; border-radius: 20px; }
         
+        /* 퀴즈 모드 뒷면(해설)은 요청하신 대로 좌측 정렬 유지 */
         .flip-card-back { background-color: #ffffff; transform: rotateY(180deg); padding: 22px 12px 8px 12px; display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; z-index: 1; }
         .flip-card-back .index-num { position: absolute; top: 8px; left: 10px; font-size: 11px; color: #94a3b8; font-weight: 700; }
         .flip-card-back .quiz-btn-wrap { margin-top: auto; padding-top: 4px; }
@@ -560,7 +570,7 @@
                     const j = Math.floor(Math.random() * (i + 1));
                     [quizWords[i], quizWords[j]] = [quizWords[j], quizWords[i]];
                 }
-                document.getElementById('dayFilter').value = 'all';
+                // 기존 문제 코드 주석(삭제) 처리: document.getElementById('dayFilter').value = 'all';
                 renderQuizCards(quizWords);
             }, 160);
         }
