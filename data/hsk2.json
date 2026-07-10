@@ -1912,5 +1912,44 @@
     "exZh": "准备好了。",
     "exPinyin": "Zhǔnbèi hǎo le.",
     "exMeaning": "준비 다 됐다."
+  },
+  {
+    "num": 148,
+    "hanzi": "走",
+    "pinyin": "zǒu",
+    "koPron": "쪼우",
+    "meaning": "[동사] 걷다, 가다, To walk",
+    "hanja": "달릴 주(走)",
+    "pronTip": "쪼우(zǒu)심해서 걷다",
+    "charTip": "사람이 팔을 크게 흔들며 힘차게 걸어가거나 달려가는 역동적인 모습을 본뜬 고유 부수 글자입니다.",
+    "exZh": "我们走吧。",
+    "exPinyin": "Wǒmen zǒu ba.",
+    "exMeaning": "우리 가자."
+  },
+  {
+    "num": 149,
+    "hanzi": "最",
+    "pinyin": "zuì",
+    "koPron": "쭈이",
+    "meaning": "[부사] 가장, 제일, Most",
+    "hanja": "가장 최(最)",
+    "pronTip": "쭈이(zuì)고로(최고로) 좋다",
+    "charTip": "가로 왈(曰) 부수 아래에 취할 취(取)가 결합하여, 여러 무리 중에서 가장 으뜸가고 뛰어난 것을 취한다는 뜻을 나타냅니다.",
+    "exZh": "最好。",
+    "exPinyin": "Zuì hǎo.",
+    "exMeaning": "가장 좋다."
+  },
+  {
+    "num": 150,
+    "hanzi": "左边",
+    "pinyin": "zuǒbian",
+    "koPron": "쭈오비엔",
+    "meaning": "[명사] 왼쪽, Left side",
+    "hanja": "왼 좌(左), 가 변(边)",
+    "pronTip": "쭈오비엔(zuǒbian) 쪼쪽이 왼쪽",
+    "charTip": "장인 공(工) 부수가 포함되어 도구를 쥘 때 거드는 손을 뜻하는 왼 좌(左)와 책받침(辶) 부수의 변(边)이 만나 좌측 방향을 뜻합니다.",
+    "exZh": "在左边。",
+    "exPinyin": "Zài zuǒbian.",
+    "exMeaning": "왼쪽에 있다."
   }
 ]  
