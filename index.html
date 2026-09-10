@@ -12,9 +12,8 @@
       <div>
         <p class="eyebrow">PC Interactive</p>
         <h1>신용장 서류 일치성 점검</h1>
-        <p class="subtext">정적 웹페이지에서 Upstage Agent API를 직접 호출하는 데모</p>
+        <p class="subtext">정적 웹페이지 데모</p>
       </div>
-      <div class="header-badge">Static Demo</div>
     </header>
 
     <main class="layout">
@@ -22,10 +21,10 @@
         <div class="card">
           <h2>실행 설정</h2>
 
-          <label class="label">API Key</label>
+          <label class="label" for="apiKey">API Key</label>
           <input id="apiKey" class="input" type="password" placeholder="up_..." />
 
-          <label class="label">Config ID (선택)</label>
+          <label class="label" for="configId">Config ID (선택)</label>
           <input id="configId" class="input" type="text" placeholder="비우면 최신 config 사용" />
 
           <label class="label">문서 업로드</label>
@@ -38,14 +37,9 @@
           <div id="fileInfo" class="file-info">선택된 파일 없음</div>
 
           <div class="button-row">
-            <button id="runBtn" class="btn btn-primary">실행</button>
-            <button id="sampleBtn" class="btn btn-secondary">샘플 보기</button>
-            <button id="clearBtn" class="btn btn-ghost">초기화</button>
-          </div>
-
-          <div class="notice">
-            <strong>주의:</strong> 이 버전은 브라우저에서 API를 직접 호출합니다.
-            테스트용으로만 사용하세요.
+            <button id="runBtn" class="btn btn-primary" type="button">실행</button>
+            <button id="sampleBtn" class="btn btn-secondary" type="button">샘플 보기</button>
+            <button id="clearBtn" class="btn btn-ghost" type="button">초기화</button>
           </div>
         </div>
 
@@ -53,16 +47,6 @@
           <h2>실행 상태</h2>
           <div id="jobStatus" class="status-text">대기 중</div>
           <div id="jobMeta" class="meta-text"></div>
-        </div>
-
-        <div class="card">
-          <h2>문서 키</h2>
-          <div id="documentKeys" class="kv-list empty">결과 없음</div>
-        </div>
-
-        <div class="card">
-          <h2>핵심 이슈</h2>
-          <div id="issues" class="issue-list empty">결과 없음</div>
         </div>
       </section>
 
@@ -92,9 +76,7 @@
         </div>
 
         <div class="card">
-          <div class="section-head">
-            <h2>비교표</h2>
-          </div>
+          <h2>비교표</h2>
           <div class="table-wrap">
             <table>
               <thead>
@@ -116,6 +98,16 @@
               </tbody>
             </table>
           </div>
+        </div>
+
+        <div class="card">
+          <h2>문서 키</h2>
+          <div id="documentKeys" class="kv-list empty">결과 없음</div>
+        </div>
+
+        <div class="card">
+          <h2>핵심 이슈</h2>
+          <div id="issues" class="issue-list empty">결과 없음</div>
         </div>
 
         <div class="card">
