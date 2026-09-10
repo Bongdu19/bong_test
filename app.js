@@ -41,6 +41,10 @@ function escapeHtml(value) {
   return str;
 }
 
+function trimValue(value) {
+  return String(value == null ? "" : value).replace(/^\s+|\s+\$/g, "");
+}
+
 function setStatus(text, meta) {
   els.jobStatus.textContent = text || "";
   els.jobMeta.textContent = meta || "";
@@ -198,11 +202,7 @@ function renderResult(parsed) {
 
   renderDocumentKeys(data.document_keys);
   renderIssues(data);
-
-  if (data.comparison_table) {
-    rows = data.comparison_table;
-  }
-
+  rows = data.comparison_table || [];
   renderComparisonTable(rows);
 }
 
@@ -225,7 +225,9 @@ function loadConfig() {
 function uploadFile(apiKey, file) {
   var form = new FormData();
   form.append("file", file);
-  form.append("purpose", "user_data");
+
+  // 필요 시 config에서 purpose를 바꿀 수 있게 함
+  form.append("purpose", CONFIG.filePurpose || "user_data");
 
   return fetch(CONFIG.baseUrl + "/files", {
     method: "POST",
@@ -241,6 +243,13 @@ function uploadFile(apiKey, file) {
     }
     return res.json();
   });
+}
+
+function validateUploadedFile(uploaded) {
+  if (!uploaded || !uploaded.id) {
+    throw new Error("업로드 응답에 file id가 없습니다.");
+  }
+  return uploaded;
 }
 
 function createJob(apiKey, fileId, configId) {
@@ -260,7 +269,7 @@ function createJob(apiKey, fileId, configId) {
     ]
   };
 
-  if (configId && configId.replace(/\s/g, "") !== "") {
+  if (configId) {
     body.config_id = configId;
   }
 
@@ -319,9 +328,7 @@ function pollJob(apiKey, jobId) {
 
           wait(CONFIG.pollIntervalMs || 2500).then(loop);
         })
-        .catch(function (error) {
-          reject(error);
-        });
+        .catch(reject);
     }
 
     loop();
@@ -346,9 +353,17 @@ function extractResultText(finalJob) {
   return null;
 }
 
+function parseResultText(rawText) {
+  try {
+    return JSON.parse(rawText);
+  } catch (e) {
+    throw new Error("결과 JSON 파싱 실패: " + e.message + "\n원문: " + rawText);
+  }
+}
+
 function runWorkflow() {
-  var apiKey = els.apiKey.value.replace(/^\s+|\s+\$/g, "");
-  var configId = els.configId.value.replace(/^\s+|\s+\$/g, "");
+  var apiKey = trimValue(els.apiKey.value);
+  var configId = trimValue(els.configId.value);
 
   if (!apiKey) {
     alert("API Key를 입력하세요.");
@@ -365,8 +380,10 @@ function runWorkflow() {
   setStatus("파일 업로드 중...", "");
 
   uploadFile(apiKey, selectedFile)
+    .then(validateUploadedFile)
     .then(function (uploaded) {
       uploadedFileId = uploaded.id;
+
       console.log("uploaded file response", uploaded);
       console.log("uploaded file id", uploadedFileId);
 
@@ -405,7 +422,7 @@ function runWorkflow() {
         return;
       }
 
-      parsed = JSON.parse(rawText);
+      parsed = parseResultText(rawText);
       renderResult(parsed);
       setStatus("완료", "job_id=" + currentJobId);
       els.runBtn.disabled = false;
@@ -413,7 +430,16 @@ function runWorkflow() {
     .catch(function (error) {
       console.error(error);
       setStatus("오류 발생", "");
-      alert(error.message || "오류가 발생했습니다.");
+
+      if (String(error.message || "").indexOf("No access to file") >= 0) {
+        alert(
+          "업로드된 file_id를 현재 에이전트 실행에서 바로 사용할 수 없어 403이 발생했습니다.\n" +
+          "이 경우 파일 업로드 목적값 또는 실행 방식이 현재 API/에이전트 컨텍스트와 맞지 않습니다."
+        );
+      } else {
+        alert(error.message || "오류가 발생했습니다.");
+      }
+
       els.runBtn.disabled = false;
     });
 }
