@@ -260,7 +260,8 @@ function createJob(apiKey, fileId, configId) {
           }
         ]
       }
-    ]
+    ],
+    file_ids: [fileId]
   };
 
   if (configId && configId.replace(/\s/g, "") !== "") {
