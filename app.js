@@ -2,34 +2,33 @@ var CONFIG = null;
 var selectedFile = null;
 var uploadedFileId = null;
 var currentJobId = null;
+var els = {};
 
-function \$(id) {
+function getEl(id) {
   return document.getElementById(id);
 }
 
-var els = {};
-
 function initElements() {
-  els.apiKey = \$("apiKey");
-  els.configId = \$("configId");
-  els.fileInput = \$("fileInput");
-  els.dropzone = \$("dropzone");
-  els.fileInfo = \$("fileInfo");
-  els.runBtn = \$("runBtn");
-  els.sampleBtn = \$("sampleBtn");
-  els.clearBtn = \$("clearBtn");
-  els.jobStatus = \$("jobStatus");
-  els.jobMeta = \$("jobMeta");
-  els.overallStatus = \$("overallStatus");
-  els.overallStatusDesc = \$("overallStatusDesc");
-  els.alertLevel = \$("alertLevel");
-  els.alertLevelDesc = \$("alertLevelDesc");
-  els.recommendedAction = \$("recommendedAction");
-  els.oneLineSummary = \$("oneLineSummary");
-  els.comparisonTableBody = \$("comparisonTableBody");
-  els.documentKeys = \$("documentKeys");
-  els.issues = \$("issues");
-  els.rawJson = \$("rawJson");
+  els.apiKey = getEl("apiKey");
+  els.configId = getEl("configId");
+  els.fileInput = getEl("fileInput");
+  els.dropzone = getEl("dropzone");
+  els.fileInfo = getEl("fileInfo");
+  els.runBtn = getEl("runBtn");
+  els.sampleBtn = getEl("sampleBtn");
+  els.clearBtn = getEl("clearBtn");
+  els.jobStatus = getEl("jobStatus");
+  els.jobMeta = getEl("jobMeta");
+  els.overallStatus = getEl("overallStatus");
+  els.overallStatusDesc = getEl("overallStatusDesc");
+  els.alertLevel = getEl("alertLevel");
+  els.alertLevelDesc = getEl("alertLevelDesc");
+  els.recommendedAction = getEl("recommendedAction");
+  els.oneLineSummary = getEl("oneLineSummary");
+  els.comparisonTableBody = getEl("comparisonTableBody");
+  els.documentKeys = getEl("documentKeys");
+  els.issues = getEl("issues");
+  els.rawJson = getEl("rawJson");
 }
 
 function escapeHtml(value) {
@@ -107,7 +106,10 @@ function renderDocumentKeys(documentKeys) {
 function renderIssues(data) {
   var html = "";
   var rows = data && data.comparison_table ? data.comparison_table : [];
-  var i, row, result, isIssue;
+  var i;
+  var row;
+  var result;
+  var isIssue;
 
   if (rows && rows.length) {
     for (i = 0; i < rows.length; i += 1) {
@@ -139,7 +141,8 @@ function renderIssues(data) {
 
 function renderComparisonTable(rows) {
   var html = "";
-  var i, row;
+  var i;
+  var row;
 
   if (!rows || !rows.length) {
     els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
@@ -313,7 +316,9 @@ function pollJob(apiKey, jobId) {
 
           wait(CONFIG.pollIntervalMs || 2500).then(loop);
         })
-        .catch(reject);
+        .catch(function (error) {
+          reject(error);
+        });
     }
 
     loop();
@@ -358,25 +363,26 @@ function runWorkflow() {
         els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
         setStatus("실행 실패", "job_id=" + currentJobId);
         alert("실행 실패: Raw JSON을 확인하세요.");
+        els.runBtn.disabled = false;
         return;
       }
 
       if (!finalJob.output_text) {
         els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
         setStatus("완료되었지만 output_text 없음", "job_id=" + currentJobId);
+        els.runBtn.disabled = false;
         return;
       }
 
       var parsed = JSON.parse(finalJob.output_text);
       renderResult(parsed);
       setStatus("완료", "job_id=" + currentJobId);
+      els.runBtn.disabled = false;
     })
     .catch(function (error) {
       console.error(error);
       setStatus("오류 발생", "");
       alert(error.message || "오류가 발생했습니다.");
-    })
-    .finally(function () {
       els.runBtn.disabled = false;
     });
 }
