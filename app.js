@@ -246,11 +246,11 @@ function uploadFile(apiKey, file) {
   });
 }
 
-
 function createJob(apiKey, fileId, configId) {
   var body = {
     model: CONFIG.agentId,
     include: ["last"],
+    input: "업로드한 파일을 검토해줘.",
     file_ids: [fileId]
   };
 
@@ -274,7 +274,6 @@ function createJob(apiKey, fileId, configId) {
     return res.json();
   });
 }
-
 
 function getJob(apiKey, jobId) {
   return fetch(CONFIG.baseUrl + "/responses/" + encodeURIComponent(jobId) + "?include[]=last", {
@@ -342,6 +341,7 @@ function runWorkflow() {
   uploadFile(apiKey, selectedFile)
     .then(function (uploaded) {
       uploadedFileId = uploaded.id;
+
       els.fileInfo.innerHTML =
         "<strong>" + escapeHtml(selectedFile.name) + "</strong><br>" +
         '<span class="meta-text">file_id=' + escapeHtml(uploadedFileId) + "</span>";
