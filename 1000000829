@@ -1,6 +1,0 @@
-{
-  "baseUrl": "https://api.upstage.ai/v2",
-  "agentId": "agt_EpTRLGpvzaoGjJEEyPcWN8",
-  "pollIntervalMs": 2500,
-  "include": ["last"]
-}
