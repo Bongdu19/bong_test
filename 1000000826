@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>신용장 서류 일치성 점검</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">PC Interactive</p>
+        <h1>신용장 서류 일치성 점검</h1>
+        <p class="subtext">정적 웹페이지에서 Upstage Agent API를 직접 호출하는 데모</p>
+      </div>
+      <div class="header-badge">Static Demo</div>
+    </header>
+
+    <main class="layout">
+      <section class="panel left-panel">
+        <div class="card">
+          <h2>실행 설정</h2>
+
+          <label class="label">API Key</label>
+          <input id="apiKey" class="input" type="password" placeholder="up_..." />
+
+          <label class="label">Config ID (선택)</label>
+          <input id="configId" class="input" type="text" placeholder="비우면 최신 config 사용" />
+
+          <label class="label">문서 업로드</label>
+          <div id="dropzone" class="dropzone">
+            <input id="fileInput" type="file" hidden />
+            <p class="dropzone-title">파일을 드래그하거나 클릭해 선택</p>
+            <p class="dropzone-sub">PDF / 이미지 / Office 파일</p>
+          </div>
+
+          <div id="fileInfo" class="file-info">선택된 파일 없음</div>
+
+          <div class="button-row">
+            <button id="runBtn" class="btn btn-primary">실행</button>
+            <button id="sampleBtn" class="btn btn-secondary">샘플 보기</button>
+            <button id="clearBtn" class="btn btn-ghost">초기화</button>
+          </div>
+
+          <div class="notice">
+            <strong>주의:</strong> 이 버전은 브라우저에서 API를 직접 호출합니다.
+            테스트용으로만 사용하세요.
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>실행 상태</h2>
+          <div id="jobStatus" class="status-text">대기 중</div>
+          <div id="jobMeta" class="meta-text"></div>
+        </div>
+
+        <div class="card">
+          <h2>문서 키</h2>
+          <div id="documentKeys" class="kv-list empty">결과 없음</div>
+        </div>
+
+        <div class="card">
+          <h2>핵심 이슈</h2>
+          <div id="issues" class="issue-list empty">결과 없음</div>
+        </div>
+      </section>
+
+      <section class="panel right-panel">
+        <div class="summary-grid">
+          <div class="card metric-card">
+            <div class="metric-label">Overall Status</div>
+            <div id="overallStatus" class="metric-value">-</div>
+            <div id="overallStatusDesc" class="metric-desc">결과 없음</div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-label">Alert Level</div>
+            <div id="alertLevel" class="metric-value">-</div>
+            <div id="alertLevelDesc" class="metric-desc">결과 없음</div>
+          </div>
+
+          <div class="card metric-card">
+            <div class="metric-label">Recommended Action</div>
+            <div id="recommendedAction" class="metric-desc large">결과 없음</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>One-line Summary</h2>
+          <p id="oneLineSummary" class="summary-text">결과 없음</p>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2>비교표</h2>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>check_item</th>
+                  <th>result</th>
+                  <th>LC</th>
+                  <th>Invoice</th>
+                  <th>B/L</th>
+                  <th>Packing List</th>
+                  <th>Insurance</th>
+                  <th>COO</th>
+                </tr>
+              </thead>
+              <tbody id="comparisonTableBody">
+                <tr>
+                  <td colspan="8" class="empty-cell">결과 없음</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Raw JSON</h2>
+          <pre id="rawJson" class="raw-json">결과 없음</pre>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
