@@ -1,50 +1,45 @@
-let CONFIG = null;
-let selectedFile = null;
-let uploadedFileId = null;
-let currentJobId = null;
+var CONFIG = null;
+var selectedFile = null;
+var uploadedFileId = null;
+var currentJobId = null;
 
 function \$(id) {
   return document.getElementById(id);
 }
 
-const els = {
-  apiKey: \$("apiKey"),
-  configId: \$("configId"),
-  fileInput: \$("fileInput"),
-  dropzone: \$("dropzone"),
-  fileInfo: \$("fileInfo"),
-  runBtn: \$("runBtn"),
-  sampleBtn: \$("sampleBtn"),
-  clearBtn: \$("clearBtn"),
-  jobStatus: \$("jobStatus"),
-  jobMeta: \$("jobMeta"),
-  overallStatus: \$("overallStatus"),
-  overallStatusDesc: \$("overallStatusDesc"),
-  alertLevel: \$("alertLevel"),
-  alertLevelDesc: \$("alertLevelDesc"),
-  recommendedAction: \$("recommendedAction"),
-  oneLineSummary: \$("oneLineSummary"),
-  comparisonTableBody: \$("comparisonTableBody"),
-  documentKeys: \$("documentKeys"),
-  issues: \$("issues"),
-  rawJson: \$("rawJson")
-};
+var els = {};
 
-async function loadConfig() {
-  const res = await fetch("./config.json");
-  if (!res.ok) {
-    throw new Error("config.json 로드 실패");
-  }
-  CONFIG = await res.json();
+function initElements() {
+  els.apiKey = \$("apiKey");
+  els.configId = \$("configId");
+  els.fileInput = \$("fileInput");
+  els.dropzone = \$("dropzone");
+  els.fileInfo = \$("fileInfo");
+  els.runBtn = \$("runBtn");
+  els.sampleBtn = \$("sampleBtn");
+  els.clearBtn = \$("clearBtn");
+  els.jobStatus = \$("jobStatus");
+  els.jobMeta = \$("jobMeta");
+  els.overallStatus = \$("overallStatus");
+  els.overallStatusDesc = \$("overallStatusDesc");
+  els.alertLevel = \$("alertLevel");
+  els.alertLevelDesc = \$("alertLevelDesc");
+  els.recommendedAction = \$("recommendedAction");
+  els.oneLineSummary = \$("oneLineSummary");
+  els.comparisonTableBody = \$("comparisonTableBody");
+  els.documentKeys = \$("documentKeys");
+  els.issues = \$("issues");
+  els.rawJson = \$("rawJson");
 }
 
 function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "<")
-    .replace(/>/g, ">")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  var str = String(value == null ? "" : value);
+  str = str.replace(/&/g, "&amp;");
+  str = str.replace(/</g, "<");
+  str = str.replace(/>/g, ">");
+  str = str.replace(/"/g, "&quot;");
+  str = str.replace(/'/g, "&#039;");
+  return str;
 }
 
 function setStatus(text, meta) {
@@ -53,18 +48,32 @@ function setStatus(text, meta) {
 }
 
 function badgeClass(result) {
-  const v = String(result || "").toLowerCase();
+  var v = String(result || "").toLowerCase();
 
-  if (v.includes("일치") || v === "match" || v === "ok") {
+  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok") {
     return "badge badge-ok";
   }
-  if (v.includes("검토") || v.includes("warning") || v === "review_required") {
+  if (v.indexOf("검토") >= 0 || v.indexOf("warning") >= 0 || v === "review_required") {
     return "badge badge-warn";
   }
-  if (v.includes("불일치") || v.includes("critical") || v === "mismatch") {
+  if (v.indexOf("불일치") >= 0 || v.indexOf("critical") >= 0 || v === "mismatch") {
     return "badge badge-crit";
   }
   return "badge badge-neutral";
+}
+
+function clearResult() {
+  els.overallStatus.textContent = "-";
+  els.overallStatusDesc.textContent = "결과 없음";
+  els.alertLevel.textContent = "-";
+  els.alertLevelDesc.textContent = "결과 없음";
+  els.recommendedAction.textContent = "결과 없음";
+  els.oneLineSummary.textContent = "결과 없음";
+  els.documentKeys.innerHTML = "결과 없음";
+  els.issues.innerHTML = "결과 없음";
+  els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
+  els.rawJson.textContent = "결과 없음";
+  setStatus("대기 중", "");
 }
 
 function normalizeResultPayload(parsed) {
@@ -75,114 +84,88 @@ function normalizeResultPayload(parsed) {
 }
 
 function renderDocumentKeys(documentKeys) {
+  var html = "";
+  var key;
+
   if (!documentKeys || typeof documentKeys !== "object") {
-    els.documentKeys.className = "kv-list empty";
     els.documentKeys.innerHTML = "결과 없음";
     return;
   }
 
-  const html = Object.entries(documentKeys)
-    .map(function (entry) {
-      const key = entry[0];
-      const value = entry[1];
-      return (
-        '<div class="kv-item">' +
-          '<div class="kv-key">' + escapeHtml(key) + "</div>" +
-          '<div class="kv-value">' + escapeHtml(value) + "</div>" +
-        "</div>"
-      );
-    })
-    .join("");
+  for (key in documentKeys) {
+    if (Object.prototype.hasOwnProperty.call(documentKeys, key)) {
+      html += '<div class="kv-item">';
+      html += '<div class="kv-key">' + escapeHtml(key) + "</div>";
+      html += '<div class="kv-value">' + escapeHtml(documentKeys[key]) + "</div>";
+      html += "</div>";
+    }
+  }
 
-  els.documentKeys.className = "kv-list";
-  els.documentKeys.innerHTML = html;
+  els.documentKeys.innerHTML = html || "결과 없음";
 }
 
 function renderIssues(data) {
-  const issues = [];
+  var html = "";
+  var rows = data && data.comparison_table ? data.comparison_table : [];
+  var i, row, result, isIssue;
 
-  if (Array.isArray(data && data.comparison_table)) {
-    data.comparison_table.forEach(function (row) {
-      const result = String(row.result || "");
-      const isIssue =
-        result.includes("불일치") ||
-        result.includes("검토") ||
-        result.toLowerCase().includes("warning") ||
-        result.toLowerCase().includes("critical");
+  if (rows && rows.length) {
+    for (i = 0; i < rows.length; i += 1) {
+      row = rows[i];
+      result = String(row.result || "");
+      isIssue =
+        result.indexOf("불일치") >= 0 ||
+        result.indexOf("검토") >= 0 ||
+        result.toLowerCase().indexOf("warning") >= 0 ||
+        result.toLowerCase().indexOf("critical") >= 0;
 
       if (isIssue) {
-        issues.push({
-          level: result.includes("불일치") ? "critical" : "warning",
-          title: row.check_item || "-",
-          desc:
-            "LC: " + (row.lc ?? "-") +
-            " / Invoice: " + (row.invoice ?? "-") +
-            " / B/L: " + (row.bill_of_lading ?? row.bl ?? "-") +
-            " / Packing List: " + (row.packing_list ?? "-")
-        });
+        html += '<div class="issue-item">';
+        html += '<span class="' + badgeClass(result) + '">' + escapeHtml(result) + "</span>";
+        html += '<div class="issue-title">' + escapeHtml(row.check_item || "-") + "</div>";
+        html += '<div class="issue-desc">';
+        html += "LC: " + escapeHtml(row.lc || "-");
+        html += " / Invoice: " + escapeHtml(row.invoice || "-");
+        html += " / B/L: " + escapeHtml(row.bill_of_lading || row.bl || "-");
+        html += " / Packing List: " + escapeHtml(row.packing_list || "-");
+        html += "</div>";
+        html += "</div>";
       }
-    });
+    }
   }
 
-  if (!issues.length && data && data.overall_alert_level) {
-    issues.push({
-      level: data.overall_alert_level,
-      title: "overall_alert_level",
-      desc: data.one_line_summary || "-"
-    });
-  }
-
-  if (!issues.length) {
-    els.issues.className = "issue-list empty";
-    els.issues.innerHTML = "이슈 없음";
-    return;
-  }
-
-  const html = issues
-    .map(function (issue) {
-      return (
-        '<div class="issue-item">' +
-          '<span class="' + badgeClass(issue.level) + '">' + escapeHtml(issue.level) + "</span>" +
-          '<div class="issue-title">' + escapeHtml(issue.title) + "</div>" +
-          '<div class="issue-desc">' + escapeHtml(issue.desc) + "</div>" +
-        "</div>"
-      );
-    })
-    .join("");
-
-  els.issues.className = "issue-list";
-  els.issues.innerHTML = html;
+  els.issues.innerHTML = html || "이슈 없음";
 }
 
 function renderComparisonTable(rows) {
-  if (!Array.isArray(rows) || rows.length === 0) {
-    els.comparisonTableBody.innerHTML =
-      '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
+  var html = "";
+  var i, row;
+
+  if (!rows || !rows.length) {
+    els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
     return;
   }
 
-  const html = rows
-    .map(function (row) {
-      return (
-        "<tr>" +
-          "<td>" + escapeHtml(row.check_item ?? row.item ?? "-") + "</td>" +
-          '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result ?? "-") + "</span></td>" +
-          "<td>" + escapeHtml(row.lc ?? "-") + "</td>" +
-          "<td>" + escapeHtml(row.invoice ?? "-") + "</td>" +
-          "<td>" + escapeHtml(row.bill_of_lading ?? row.bl ?? "-") + "</td>" +
-          "<td>" + escapeHtml(row.packing_list ?? "-") + "</td>" +
-          "<td>" + escapeHtml(row.insurance ?? "-") + "</td>" +
-          "<td>" + escapeHtml(row.coo ?? row.certificate_of_origin ?? "-") + "</td>" +
-        "</tr>"
-      );
-    })
-    .join("");
+  for (i = 0; i < rows.length; i += 1) {
+    row = rows[i];
+    html += "<tr>";
+    html += "<td>" + escapeHtml(row.check_item || row.item || "-") + "</td>";
+    html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
+    html += "<td>" + escapeHtml(row.lc || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.invoice || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.bill_of_lading || row.bl || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.packing_list || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.insurance || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.coo || row.certificate_of_origin || "-") + "</td>";
+    html += "</tr>";
+  }
 
   els.comparisonTableBody.innerHTML = html;
 }
 
 function renderResult(parsed) {
-  const data = normalizeResultPayload(parsed);
+  var data = normalizeResultPayload(parsed);
+  var rows = [];
 
   els.rawJson.textContent = JSON.stringify(parsed, null, 2);
   els.overallStatus.textContent = data.overall_status || "-";
@@ -190,76 +173,76 @@ function renderResult(parsed) {
   els.oneLineSummary.textContent = data.one_line_summary || "-";
   els.recommendedAction.textContent = data.recommended_action || "-";
 
-  els.overallStatusDesc.textContent =
-    data.overall_status === "review_required"
-      ? "진행 전 검토 필요"
-      : data.overall_status === "approved"
-      ? "이상 없음"
-      : "결과 확인";
+  if (data.overall_status === "review_required") {
+    els.overallStatusDesc.textContent = "진행 전 검토 필요";
+  } else if (data.overall_status === "approved") {
+    els.overallStatusDesc.textContent = "이상 없음";
+  } else {
+    els.overallStatusDesc.textContent = "결과 확인";
+  }
 
-  els.alertLevelDesc.textContent =
-    data.overall_alert_level === "critical"
-      ? "치명 이슈 포함"
-      : data.overall_alert_level === "warning"
-      ? "주의 필요"
-      : data.overall_alert_level === "info"
-      ? "참고 수준"
-      : "결과 확인";
+  if (data.overall_alert_level === "critical") {
+    els.alertLevelDesc.textContent = "치명 이슈 포함";
+  } else if (data.overall_alert_level === "warning") {
+    els.alertLevelDesc.textContent = "주의 필요";
+  } else if (data.overall_alert_level === "info") {
+    els.alertLevelDesc.textContent = "참고 수준";
+  } else {
+    els.alertLevelDesc.textContent = "결과 확인";
+  }
 
   renderDocumentKeys(data.document_keys);
-
-  const rows =
-    data.comparison_table ||
-    data.comparison_results ||
-    data.check_results ||
-    [];
-
   renderIssues(data);
+
+  if (data.comparison_table) {
+    rows = data.comparison_table;
+  } else if (data.comparison_results) {
+    rows = data.comparison_results;
+  } else if (data.check_results) {
+    rows = data.check_results;
+  }
+
   renderComparisonTable(rows);
 }
 
-function clearResult() {
-  els.overallStatus.textContent = "-";
-  els.overallStatusDesc.textContent = "결과 없음";
-  els.alertLevel.textContent = "-";
-  els.alertLevelDesc.textContent = "결과 없음";
-  els.recommendedAction.textContent = "결과 없음";
-  els.oneLineSummary.textContent = "결과 없음";
-  els.documentKeys.className = "kv-list empty";
-  els.documentKeys.innerHTML = "결과 없음";
-  els.issues.className = "issue-list empty";
-  els.issues.innerHTML = "결과 없음";
-  els.comparisonTableBody.innerHTML =
-    '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
-  els.rawJson.textContent = "결과 없음";
-  setStatus("대기 중", "");
+function loadConfig() {
+  return fetch("./config.json")
+    .then(function (res) {
+      if (!res.ok) {
+        throw new Error("config.json 로드 실패");
+      }
+      return res.json();
+    })
+    .then(function (json) {
+      CONFIG = json;
+    });
 }
 
-async function uploadFile(apiKey, file) {
-  const form = new FormData();
+function uploadFile(apiKey, file) {
+  var form = new FormData();
   form.append("file", file);
   form.append("purpose", "user_data");
 
-  const res = await fetch(CONFIG.baseUrl + "/files", {
+  return fetch(CONFIG.baseUrl + "/files", {
     method: "POST",
     headers: {
       Authorization: "Bearer " + apiKey
     },
     body: form
+  }).then(function (res) {
+    if (!res.ok) {
+      return res.text().then(function (text) {
+        throw new Error("파일 업로드 실패 (" + res.status + "): " + text);
+      });
+    }
+    return res.json();
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error("파일 업로드 실패 (" + res.status + "): " + text);
-  }
-
-  return await res.json();
 }
 
-async function createJob(apiKey, fileId, configId) {
-  const body = {
+function createJob(apiKey, fileId, configId) {
+  var body = {
     model: CONFIG.agentId,
-    include: CONFIG.include,
+    include: ["last"],
     input: [
       {
         role: "user",
@@ -273,121 +256,133 @@ async function createJob(apiKey, fileId, configId) {
     ]
   };
 
-  if (configId && configId.trim()) {
-    body.config_id = configId.trim();
+  if (configId && configId.replace(/\s/g, "") !== "") {
+    body.config_id = configId;
   }
 
-  const res = await fetch(CONFIG.baseUrl + "/responses", {
+  return fetch(CONFIG.baseUrl + "/responses", {
     method: "POST",
     headers: {
       Authorization: "Bearer " + apiKey,
       "Content-Type": "application/json"
     },
     body: JSON.stringify(body)
+  }).then(function (res) {
+    if (!res.ok) {
+      return res.text().then(function (text) {
+        throw new Error("Job 생성 실패 (" + res.status + "): " + text);
+      });
+    }
+    return res.json();
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error("Job 생성 실패 (" + res.status + "): " + text);
-  }
-
-  return await res.json();
 }
 
-async function getJob(apiKey, jobId) {
-  const res = await fetch(
-    CONFIG.baseUrl + "/responses/" + encodeURIComponent(jobId) + "?include[]=last",
-    {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + apiKey
+function getJob(apiKey, jobId) {
+  return fetch(CONFIG.baseUrl + "/responses/" + encodeURIComponent(jobId) + "?include[]=last", {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + apiKey
+    }
+  }).then(function (res) {
+    if (!res.ok) {
+      return res.text().then(function (text) {
+        throw new Error("Job 조회 실패 (" + res.status + "): " + text);
+      });
+    }
+    return res.json();
+  });
+}
+
+function wait(ms) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, ms);
+  });
+}
+
+function pollJob(apiKey, jobId) {
+  return new Promise(function (resolve, reject) {
+    function loop() {
+      getJob(apiKey, jobId)
+        .then(function (job) {
+          setStatus("실행 상태: " + job.status, "job_id=" + job.id);
+
+          if (job.status === "completed" || job.status === "failed") {
+            resolve(job);
+            return;
+          }
+
+          wait(CONFIG.pollIntervalMs || 2500).then(loop);
+        })
+        .catch(reject);
+    }
+
+    loop();
+  });
+}
+
+function runWorkflow() {
+  var apiKey = els.apiKey.value.replace(/^\s+|\s+\$/g, "");
+  var configId = els.configId.value.replace(/^\s+|\s+\$/g, "");
+
+  if (!apiKey) {
+    alert("API Key를 입력하세요.");
+    return;
+  }
+
+  if (!selectedFile) {
+    alert("파일을 선택하세요.");
+    return;
+  }
+
+  clearResult();
+  els.runBtn.disabled = true;
+  setStatus("파일 업로드 중...", "");
+
+  uploadFile(apiKey, selectedFile)
+    .then(function (uploaded) {
+      uploadedFileId = uploaded.id;
+      els.fileInfo.innerHTML =
+        "<strong>" + escapeHtml(selectedFile.name) + "</strong><br>" +
+        '<span class="meta-text">file_id=' + escapeHtml(uploadedFileId) + "</span>";
+
+      setStatus("Job 생성 중...", "file_id=" + uploadedFileId);
+      return createJob(apiKey, uploadedFileId, configId);
+    })
+    .then(function (job) {
+      currentJobId = job.id;
+      setStatus("실행 중...", "job_id=" + currentJobId);
+      return pollJob(apiKey, currentJobId);
+    })
+    .then(function (finalJob) {
+      if (finalJob.status === "failed") {
+        els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
+        setStatus("실행 실패", "job_id=" + currentJobId);
+        alert("실행 실패: Raw JSON을 확인하세요.");
+        return;
       }
-    }
-  );
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error("Job 조회 실패 (" + res.status + "): " + text);
-  }
+      if (!finalJob.output_text) {
+        els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
+        setStatus("완료되었지만 output_text 없음", "job_id=" + currentJobId);
+        return;
+      }
 
-  return await res.json();
-}
-
-async function pollJob(apiKey, jobId) {
-  while (true) {
-    const job = await getJob(apiKey, jobId);
-    setStatus("실행 상태: " + job.status, "job_id=" + job.id);
-
-    if (job.status === "completed" || job.status === "failed") {
-      return job;
-    }
-
-    await new Promise(function (resolve) {
-      setTimeout(resolve, CONFIG.pollIntervalMs);
+      var parsed = JSON.parse(finalJob.output_text);
+      renderResult(parsed);
+      setStatus("완료", "job_id=" + currentJobId);
+    })
+    .catch(function (error) {
+      console.error(error);
+      setStatus("오류 발생", "");
+      alert(error.message || "오류가 발생했습니다.");
+    })
+    .finally(function () {
+      els.runBtn.disabled = false;
     });
-  }
-}
-
-async function runWorkflow() {
-  try {
-    const apiKey = els.apiKey.value.trim();
-    const configId = els.configId.value.trim();
-
-    if (!apiKey) {
-      alert("API Key를 입력하세요.");
-      return;
-    }
-
-    if (!selectedFile) {
-      alert("파일을 선택하세요.");
-      return;
-    }
-
-    clearResult();
-    els.runBtn.disabled = true;
-
-    setStatus("파일 업로드 중...", "");
-    const uploaded = await uploadFile(apiKey, selectedFile);
-    uploadedFileId = uploaded.id;
-
-    els.fileInfo.innerHTML =
-      "<strong>" + escapeHtml(selectedFile.name) + "</strong><br>" +
-      '<span class="meta-text">file_id=' + escapeHtml(uploadedFileId) + "</span>";
-
-    setStatus("Job 생성 중...", "file_id=" + uploadedFileId);
-    const job = await createJob(apiKey, uploadedFileId, configId);
-    currentJobId = job.id;
-
-    setStatus("실행 중...", "job_id=" + currentJobId);
-    const finalJob = await pollJob(apiKey, currentJobId);
-
-    if (finalJob.status === "failed") {
-      els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
-      setStatus("실행 실패", "job_id=" + currentJobId);
-      alert("실행 실패: Raw JSON을 확인하세요.");
-      return;
-    }
-
-    if (!finalJob.output_text) {
-      els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
-      setStatus("완료되었지만 output_text 없음", "job_id=" + currentJobId);
-      return;
-    }
-
-    const parsed = JSON.parse(finalJob.output_text);
-    renderResult(parsed);
-    setStatus("완료", "job_id=" + currentJobId);
-  } catch (error) {
-    console.error(error);
-    setStatus("오류 발생", "");
-    alert(error.message || "오류가 발생했습니다.");
-  } finally {
-    els.runBtn.disabled = false;
-  }
 }
 
 function fillSample() {
-  const sample = {
+  var sample = {
     structured_result: {
       overall_status: "review_required",
       overall_alert_level: "warning",
@@ -434,44 +429,43 @@ function bindFileEvents() {
   });
 
   els.fileInput.addEventListener("change", function (e) {
-    selectedFile = (e.target.files && e.target.files[0]) ? e.target.files[0] : null;
+    selectedFile = e.target.files && e.target.files[0] ? e.target.files[0] : null;
     els.fileInfo.textContent = selectedFile ? selectedFile.name : "선택된 파일 없음";
   });
 
-  ["dragenter", "dragover"].forEach(function (eventName) {
-    els.dropzone.addEventListener(eventName, function (e) {
-      e.preventDefault();
-      els.dropzone.classList.add("dragover");
-    });
+  els.dropzone.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    els.dropzone.classList.add("dragover");
   });
 
-  ["dragleave", "drop"].forEach(function (eventName) {
-    els.dropzone.addEventListener(eventName, function (e) {
-      e.preventDefault();
-      els.dropzone.classList.remove("dragover");
-    });
+  els.dropzone.addEventListener("dragleave", function (e) {
+    e.preventDefault();
+    els.dropzone.classList.remove("dragover");
   });
 
   els.dropzone.addEventListener("drop", function (e) {
-    selectedFile = (e.dataTransfer.files && e.dataTransfer.files[0]) ? e.dataTransfer.files[0] : null;
+    e.preventDefault();
+    els.dropzone.classList.remove("dragover");
+    selectedFile = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
     els.fileInfo.textContent = selectedFile ? selectedFile.name : "선택된 파일 없음";
   });
 }
 
-async function init() {
-  try {
-    await loadConfig();
-    bindFileEvents();
+function init() {
+  initElements();
 
-    els.runBtn.addEventListener("click", runWorkflow);
-    els.sampleBtn.addEventListener("click", fillSample);
-    els.clearBtn.addEventListener("click", clearResult);
-
-    clearResult();
-  } catch (error) {
-    console.error(error);
-    alert("초기화 실패: config.json을 확인하세요.");
-  }
+  loadConfig()
+    .then(function () {
+      bindFileEvents();
+      els.runBtn.addEventListener("click", runWorkflow);
+      els.sampleBtn.addEventListener("click", fillSample);
+      els.clearBtn.addEventListener("click", clearResult);
+      clearResult();
+    })
+    .catch(function (error) {
+      console.error(error);
+      alert("초기화 실패: " + error.message);
+    });
 }
 
-init();
+document.addEventListener("DOMContentLoaded", init);
