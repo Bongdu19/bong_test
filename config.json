@@ -2,5 +2,6 @@
   "baseUrl": "https://api.upstage.ai/v2",
   "agentId": "agt_nhYFmSZojMGTsHzEBN3xVq",
   "pollIntervalMs": 2500,
+  "filePurpose": "user_data",
   "defaultApiKey": "up_Dd09X7ZhAFYvYX2CUR7tyCy1S3vRw"
 }
