@@ -128,7 +128,7 @@ function renderIssues(data) {
         html += '<div class="issue-desc">';
         html += "LC: " + escapeHtml(row.lc || "-");
         html += " / Invoice: " + escapeHtml(row.invoice || "-");
-        html += " / B/L: " + escapeHtml(row.bill_of_lading || row.bl || "-");
+        html += " / B/L: " + escapeHtml(row.bill_of_lading || "-");
         html += " / Packing List: " + escapeHtml(row.packing_list || "-");
         html += "</div>";
         html += "</div>";
@@ -152,14 +152,14 @@ function renderComparisonTable(rows) {
   for (i = 0; i < rows.length; i += 1) {
     row = rows[i];
     html += "<tr>";
-    html += "<td>" + escapeHtml(row.check_item || row.item || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.check_item || "-") + "</td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
     html += "<td>" + escapeHtml(row.lc || "-") + "</td>";
     html += "<td>" + escapeHtml(row.invoice || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.bill_of_lading || row.bl || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.bill_of_lading || "-") + "</td>";
     html += "<td>" + escapeHtml(row.packing_list || "-") + "</td>";
     html += "<td>" + escapeHtml(row.insurance || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.coo || row.certificate_of_origin || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.coo || "-") + "</td>";
     html += "</tr>";
   }
 
@@ -180,6 +180,8 @@ function renderResult(parsed) {
     els.overallStatusDesc.textContent = "진행 전 검토 필요";
   } else if (data.overall_status === "approved") {
     els.overallStatusDesc.textContent = "이상 없음";
+  } else if (data.overall_status === "rejected") {
+    els.overallStatusDesc.textContent = "반려";
   } else {
     els.overallStatusDesc.textContent = "결과 확인";
   }
@@ -199,10 +201,6 @@ function renderResult(parsed) {
 
   if (data.comparison_table) {
     rows = data.comparison_table;
-  } else if (data.comparison_results) {
-    rows = data.comparison_results;
-  } else if (data.check_results) {
-    rows = data.check_results;
   }
 
   renderComparisonTable(rows);
@@ -218,7 +216,6 @@ function loadConfig() {
     })
     .then(function (json) {
       CONFIG = json;
-
       if (CONFIG.defaultApiKey) {
         els.apiKey.value = CONFIG.defaultApiKey;
       }
@@ -260,13 +257,14 @@ function createJob(apiKey, fileId, configId) {
           }
         ]
       }
-    ],
-    file_ids: [fileId]
+    ]
   };
 
   if (configId && configId.replace(/\s/g, "") !== "") {
     body.config_id = configId;
   }
+
+  console.log("createJob request body", JSON.stringify(body, null, 2));
 
   return fetch(CONFIG.baseUrl + "/responses", {
     method: "POST",
@@ -369,6 +367,8 @@ function runWorkflow() {
   uploadFile(apiKey, selectedFile)
     .then(function (uploaded) {
       uploadedFileId = uploaded.id;
+      console.log("uploaded file response", uploaded);
+      console.log("uploaded file id", uploadedFileId);
 
       els.fileInfo.innerHTML =
         "<strong>" + escapeHtml(selectedFile.name) + "</strong><br>" +
@@ -379,6 +379,7 @@ function runWorkflow() {
     })
     .then(function (job) {
       currentJobId = job.id;
+      console.log("job created", job);
       setStatus("실행 중...", "job_id=" + currentJobId);
       return pollJob(apiKey, currentJobId);
     })
@@ -386,6 +387,7 @@ function runWorkflow() {
       var rawText;
       var parsed;
 
+      console.log("final job", finalJob);
       els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
 
       if (finalJob.status === "failed") {
@@ -421,8 +423,8 @@ function fillSample() {
     structured_result: {
       overall_status: "review_required",
       overall_alert_level: "warning",
-      one_line_summary: "B/L과 Packing List의 핵심 항목은 대체로 일치하나 일부 추가 검토가 필요합니다.",
-      recommended_action: "불일치 또는 검토필요 항목을 우선 확인하고 선적서류 원본과 대조하세요.",
+      one_line_summary: "합본 무역서류 비교 결과 일부 검토가 필요합니다.",
+      recommended_action: "불일치 또는 누락 항목을 확인하고 원본 서류와 대조하세요.",
       document_keys: {
         lc_number: "M0201410ES04828",
         invoice_number: "A4631-L032-61",
