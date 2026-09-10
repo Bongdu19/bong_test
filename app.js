@@ -250,8 +250,17 @@ function createJob(apiKey, fileId, configId) {
   var body = {
     model: CONFIG.agentId,
     include: ["last"],
-    input: "업로드한 파일을 검토해줘.",
-    file_ids: [fileId]
+    input: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "input_file",
+            file_id: fileId
+          }
+        ]
+      }
+    ]
   };
 
   if (configId && configId.replace(/\s/g, "") !== "") {
@@ -320,6 +329,24 @@ function pollJob(apiKey, jobId) {
   });
 }
 
+function extractResultText(finalJob) {
+  if (finalJob.output_text) {
+    return finalJob.output_text;
+  }
+
+  if (
+    finalJob.output &&
+    finalJob.output.length > 0 &&
+    finalJob.output[0].content &&
+    finalJob.output[0].content.length > 0 &&
+    finalJob.output[0].content[0].text
+  ) {
+    return finalJob.output[0].content[0].text;
+  }
+
+  return null;
+}
+
 function runWorkflow() {
   var apiKey = els.apiKey.value.replace(/^\s+|\s+\$/g, "");
   var configId = els.configId.value.replace(/^\s+|\s+\$/g, "");
@@ -355,22 +382,27 @@ function runWorkflow() {
       return pollJob(apiKey, currentJobId);
     })
     .then(function (finalJob) {
+      var rawText;
+      var parsed;
+
+      els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
+
       if (finalJob.status === "failed") {
-        els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
         setStatus("실행 실패", "job_id=" + currentJobId);
         alert("실행 실패: Raw JSON을 확인하세요.");
         els.runBtn.disabled = false;
         return;
       }
 
-      if (!finalJob.output_text) {
-        els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
-        setStatus("완료되었지만 output_text 없음", "job_id=" + currentJobId);
+      rawText = extractResultText(finalJob);
+
+      if (!rawText) {
+        setStatus("완료되었지만 결과 텍스트 없음", "job_id=" + currentJobId);
         els.runBtn.disabled = false;
         return;
       }
 
-      var parsed = JSON.parse(finalJob.output_text);
+      parsed = JSON.parse(rawText);
       renderResult(parsed);
       setStatus("완료", "job_id=" + currentJobId);
       els.runBtn.disabled = false;
