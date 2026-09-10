@@ -1,3 +1,4 @@
+
 var CONFIG = null;
 var selectedFile = null;
 var uploadedFileId = null;
