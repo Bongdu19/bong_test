@@ -218,6 +218,10 @@ function loadConfig() {
     })
     .then(function (json) {
       CONFIG = json;
+
+      if (CONFIG.defaultApiKey) {
+        els.apiKey.value = CONFIG.defaultApiKey;
+      }
     });
 }
 
