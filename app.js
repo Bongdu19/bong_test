@@ -242,21 +242,12 @@ function uploadFile(apiKey, file) {
   });
 }
 
+
 function createJob(apiKey, fileId, configId) {
   var body = {
     model: CONFIG.agentId,
     include: ["last"],
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_file",
-            file_id: fileId
-          }
-        ]
-      }
-    ]
+    file_ids: [fileId]
   };
 
   if (configId && configId.replace(/\s/g, "") !== "") {
@@ -279,6 +270,7 @@ function createJob(apiKey, fileId, configId) {
     return res.json();
   });
 }
+
 
 function getJob(apiKey, jobId) {
   return fetch(CONFIG.baseUrl + "/responses/" + encodeURIComponent(jobId) + "?include[]=last", {
