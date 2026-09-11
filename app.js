@@ -53,13 +53,24 @@ function setStatus(text, meta) {
 function badgeClass(result) {
   var v = String(result || "").toLowerCase();
 
-  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok") {
+  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok" || v === "proceed") {
     return "badge badge-ok";
   }
-  if (v.indexOf("검토") >= 0 || v.indexOf("warning") >= 0 || v === "review_required") {
+  if (
+    v.indexOf("검토") >= 0 ||
+    v.indexOf("warning") >= 0 ||
+    v === "review_required" ||
+    v === "unclear"
+  ) {
     return "badge badge-warn";
   }
-  if (v.indexOf("불일치") >= 0 || v.indexOf("critical") >= 0 || v === "mismatch") {
+  if (
+    v.indexOf("불일치") >= 0 ||
+    v.indexOf("critical") >= 0 ||
+    v === "mismatch" ||
+    v === "on_hold" ||
+    v === "missing"
+  ) {
     return "badge badge-crit";
   }
   return "badge badge-neutral";
@@ -83,7 +94,7 @@ function normalizeResultPayload(parsed) {
   if (parsed && parsed.structured_result) {
     return parsed.structured_result;
   }
-  return parsed;
+  return parsed || {};
 }
 
 function renderDocumentKeys(documentKeys) {
@@ -99,7 +110,7 @@ function renderDocumentKeys(documentKeys) {
     if (Object.prototype.hasOwnProperty.call(documentKeys, key)) {
       html += '<div class="kv-item">';
       html += '<div class="kv-key">' + escapeHtml(key) + "</div>";
-      html += '<div class="kv-value">' + escapeHtml(documentKeys[key]) + "</div>";
+      html += '<div class="kv-value">' + escapeHtml(documentKeys[key] || "-") + "</div>";
       html += "</div>";
     }
   }
@@ -107,13 +118,72 @@ function renderDocumentKeys(documentKeys) {
   els.documentKeys.innerHTML = html || "결과 없음";
 }
 
+function buildDateTimeline(dateChecks) {
+  var items = [
+    { key: "insurance_policy_issue_date", label: "Insurance Issue" },
+    { key: "invoice_date", label: "Invoice" },
+    { key: "packing_list_date", label: "Packing List" },
+    { key: "bl_shipment_date", label: "B/L Shipment" },
+    { key: "bl_on_board_date", label: "B/L On Board" },
+    { key: "latest_shipment_date", label: "Latest Shipment" },
+    { key: "lc_issue_date", label: "LC Issue" },
+    { key: "certificate_issue_date", label: "COO Issue" }
+  ];
+
+  var html = "";
+  var i;
+  var item;
+  var value;
+  var statusClass = "badge-neutral";
+
+  if (!dateChecks || typeof dateChecks !== "object") {
+    return "";
+  }
+
+  if (dateChecks.date_sequence_status === "match") {
+    statusClass = "badge-ok";
+  } else if (dateChecks.date_sequence_status === "mismatch") {
+    statusClass = "badge-crit";
+  } else if (dateChecks.date_sequence_status === "missing" || dateChecks.date_sequence_status === "unclear") {
+    statusClass = "badge-warn";
+  }
+
+  html += '<div class="issue-item">';
+  html += '<div class="issue-title">Date Flow</div>';
+  html += '<div class="issue-desc">';
+  html += '<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + "</span>";
+  html += " " + escapeHtml(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
+  html += "</div>";
+  html += '<div class="timeline-wrap" style="margin-top:10px;">';
+
+  for (i = 0; i < items.length; i += 1) {
+    item = items[i];
+    value = trimValue(dateChecks[item.key] || "");
+    if (!value) {
+      continue;
+    }
+
+    html += '<div class="kv-item" style="margin-bottom:8px;">';
+    html += '<div class="kv-key">' + escapeHtml(item.label) + "</div>";
+    html += '<div class="kv-value">' + escapeHtml(value) + "</div>";
+    html += "</div>";
+  }
+
+  html += "</div>";
+  html += "</div>";
+
+  return html;
+}
+
 function renderIssues(data) {
   var html = "";
-  var rows = data && data.comparison_table ? data.comparison_table : [];
+  var rows = data && data.comparison_matrix ? data.comparison_matrix : [];
   var i;
   var row;
   var result;
   var isIssue;
+
+  html += buildDateTimeline(data.date_checks);
 
   if (rows && rows.length) {
     for (i = 0; i < rows.length; i += 1) {
@@ -123,7 +193,10 @@ function renderIssues(data) {
         result.indexOf("불일치") >= 0 ||
         result.indexOf("검토") >= 0 ||
         result.toLowerCase().indexOf("warning") >= 0 ||
-        result.toLowerCase().indexOf("critical") >= 0;
+        result.toLowerCase().indexOf("critical") >= 0 ||
+        result.toLowerCase() === "mismatch" ||
+        result.toLowerCase() === "missing" ||
+        result.toLowerCase() === "unclear";
 
       if (isIssue) {
         html += '<div class="issue-item">';
@@ -131,9 +204,10 @@ function renderIssues(data) {
         html += '<div class="issue-title">' + escapeHtml(row.check_item || "-") + "</div>";
         html += '<div class="issue-desc">';
         html += "LC: " + escapeHtml(row.lc || "-");
-        html += " / Invoice: " + escapeHtml(row.invoice || "-");
+        html += " / Invoice: " + escapeHtml(row.commercial_invoice || "-");
         html += " / B/L: " + escapeHtml(row.bill_of_lading || "-");
         html += " / Packing List: " + escapeHtml(row.packing_list || "-");
+        html += " / Insurance: " + escapeHtml(row.marine_cargo_insurance || "-");
         html += "</div>";
         html += "</div>";
       }
@@ -159,11 +233,11 @@ function renderComparisonTable(rows) {
     html += "<td>" + escapeHtml(row.check_item || "-") + "</td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
     html += "<td>" + escapeHtml(row.lc || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.invoice || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.commercial_invoice || "-") + "</td>";
     html += "<td>" + escapeHtml(row.bill_of_lading || "-") + "</td>";
     html += "<td>" + escapeHtml(row.packing_list || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.insurance || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.coo || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.marine_cargo_insurance || "-") + "</td>";
+    html += "<td>" + escapeHtml(row.certificate_of_origin || "-") + "</td>";
     html += "</tr>";
   }
 
@@ -182,10 +256,10 @@ function renderResult(parsed) {
 
   if (data.overall_status === "review_required") {
     els.overallStatusDesc.textContent = "진행 전 검토 필요";
-  } else if (data.overall_status === "approved") {
-    els.overallStatusDesc.textContent = "이상 없음";
-  } else if (data.overall_status === "rejected") {
-    els.overallStatusDesc.textContent = "반려";
+  } else if (data.overall_status === "proceed") {
+    els.overallStatusDesc.textContent = "진행 가능";
+  } else if (data.overall_status === "on_hold") {
+    els.overallStatusDesc.textContent = "보류";
   } else {
     els.overallStatusDesc.textContent = "결과 확인";
   }
@@ -202,7 +276,7 @@ function renderResult(parsed) {
 
   renderDocumentKeys(data.document_keys);
   renderIssues(data);
-  rows = data.comparison_table || [];
+  rows = data.comparison_matrix || [];
   renderComparisonTable(rows);
 }
 
@@ -225,8 +299,6 @@ function loadConfig() {
 function uploadFile(apiKey, file) {
   var form = new FormData();
   form.append("file", file);
-
-  // 필요 시 config에서 purpose를 바꿀 수 있게 함
   form.append("purpose", CONFIG.filePurpose || "user_data");
 
   return fetch(CONFIG.baseUrl + "/files", {
@@ -457,26 +529,48 @@ function fillSample() {
         bl_number: "RKOE076",
         policy_certificate_number: "15-H0065622"
       },
-      comparison_table: [
+      date_checks: {
+        insurance_policy_issue_date: "2015-05-01",
+        invoice_date: "2015-05-07",
+        packing_list_date: "2015-05-07",
+        bl_shipment_date: "2015-05-07",
+        bl_on_board_date: "2015-05-07",
+        latest_shipment_date: "",
+        lc_issue_date: "",
+        certificate_issue_date: "",
+        date_sequence_status: "match",
+        date_sequence_notes: "보험증권 발행일 이후 송장/패킹리스트/B/L 날짜 흐름은 대체로 자연스럽습니다."
+      },
+      comparison_matrix: [
         {
-          check_item: "L/C 번호",
-          result: "일치",
-          lc: "M0201410ES04828",
-          invoice: "M0201410ES04828",
-          bill_of_lading: "M0201410ES04828",
-          packing_list: "M0201410ES04828",
-          insurance: "M0201410ES04828",
-          coo: "-"
+          check_item: "invoice_number",
+          result: "match",
+          lc: "-",
+          commercial_invoice: "A4631-L032-61",
+          bill_of_lading: "-",
+          packing_list: "A4631-L032-61",
+          marine_cargo_insurance: "A4631-L032-61",
+          certificate_of_origin: "-"
         },
         {
-          check_item: "부피(CBM)",
-          result: "일치",
+          check_item: "measurement_cbm",
+          result: "match",
           lc: "-",
-          invoice: "-",
+          commercial_invoice: "-",
           bill_of_lading: "22.948",
           packing_list: "22.948",
-          insurance: "-",
-          coo: "-"
+          marine_cargo_insurance: "-",
+          certificate_of_origin: "-"
+        },
+        {
+          check_item: "date_flow_timeline",
+          result: "match",
+          lc: "-",
+          commercial_invoice: "2015-05-07",
+          bill_of_lading: "2015-05-07",
+          packing_list: "2015-05-07",
+          marine_cargo_insurance: "2015-05-01",
+          certificate_of_origin: "-"
         }
       ]
     }
