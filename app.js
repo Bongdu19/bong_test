@@ -45,6 +45,11 @@ function trimValue(value) {
   return String(value == null ? "" : value).replace(/^\s+|\s+\$/g, "");
 }
 
+function getCacheBuster() {
+  var url = new URL(window.location.href);
+  return url.searchParams.get("v") || String(Date.now());
+}
+
 function setStatus(text, meta) {
   els.jobStatus.textContent = text || "";
   els.jobMeta.textContent = meta || "";
@@ -144,7 +149,10 @@ function buildDateTimeline(dateChecks) {
     statusClass = "badge-ok";
   } else if (dateChecks.date_sequence_status === "mismatch") {
     statusClass = "badge-crit";
-  } else if (dateChecks.date_sequence_status === "missing" || dateChecks.date_sequence_status === "unclear") {
+  } else if (
+    dateChecks.date_sequence_status === "missing" ||
+    dateChecks.date_sequence_status === "unclear"
+  ) {
     statusClass = "badge-warn";
   }
 
@@ -281,7 +289,11 @@ function renderResult(parsed) {
 }
 
 function loadConfig() {
-  return fetch("./config.json")
+  var v = getCacheBuster();
+
+  return fetch("./config.json?v=" + encodeURIComponent(v), {
+    cache: "no-store"
+  })
     .then(function (res) {
       if (!res.ok) {
         throw new Error("config.json 로드 실패");
@@ -618,6 +630,7 @@ function init() {
       els.sampleBtn.addEventListener("click", fillSample);
       els.clearBtn.addEventListener("click", clearResult);
       clearResult();
+      setStatus("대기 중", "cache_buster=v=" + getCacheBuster());
     })
     .catch(function (error) {
       console.error(error);
