@@ -1,7 +1,7 @@
 {
   "baseUrl": "https://api.upstage.ai/v2",
-  "agentId": "agt_nhYFmSZojMGTsHzEBN3xVq",
-  "agentId_detail": "agt_EpTRLGpvzaoGjJEEyPcWN8",
+  "__agentId_old": "agt_nhYFmSZojMGTsHzEBN3xVq",
+  "agentId": "agt_EpTRLGpvzaoGjJEEyPcWN8",
   "pollIntervalMs": 2500,
   "filePurpose": "user_data",
   "defaultApiKey": "up_Dd09X7ZhAFYvYX2CUR7tyCy1S3vRw"
