@@ -548,8 +548,44 @@ function renderChecklists(documentChecklists) {
   var firstKey = keys[0];
 
   keys.forEach(function (key) {
+    var items = documentChecklists[key] || [];
     var label = docLabels[key] || (key.toUpperCase() + " 서류");
-    tabsHtml += '<button type="button" class="tab-btn" data-key="' + escapeHtml(key) + '">' + escapeHtml(label) + '</button>';
+    
+    var critCount = 0;
+    var warnCount = 0;
+    var passCount = 0;
+
+    items.forEach(function (it) {
+      var st = String(it.status || "").toLowerCase();
+      if (st === "fail" || st === "crit" || st === "mismatch" || st === "missing" || st.indexOf("불일치") >= 0) {
+        critCount += 1;
+      } else if (st === "warning" || st === "warn" || st === "review_required" || st === "unclear" || st.indexOf("검토") >= 0) {
+        warnCount += 1;
+      } else if (st === "pass" || st === "ok" || st === "match" || st.indexOf("일치") >= 0) {
+        passCount += 1;
+      }
+    });
+
+    var tabClass = "tab-btn-neutral";
+    var tabPillHtml = "";
+
+    if (critCount > 0) {
+      tabClass = "tab-btn-crit";
+      tabPillHtml = '<span class="tab-pill pill-crit">🚨 미비 ' + critCount + '</span>';
+    } else if (warnCount > 0) {
+      tabClass = "tab-btn-warn";
+      tabPillHtml = '<span class="tab-pill pill-warn">⚠️ 주의 ' + warnCount + '</span>';
+    } else if (passCount > 0) {
+      tabClass = "tab-btn-ok";
+      tabPillHtml = '<span class="tab-pill pill-ok">✅ 정상 ' + passCount + '</span>';
+    } else {
+      tabPillHtml = '<span class="tab-pill pill-neutral">' + items.length + '</span>';
+    }
+
+    tabsHtml += '<button type="button" class="tab-btn ' + tabClass + '" data-key="' + escapeHtml(key) + '">';
+    tabsHtml += '<span class="tab-label">' + escapeHtml(label) + '</span>';
+    tabsHtml += tabPillHtml;
+    tabsHtml += '</button>';
   });
 
   els.checklistTabs.innerHTML = tabsHtml;
@@ -576,34 +612,34 @@ function renderResult(parsed, finalJob) {
   currentRawPayload = finalJob || parsed;
   els.rawJson.textContent = JSON.stringify(currentRawPayload, null, 2);
 
-  /* Render Overall Status Pill */
+  /* Render Overall Status Pill & Large Korean Desc */
   if (overall === "review_required") {
     els.overallStatus.innerHTML = '<span class="status-pill-lg badge-warn">Review Required</span>';
-    els.overallStatusDesc.textContent = "진행 전 추가 검토 필요";
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">⚠️ 진행 전 추가 검토 필요</span>';
   } else if (overall === "proceed") {
     els.overallStatus.innerHTML = '<span class="status-pill-lg badge-ok">Proceed</span>';
-    els.overallStatusDesc.textContent = "서류 일치 (진행 가능)";
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">✅ 서류 일치 (진행 가능)</span>';
   } else if (overall === "on_hold") {
     els.overallStatus.innerHTML = '<span class="status-pill-lg badge-crit">On Hold</span>';
-    els.overallStatusDesc.textContent = "불일치 발생 (보류)";
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">🚨 불일치 발생 (보류)</span>';
   } else {
     els.overallStatus.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_status || "-") + '</span>';
-    els.overallStatusDesc.textContent = "결과 확인";
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(data.overall_status || "결과 확인") + '</span>';
   }
 
-  /* Render Alert Level Pill */
+  /* Render Alert Level Pill & Large Korean Desc */
   if (alertLvl === "critical") {
     els.alertLevel.innerHTML = '<span class="status-pill-lg badge-crit">Critical</span>';
-    els.alertLevelDesc.textContent = "치명 이슈 포함";
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight crit">🚨 치명 이슈 포함</span>';
   } else if (alertLvl === "warning") {
     els.alertLevel.innerHTML = '<span class="status-pill-lg badge-warn">Warning</span>';
-    els.alertLevelDesc.textContent = "주의 필요";
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight warn">⚠️ 주의 필요</span>';
   } else if (alertLvl === "info") {
     els.alertLevel.innerHTML = '<span class="status-pill-lg badge-ok">Info</span>';
-    els.alertLevelDesc.textContent = "참고 수준";
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight ok">ℹ️ 참고 수준</span>';
   } else {
     els.alertLevel.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_alert_level || "-") + '</span>';
-    els.alertLevelDesc.textContent = "결과 확인";
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(data.overall_alert_level || "결과 확인") + '</span>';
   }
 
   els.oneLineSummary.textContent = cleanText(data.one_line_summary) || "-";
