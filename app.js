@@ -2,6 +2,8 @@ var CONFIG = null;
 var selectedFile = null;
 var uploadedFileId = null;
 var currentJobId = null;
+var currentChecklistData = null;
+var activeChecklistTab = null;
 var els = {};
 
 function getEl(id) {
@@ -37,6 +39,8 @@ function initElements() {
   els.comparisonTableBody = getEl("comparisonTableBody");
   els.documentKeys = getEl("documentKeys");
   els.dateTimeline = getEl("dateTimeline");
+  els.checklistTabs = getEl("checklistTabs");
+  els.checklistContent = getEl("checklistContent");
   els.rawJson = getEl("rawJson");
 }
 
@@ -103,11 +107,10 @@ function getApiEndpoint(path) {
     workerBase = "https://bong.gehunmin19.workers.dev";
   }
   
-  // Ensure protocol
   if (!/^https?:\/\//i.test(workerBase)) {
     workerBase = "https://" + workerBase;
   }
-  
+
   workerBase = workerBase.replace(/\/+$/, "");
 
   if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
@@ -124,14 +127,15 @@ function setStatus(text, meta) {
 function badgeClass(result) {
   var v = String(result || "").toLowerCase();
 
-  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok" || v === "proceed") {
+  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok" || v === "proceed" || v === "pass") {
     return "badge badge-ok";
   }
   if (
     v.indexOf("검토") >= 0 ||
     v.indexOf("warning") >= 0 ||
     v === "review_required" ||
-    v === "unclear"
+    v === "unclear" ||
+    v === "warn"
   ) {
     return "badge badge-warn";
   }
@@ -140,7 +144,8 @@ function badgeClass(result) {
     v.indexOf("critical") >= 0 ||
     v === "mismatch" ||
     v === "on_hold" ||
-    v === "missing"
+    v === "missing" ||
+    v === "fail"
   ) {
     return "badge badge-crit";
   }
@@ -154,7 +159,8 @@ function rowHighlightClass(result) {
     v.indexOf("불일치") >= 0 ||
     v.indexOf("critical") >= 0 ||
     v === "mismatch" ||
-    v === "missing"
+    v === "missing" ||
+    v === "fail"
   ) {
     return "row-crit";
   }
@@ -162,7 +168,8 @@ function rowHighlightClass(result) {
     v.indexOf("검토") >= 0 ||
     v.indexOf("warning") >= 0 ||
     v === "review_required" ||
-    v === "unclear"
+    v === "unclear" ||
+    v === "warn"
   ) {
     return "row-warn";
   }
@@ -180,7 +187,11 @@ function clearResult() {
   els.documentKeys.innerHTML = "결과 없음";
   if (els.dateTimeline) els.dateTimeline.innerHTML = "결과 없음";
   els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
+  if (els.checklistTabs) els.checklistTabs.innerHTML = "";
+  if (els.checklistContent) els.checklistContent.innerHTML = '<div class="empty-cell">결과 없음</div>';
   els.rawJson.textContent = "결과 없음";
+  currentChecklistData = null;
+  activeChecklistTab = null;
   setStatus("대기 중", "");
 }
 
@@ -302,6 +313,7 @@ function renderComparisonTable(rows) {
   var i;
   var row;
   var rowClass = "";
+  var itemTitle = "";
 
   if (!rows || !rows.length) {
     els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
@@ -311,19 +323,115 @@ function renderComparisonTable(rows) {
   for (i = 0; i < rows.length; i += 1) {
     row = rows[i];
     rowClass = rowHighlightClass(row.result);
+    itemTitle = row.check_item_ko || row.check_item || "-";
+
     html += '<tr class="' + rowClass + '">';
-    html += "<td><strong>" + escapeHtml(cleanText(row.check_item || "-")) + "</strong></td>";
+    html += "<td><strong>" + escapeHtml(cleanText(itemTitle)) + "</strong></td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
     html += "<td>" + escapeHtml(cleanText(row.lc || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.commercial_invoice || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.bill_of_lading || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.commercial_invoice || row.invoice || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.bill_of_lading || row.bl || "-")) + "</td>";
     html += "<td>" + escapeHtml(cleanText(row.packing_list || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.marine_cargo_insurance || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.certificate_of_origin || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.marine_cargo_insurance || row.insurance || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.certificate_of_origin || row.coo || "-")) + "</td>";
     html += "</tr>";
   }
 
   els.comparisonTableBody.innerHTML = html;
+}
+
+/* Render Per-Document Checklist Tabs & Content */
+function selectChecklistTab(docKey) {
+  if (!currentChecklistData || !currentChecklistData[docKey]) return;
+
+  activeChecklistTab = docKey;
+
+  // Update tab buttons active state
+  var buttons = els.checklistTabs.querySelectorAll(".tab-btn");
+  buttons.forEach(function (btn) {
+    if (btn.getAttribute("data-key") === docKey) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  // Render checklist items
+  var items = currentChecklistData[docKey];
+  var html = "";
+  var i;
+  var item;
+  var statusBadge = "badge-neutral";
+
+  if (!items || !items.length) {
+    els.checklistContent.innerHTML = '<div class="empty-cell">해당 서류의 체크리스트 항목이 없습니다.</div>';
+    return;
+  }
+
+  for (i = 0; i < items.length; i += 1) {
+    item = items[i];
+    statusBadge = badgeClass(item.status);
+
+    html += '<div class="checklist-item">';
+    html += '<div>';
+    html += '<div class="checklist-item-title">' + escapeHtml(cleanText(item.item || item.title || "점검 항목")) + '</div>';
+    if (item.details || item.desc) {
+      html += '<div class="checklist-item-details">' + escapeHtml(cleanText(item.details || item.desc)) + '</div>';
+    }
+    html += '</div>';
+    html += '<div><span class="' + statusBadge + '">' + escapeHtml(item.status || "CHECK") + '</span></div>';
+    html += '</div>';
+  }
+
+  els.checklistContent.innerHTML = html;
+}
+
+function renderChecklists(documentChecklists) {
+  if (!els.checklistTabs || !els.checklistContent) return;
+
+  if (!documentChecklists || typeof documentChecklists !== "object" || Object.keys(documentChecklists).length === 0) {
+    els.checklistTabs.innerHTML = "";
+    els.checklistContent.innerHTML = '<div class="empty-cell">서류별 체크리스트 데이터가 없습니다.</div>';
+    return;
+  }
+
+  currentChecklistData = documentChecklists;
+
+  var docLabels = {
+    lc: "📜 L/C 신용장",
+    invoice: "📄 상업송장 (INV)",
+    commercial_invoice: "📄 상업송장 (INV)",
+    bl: "🚢 선하증권 (B/L)",
+    bill_of_lading: "🚢 선하증권 (B/L)",
+    packing_list: "📦 포장명세서 (PK)",
+    insurance: "🛡️ 해상보험 (INS)",
+    marine_cargo_insurance: "🛡️ 해상보험 (INS)",
+    coo: "🏛️ 원산지증명 (COO)",
+    certificate_of_origin: "🏛️ 원산지증명 (COO)"
+  };
+
+  var tabsHtml = "";
+  var keys = Object.keys(documentChecklists);
+  var firstKey = keys[0];
+
+  keys.forEach(function (key) {
+    var label = docLabels[key] || (key.toUpperCase() + " 서류");
+    tabsHtml += '<button type="button" class="tab-btn" data-key="' + escapeHtml(key) + '">' + escapeHtml(label) + '</button>';
+  });
+
+  els.checklistTabs.innerHTML = tabsHtml;
+
+  // Bind tab click events
+  var buttons = els.checklistTabs.querySelectorAll(".tab-btn");
+  buttons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var k = this.getAttribute("data-key");
+      selectChecklistTab(k);
+    });
+  });
+
+  // Select first tab default
+  selectChecklistTab(firstKey);
 }
 
 function renderResult(parsed, finalJob) {
@@ -375,6 +483,7 @@ function renderResult(parsed, finalJob) {
   renderDateTimeline(data.date_checks);
   rows = data.comparison_matrix || [];
   renderComparisonTable(rows);
+  renderChecklists(data.document_checklists);
 }
 
 function loadConfig() {
@@ -396,6 +505,9 @@ function loadConfig() {
       }
       if (CONFIG.workerUrl && els.workerUrl) {
         els.workerUrl.value = CONFIG.workerUrl;
+      }
+      if (CONFIG.configId && els.configId) {
+        els.configId.value = CONFIG.configId;
       }
     });
 }
@@ -625,7 +737,7 @@ function runWorkflow() {
 
 function fillSample() {
   var sampleJob = {
-    id: "job_demo_20260912",
+    id: "job_demo_20260912_v22",
     object: "response",
     status: "completed",
     model: "agt_EpTRLGpvzaoGjJEEyPcWN8",
@@ -662,15 +774,17 @@ function fillSample() {
                   packing_list_date: "2015-05-07",
                   bl_shipment_date: "2015-05-07",
                   bl_on_board_date: "2015-05-07",
-                  latest_shipment_date: "",
-                  lc_issue_date: "",
-                  certificate_issue_date: "",
+                  latest_shipment_date: "2015-05-15",
+                  lc_issue_date: "2015-04-20",
+                  certificate_issue_date: "-",
                   date_sequence_status: "missing",
                   date_sequence_notes: "보험증권 발행일은 2015-05-01, Invoice 및 Packing List 일자는 2015-05-07, B/L 선적일 및 On Board 일자는 2015-05-07로 시간 흐름은 대체로 자연스럽지만 L/C 발행일과 최종선적기한이 없어 완전 판정은 불가합니다."
                 },
                 comparison_matrix: [
                   {
+                    category: "서류 구비 현황",
                     check_item: "file_presence",
+                    check_item_ko: "서류 구비 현황",
                     result: "missing",
                     lc: "missing",
                     commercial_invoice: "present",
@@ -680,7 +794,9 @@ function fillSample() {
                     certificate_of_origin: "missing"
                   },
                   {
+                    category: "당사자 정보",
                     check_item: "seller_party_consistency",
+                    check_item_ko: "수출자(Beneficiary/Shipper) 정보 일치성",
                     result: "match",
                     lc: "not_available",
                     commercial_invoice: "MITSUBISHI ELECTRIC CORPORATION",
@@ -690,7 +806,9 @@ function fillSample() {
                     certificate_of_origin: "missing"
                   },
                   {
+                    category: "당사자 정보",
                     check_item: "buyer_party_consistency",
+                    check_item_ko: "수입자(Applicant/Consignee) 정보 일치성",
                     result: "unclear",
                     lc: "not_available",
                     commercial_invoice: "Hyundai Rotem Company",
@@ -699,7 +817,27 @@ function fillSample() {
                     marine_cargo_insurance: "not_available",
                     certificate_of_origin: "-"
                   }
-                ]
+                ],
+                document_checklists: {
+                  lc: [
+                    { item: "신용장 유효기한 (Expiry Date)", status: "warning", details: "L/C 원문 미확인으로 유효기한 검증 필요" },
+                    { item: "분할선적 허용 여부 (Partial Shipment)", status: "pass", details: "Partial Shipment Allowed 기재됨" }
+                  ],
+                  invoice: [
+                    { item: "L/C 번호 표기 유무", status: "pass", details: "M0201410ES04828 기재 완료" },
+                    { item: "발행자 서명 및 인장", status: "pass", details: "MITSUBISHI ELECTRIC 서명 확인" }
+                  ],
+                  bl: [
+                    { item: "Clean On Board 표기", status: "pass", details: "2015-05-07 On Board 적재 확인" },
+                    { item: "운임 지급 조건 (Freight Prepaid)", status: "pass", details: "Freight Prepaid 기재됨" }
+                  ],
+                  packing_list: [
+                    { item: "포장 수량 및 CBM 산정", status: "pass", details: "22.948 CBM 산정 일치" }
+                  ],
+                  insurance: [
+                    { item: "보험증권 발행일 (선적일 이전)", status: "pass", details: "2015-05-01 발행으로 B/L 선적일(05-07) 이전 부보됨" }
+                  ]
+                }
               }
             })
           }

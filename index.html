@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_4" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_5" />
 </head>
 <body>
   <div class="container">
@@ -42,9 +42,10 @@
           <input id="workerUrl" class="input" type="text" value="https://bong.gehunmin19.workers.dev" placeholder="https://bong.gehunmin19.workers.dev" />
 
           <div class="label" style="margin-top: 14px;">
-            <span>Config ID (선택)</span>
+            <span>Config ID</span>
+            <span class="label-hint">Default: 22</span>
           </div>
-          <input id="configId" class="input" type="text" placeholder="비우면 최신 config 사용" />
+          <input id="configId" class="input" type="text" value="22" placeholder="Config version ID" />
 
           <div class="label" style="margin-top: 16px;">
             <span>문서 업로드</span>
@@ -75,7 +76,7 @@
 
       <!-- Right Panel: Results & Metrics -->
       <section class="panel right-panel">
-        <!-- Flexible Metric Cards Grid -->
+        <!-- 1️⃣ Flexible Metric Cards Grid -->
         <div class="summary-grid">
           <div class="card metric-card">
             <div class="metric-label">OVERALL STATUS</div>
@@ -117,12 +118,13 @@
           </div>
         </div>
 
+        <!-- 2️⃣ One-line Summary -->
         <div class="card">
           <h2>📝 One-line Summary</h2>
           <p id="oneLineSummary" class="summary-text">결과 없음</p>
         </div>
 
-        <!-- Document Keys & Date Flow Summary -->
+        <!-- 3️⃣ Document Keys & Date Flow Summary -->
         <div class="card">
           <h2>🔑 주요 문서 번호 (Document Keys)</h2>
           <div id="documentKeys" class="kv-grid empty">결과 없음</div>
@@ -134,21 +136,21 @@
           <div id="dateTimeline" class="empty">결과 없음</div>
         </div>
 
-        <!-- Streamlined Integrated Comparison Table -->
+        <!-- 4️⃣ ⭐️ Streamlined Integrated Comparison Table (가장 중요) -->
         <div class="card">
-          <h2>📋 무역서류 일치성 상세 비교표</h2>
+          <h2>📋 무역서류 일치성 상세 교차 비교표</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>점검 항목 (check_item)</th>
-                  <th>결과 (result)</th>
+                  <th>점검 항목</th>
+                  <th>판정</th>
                   <th>LC</th>
-                  <th>Commercial Invoice</th>
-                  <th>Bill of Lading</th>
-                  <th>Packing List</th>
-                  <th>Insurance</th>
-                  <th>COO</th>
+                  <th>송장 (INV)</th>
+                  <th>B/L</th>
+                  <th>포장 (PK)</th>
+                  <th>보험 (INS)</th>
+                  <th>원산지 (COO)</th>
                 </tr>
               </thead>
               <tbody id="comparisonTableBody">
@@ -160,7 +162,18 @@
           </div>
         </div>
 
-        <!-- Collapsible Raw JSON Response -->
+        <!-- 5️⃣ 🔍 Per-Document Checklists Tabs (신규 기능) -->
+        <div class="card">
+          <h2>🔍 서류별 개별 상세 체크리스트</h2>
+          <div id="checklistTabs" class="checklist-tabs">
+            <!-- Dynamic Document Tabs -->
+          </div>
+          <div id="checklistContent" class="checklist-content-wrap">
+            <div class="empty-cell">결과 없음</div>
+          </div>
+        </div>
+
+        <!-- 6️⃣ Collapsible Raw JSON Response -->
         <details class="card raw-json-details">
           <summary class="raw-json-summary">
             <span>💻 Raw JSON Response</span>
@@ -172,6 +185,6 @@
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_4"></script>
+  <script src="./app.js?v=20260912_5"></script>
 </body>
 </html>
