@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_10" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_11" />
 </head>
 <body>
   <div class="container">
@@ -40,7 +40,7 @@
             <div class="api-settings-body">
               <div class="label">
                 <span>API Key</span>
-                <span class="label-hint">Upstage API Key</span>
+                <span class="label-hint">Upstage Studio API Key</span>
               </div>
               <input id="apiKey" class="input" type="password" placeholder="up_..." />
 
@@ -114,43 +114,21 @@
       <section class="panel right-panel">
         <!-- 1️⃣ Flexible Metric Cards Grid -->
         <div class="summary-grid">
-          <div id="overallStatusCard" class="card metric-card">
-            <div class="metric-label">종합 상태 (Overall Status)</div>
+          <div id="overallStatusCard" class="card metric-card metric-card-centered">
+            <div class="metric-label header-metric-label">종합 상태</div>
             <div id="overallStatus" class="metric-value" style="display: none;">-</div>
             <div id="overallStatusDesc" class="metric-desc">결과 없음</div>
           </div>
 
-          <div id="alertLevelCard" class="card metric-card">
-            <div class="metric-label">위험도 수준 (Alert Level)</div>
+          <div id="alertLevelCard" class="card metric-card metric-card-centered">
+            <div class="metric-label header-metric-label">위험도 수준</div>
             <div id="alertLevel" class="metric-value" style="display: none;">-</div>
             <div id="alertLevelDesc" class="metric-desc">결과 없음</div>
           </div>
 
-          <div class="card metric-card metric-card-wide">
-            <div class="metric-label">권장 조치사항 (Recommended Action)</div>
+          <div id="recommendedActionCard" class="card metric-card metric-card-wide">
+            <div class="metric-label header-metric-label">권장 조치사항</div>
             <div id="recommendedAction" class="metric-desc large">결과 없음</div>
-          </div>
-        </div>
-
-        <!-- Token Usage & Model Metadata -->
-        <div id="usageCard" class="card usage-card" style="display: none;">
-          <div class="usage-grid">
-            <div class="usage-item">
-              <span class="usage-label">Execution Step:</span>
-              <span id="usageStepName" class="usage-val">-</span>
-            </div>
-            <div class="usage-item">
-              <span class="usage-label">Input Tokens:</span>
-              <span id="usageInputTokens" class="usage-val">-</span>
-            </div>
-            <div class="usage-item">
-              <span class="usage-label">Output Tokens:</span>
-              <span id="usageOutputTokens" class="usage-val">-</span>
-            </div>
-            <div class="usage-item">
-              <span class="usage-label">Total Tokens:</span>
-              <span id="usageTotalTokens" class="usage-val badge badge-ok">-</span>
-            </div>
           </div>
         </div>
 
@@ -178,55 +156,53 @@
             <h2>📋 무역서류 일치성 상세 교차 비교표</h2>
             <div class="view-toggle-group">
               <button id="viewCardBtn" class="btn-toggle active" type="button">📱 카드형</button>
-              <button id="viewTableBtn" class="btn-toggle" type="button">📊 표형</button>
+              <button id="viewTableBtn" class="btn-toggle" type="button">📊 테이블형</button>
             </div>
           </div>
 
-          <!-- Mobile Cards List -->
-          <div id="comparisonCardsContainer" class="mobile-matrix-container">
+          <p class="table-desc">LC, Invoice, B/L, Packing List, Insurance, COO 등 6개 주요 수입 서류 간의 세부 항목별 일치 여부 비교</p>
+          
+          <!-- Mobile Friendly Cards Container -->
+          <div id="comparisonCardsContainer" class="mobile-cards-grid">
             <div class="empty-cell">결과 없음</div>
           </div>
 
-          <!-- Desktop Table -->
-          <div id="comparisonTableWrap" class="table-wrap">
-            <table>
+          <!-- Responsive Table Container -->
+          <div id="comparisonTableWrap" class="table-wrap" style="display: none;">
+            <table class="data-table">
               <thead>
                 <tr>
-                  <th>점검 항목</th>
-                  <th>판정</th>
-                  <th>LC</th>
-                  <th>송장 (INV)</th>
-                  <th>B/L</th>
-                  <th>포장 (PK)</th>
-                  <th>보험 (INS)</th>
-                  <th>원산지 (COO)</th>
+                  <th style="min-width: 140px;">검토 항목</th>
+                  <th style="min-width: 90px;">결과</th>
+                  <th style="min-width: 100px;">📜 L/C</th>
+                  <th style="min-width: 100px;">📄 송장</th>
+                  <th style="min-width: 100px;">🚢 B/L</th>
+                  <th style="min-width: 100px;">📦 포장</th>
+                  <th style="min-width: 100px;">🛡️ 보험</th>
+                  <th style="min-width: 100px;">🏛️ COO</th>
                 </tr>
               </thead>
               <tbody id="comparisonTableBody">
-                <tr>
-                  <td colspan="8" class="empty-cell">결과 없음</td>
-                </tr>
+                <tr><td colspan="8" class="empty-cell">결과 없음</td></tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- 5️⃣ 🔍 Per-Document Checklists Tabs -->
+        <!-- 5️⃣ Per-Document Detailed Checklist -->
         <div class="card">
-          <h2>🔍 서류별 개별 상세 체크리스트</h2>
-          <div id="checklistTabs" class="checklist-tabs">
-            <!-- Dynamic Document Tabs -->
-          </div>
-          <div id="checklistContent" class="checklist-content-wrap">
+          <h2>📑 서류별 개별 상세 체크리스트</h2>
+          <p class="table-desc">서류를 선택하여 해당 서류의 상세 검증 항목 및 규정 충족 상태를 확인하세요.</p>
+          <div id="checklistTabs" class="tabs-header"></div>
+          <div id="checklistContent" class="checklist-container">
             <div class="empty-cell">결과 없음</div>
           </div>
         </div>
 
-        <!-- 6️⃣ Collapsible Raw JSON Response with Quick Export Actions -->
-        <details class="card raw-json-details">
+        <!-- Raw JSON Result (Collapsible for Debugging) -->
+        <details class="card raw-json-card">
           <summary class="raw-json-summary">
-            <span>💻 Raw JSON Response</span>
-            <span class="summary-hint">클릭하여 펼치기 / 접기</span>
+            <span>⚙️ 개발자용 Raw JSON 결과 보기</span>
           </summary>
           
           <div class="json-action-bar">

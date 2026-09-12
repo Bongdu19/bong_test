@@ -40,6 +40,7 @@ function initElements() {
   els.alertLevelCard = getEl("alertLevelCard");
   els.alertLevelDesc = getEl("alertLevelDesc");
   els.recommendedAction = getEl("recommendedAction");
+  els.recommendedActionCard = getEl("recommendedActionCard");
   els.oneLineSummary = getEl("oneLineSummary");
   els.usageCard = getEl("usageCard");
   els.usageStepName = getEl("usageStepName");
@@ -265,6 +266,7 @@ function applyCardTheme(cardEl, themeClass) {
 function clearResult() {
   applyCardTheme(els.overallStatusCard, null);
   applyCardTheme(els.alertLevelCard, null);
+  applyCardTheme(els.recommendedActionCard, null);
   if (els.overallStatus) els.overallStatus.style.display = "none";
   els.overallStatusDesc.textContent = "결과 없음";
   if (els.alertLevel) els.alertLevel.style.display = "none";
@@ -697,15 +699,19 @@ function renderResult(parsed, finalJob) {
   if (overall === "review_required" || overall === "검토 필요") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">진행 전 추가 검토 필요</span>';
     applyCardTheme(els.overallStatusCard, "card-theme-warn");
+    applyCardTheme(els.recommendedActionCard, "card-theme-warn");
   } else if (overall === "proceed" || overall === "진행 가능") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">서류 일치 (진행 가능)</span>';
     applyCardTheme(els.overallStatusCard, "card-theme-ok");
+    applyCardTheme(els.recommendedActionCard, "card-theme-ok");
   } else if (overall === "on_hold" || overall === "보류") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">불일치 발생 (보류)</span>';
     applyCardTheme(els.overallStatusCard, "card-theme-crit");
+    applyCardTheme(els.recommendedActionCard, "card-theme-crit");
   } else {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_status) || "결과 확인") + '</span>';
     applyCardTheme(els.overallStatusCard, "card-theme-neutral");
+    applyCardTheme(els.recommendedActionCard, "card-theme-neutral");
   }
 
   /* Render Single Korean Alert Level Highlight & Full Card Background Theme */

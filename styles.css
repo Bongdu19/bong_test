@@ -536,6 +536,26 @@ details.api-settings-details[open] {
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
+.metric-card-centered {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.metric-card-centered .metric-label,
+.metric-card-centered .header-metric-label {
+  text-align: center;
+  width: 100%;
+}
+
+.metric-card-centered .metric-desc {
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .metric-card-wide {
   background: var(--card-bg);
 }
@@ -547,6 +567,13 @@ details.api-settings-details[open] {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
+}
+
+.header-metric-label {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.2px !important;
+  margin-bottom: 8px !important;
 }
 
 .metric-value {
@@ -572,39 +599,42 @@ details.api-settings-details[open] {
   background-color: var(--badge-warn-bg) !important;
   border: 1.5px solid var(--badge-warn-border) !important;
 }
+.metric-card.card-theme-warn .header-metric-label,
 .metric-card.card-theme-warn .metric-label {
   color: var(--badge-warn-text) !important;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .metric-card.card-theme-warn .metric-desc,
 .metric-card.card-theme-warn .desc-status-highlight {
-  color: var(--badge-warn-text) !important;
+  color: #78350f !important;
 }
 
 .metric-card.card-theme-crit {
   background-color: var(--badge-crit-bg) !important;
   border: 1.5px solid var(--badge-crit-border) !important;
 }
+.metric-card.card-theme-crit .header-metric-label,
 .metric-card.card-theme-crit .metric-label {
   color: var(--badge-crit-text) !important;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .metric-card.card-theme-crit .metric-desc,
 .metric-card.card-theme-crit .desc-status-highlight {
-  color: var(--badge-crit-text) !important;
+  color: #7f1d1d !important;
 }
 
 .metric-card.card-theme-ok {
   background-color: var(--badge-ok-bg) !important;
   border: 1.5px solid var(--badge-ok-border) !important;
 }
+.metric-card.card-theme-ok .header-metric-label,
 .metric-card.card-theme-ok .metric-label {
   color: var(--badge-ok-text) !important;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 .metric-card.card-theme-ok .metric-desc,
 .metric-card.card-theme-ok .desc-status-highlight {
-  color: var(--badge-ok-text) !important;
+  color: #14532d !important;
 }
 
 .metric-card.card-theme-neutral {
@@ -614,12 +644,35 @@ details.api-settings-details[open] {
 
 .desc-status-highlight {
   display: block;
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
-  margin-top: 6px;
+  margin-top: 4px;
   letter-spacing: -0.3px;
   line-height: 1.35;
   word-break: break-word;
+}
+
+.desc-status-highlight.warn {
+  color: #92400e !important;
+}
+.desc-status-highlight.crit {
+  color: #991b1b !important;
+}
+.desc-status-highlight.ok {
+  color: #166534 !important;
+}
+
+[data-theme="dark"] .metric-card.card-theme-warn .desc-status-highlight.warn,
+[data-theme="dark"] .metric-card.card-theme-warn .metric-desc {
+  color: #fef08a !important;
+}
+[data-theme="dark"] .metric-card.card-theme-crit .desc-status-highlight.crit,
+[data-theme="dark"] .metric-card.card-theme-crit .metric-desc {
+  color: #fecaca !important;
+}
+[data-theme="dark"] .metric-card.card-theme-ok .desc-status-highlight.ok,
+[data-theme="dark"] .metric-card.card-theme-ok .metric-desc {
+  color: #bbf7d0 !important;
 }
 
 .metric-desc.large {
@@ -634,6 +687,38 @@ details.api-settings-details[open] {
   margin-top: 8px;
   word-break: break-word;
   overflow-wrap: anywhere;
+}
+
+.metric-card.card-theme-warn .metric-desc.large {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(180, 83, 9, 0.25) !important;
+  color: #78350f !important;
+}
+.metric-card.card-theme-crit .metric-desc.large {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(185, 28, 28, 0.25) !important;
+  color: #7f1d1d !important;
+}
+.metric-card.card-theme-ok .metric-desc.large {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border: 1px solid rgba(4, 120, 87, 0.25) !important;
+  color: #14532d !important;
+}
+
+[data-theme="dark"] .metric-card.card-theme-warn .metric-desc.large {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(253, 230, 138, 0.2) !important;
+  color: #fde68a !important;
+}
+[data-theme="dark"] .metric-card.card-theme-crit .metric-desc.large {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(254, 202, 202, 0.2) !important;
+  color: #fecaca !important;
+}
+[data-theme="dark"] .metric-card.card-theme-ok .metric-desc.large {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(167, 243, 208, 0.2) !important;
+  color: #a7f3d0 !important;
 }
 
 /* Usage Card */
