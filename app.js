@@ -131,6 +131,16 @@ function getApiEndpoint(path) {
 
   workerBase = workerBase.replace(/\/+$/, "");
 
+  if (path.indexOf("/files") >= 0) {
+    if (workerBase.endsWith("/v2")) {
+      workerBase = workerBase.substring(0, workerBase.length - 3);
+    }
+    if (!workerBase.endsWith("/v1")) {
+      return workerBase + "/v1" + path;
+    }
+    return workerBase + path;
+  }
+
   if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
     return workerBase + "/v2" + path;
   }
@@ -776,8 +786,9 @@ function loadConfig() {
 
 function uploadFile(apiKey, file) {
   var form = new FormData();
-  form.append("file", file);
-  form.append("purpose", CONFIG.filePurpose || "user_data");
+  var filename = (file && file.name) ? file.name : "document.pdf";
+  form.append("file", file, filename);
+  form.append("purpose", (CONFIG && CONFIG.filePurpose) || "user_data");
 
   var endpoint = getApiEndpoint("/files");
 
@@ -1011,6 +1022,7 @@ function setAsCustomSample() {
 function runWorkflow() {
   var apiKey = trimValue(els.apiKey.value);
   var configId = trimValue(els.configId.value);
+  var sampleVal = els.sampleSelect ? parseInt(els.sampleSelect.value, 10) : 0;
 
   if (!apiKey) {
     alert("API Key를 입력하세요.");
@@ -1018,7 +1030,11 @@ function runWorkflow() {
   }
 
   if (!selectedFile) {
-    alert("파일을 선택하세요.");
+    if (sampleVal >= 1 && sampleVal <= 4) {
+      fillSample(sampleVal);
+      return;
+    }
+    alert("파일을 선택하거나 샘플 데이터셋을 선택하세요.");
     return;
   }
 
