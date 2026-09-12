@@ -468,7 +468,57 @@ h2 {
   box-shadow: var(--shadow-sm);
 }
 
-/* Summary Grid */
+/* Collapsible API Settings Details */
+details.api-settings-details {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-input);
+  padding: 12px 14px;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+details.api-settings-details[open] {
+  padding-bottom: 16px;
+  background: var(--card-bg);
+}
+
+.api-settings-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.api-settings-summary::-webkit-details-marker {
+  display: none;
+}
+
+.api-settings-body {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Sample Selection Combo Box */
+.sample-select-combo {
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232563EB%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  padding-right: 36px;
+}
+
+/* Summary Grid & Full Metric Card Color Themes */
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.8fr;
@@ -483,6 +533,7 @@ h2 {
   flex-direction: column;
   justify-content: flex-start;
   min-width: 0;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 .metric-card-wide {
@@ -516,40 +567,59 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+/* Metric Card Theme Colors (Full Card Background Color) */
+.metric-card.card-theme-warn {
+  background-color: var(--badge-warn-bg) !important;
+  border: 1.5px solid var(--badge-warn-border) !important;
+}
+.metric-card.card-theme-warn .metric-label {
+  color: var(--badge-warn-text) !important;
+  opacity: 0.9;
+}
+.metric-card.card-theme-warn .metric-desc,
+.metric-card.card-theme-warn .desc-status-highlight {
+  color: var(--badge-warn-text) !important;
+}
+
+.metric-card.card-theme-crit {
+  background-color: var(--badge-crit-bg) !important;
+  border: 1.5px solid var(--badge-crit-border) !important;
+}
+.metric-card.card-theme-crit .metric-label {
+  color: var(--badge-crit-text) !important;
+  opacity: 0.9;
+}
+.metric-card.card-theme-crit .metric-desc,
+.metric-card.card-theme-crit .desc-status-highlight {
+  color: var(--badge-crit-text) !important;
+}
+
+.metric-card.card-theme-ok {
+  background-color: var(--badge-ok-bg) !important;
+  border: 1.5px solid var(--badge-ok-border) !important;
+}
+.metric-card.card-theme-ok .metric-label {
+  color: var(--badge-ok-text) !important;
+  opacity: 0.9;
+}
+.metric-card.card-theme-ok .metric-desc,
+.metric-card.card-theme-ok .desc-status-highlight {
+  color: var(--badge-ok-text) !important;
+}
+
+.metric-card.card-theme-neutral {
+  background-color: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
 .desc-status-highlight {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 20px;
+  display: block;
+  font-size: 21px;
   font-weight: 800;
-  padding: 12px 20px;
-  border-radius: 12px;
   margin-top: 6px;
   letter-spacing: -0.3px;
   line-height: 1.35;
-  width: fit-content;
-  max-width: 100%;
-  box-sizing: border-box;
-  box-shadow: var(--shadow-sm);
-}
-
-.desc-status-highlight.crit {
-  color: var(--badge-crit-text);
-  background: var(--badge-crit-bg);
-  border: 1.5px solid var(--badge-crit-border);
-}
-
-.desc-status-highlight.warn {
-  color: var(--badge-warn-text);
-  background: var(--badge-warn-bg);
-  border: 1.5px solid var(--badge-warn-border);
-}
-
-.desc-status-highlight.ok {
-  color: var(--badge-ok-text);
-  background: var(--badge-ok-bg);
-  border: 1.5px solid var(--badge-ok-border);
+  word-break: break-word;
 }
 
 .metric-desc.large {

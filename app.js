@@ -27,14 +27,17 @@ function initElements() {
   els.sampleBtn2 = getEl("sampleBtn2");
   els.sampleBtn3 = getEl("sampleBtn3");
   els.sampleBtn4 = getEl("sampleBtn4");
+  els.sampleSelect = getEl("sampleSelect");
   els.clearBtn = getEl("clearBtn");
   els.lookupJobId = getEl("lookupJobId");
   els.lookupBtn = getEl("lookupBtn");
   els.jobStatus = getEl("jobStatus");
   els.jobMeta = getEl("jobMeta");
   els.overallStatus = getEl("overallStatus");
+  els.overallStatusCard = getEl("overallStatusCard");
   els.overallStatusDesc = getEl("overallStatusDesc");
   els.alertLevel = getEl("alertLevel");
+  els.alertLevelCard = getEl("alertLevelCard");
   els.alertLevelDesc = getEl("alertLevelDesc");
   els.recommendedAction = getEl("recommendedAction");
   els.oneLineSummary = getEl("oneLineSummary");
@@ -251,7 +254,17 @@ function rowHighlightClass(result) {
   return "";
 }
 
+function applyCardTheme(cardEl, themeClass) {
+  if (!cardEl) return;
+  cardEl.classList.remove("card-theme-warn", "card-theme-crit", "card-theme-ok", "card-theme-neutral");
+  if (themeClass) {
+    cardEl.classList.add(themeClass);
+  }
+}
+
 function clearResult() {
+  applyCardTheme(els.overallStatusCard, null);
+  applyCardTheme(els.alertLevelCard, null);
   if (els.overallStatus) els.overallStatus.style.display = "none";
   els.overallStatusDesc.textContent = "결과 없음";
   if (els.alertLevel) els.alertLevel.style.display = "none";
@@ -680,26 +693,34 @@ function renderResult(parsed, finalJob) {
   if (els.overallStatus) els.overallStatus.style.display = "none";
   if (els.alertLevel) els.alertLevel.style.display = "none";
 
-  /* Render Single Korean Status Highlight */
+  /* Render Single Korean Status Highlight & Full Card Background Theme */
   if (overall === "review_required" || overall === "검토 필요") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">진행 전 추가 검토 필요</span>';
+    applyCardTheme(els.overallStatusCard, "card-theme-warn");
   } else if (overall === "proceed" || overall === "진행 가능") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">서류 일치 (진행 가능)</span>';
+    applyCardTheme(els.overallStatusCard, "card-theme-ok");
   } else if (overall === "on_hold" || overall === "보류") {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">불일치 발생 (보류)</span>';
+    applyCardTheme(els.overallStatusCard, "card-theme-crit");
   } else {
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_status) || "결과 확인") + '</span>';
+    applyCardTheme(els.overallStatusCard, "card-theme-neutral");
   }
 
-  /* Render Single Korean Alert Level Highlight */
+  /* Render Single Korean Alert Level Highlight & Full Card Background Theme */
   if (alertLvl === "critical" || alertLvl === "치명") {
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight crit">치명 이슈 포함</span>';
+    applyCardTheme(els.alertLevelCard, "card-theme-crit");
   } else if (alertLvl === "warning" || alertLvl === "warn" || alertLvl === "주의") {
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight warn">주의 필요</span>';
+    applyCardTheme(els.alertLevelCard, "card-theme-warn");
   } else if (alertLvl === "info" || alertLvl === "참고") {
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight ok">참고 수준</span>';
+    applyCardTheme(els.alertLevelCard, "card-theme-ok");
   } else {
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_alert_level) || "결과 확인") + '</span>';
+    applyCardTheme(els.alertLevelCard, "card-theme-neutral");
   }
 
   els.oneLineSummary.textContent = cleanText(data.one_line_summary) || "-";
@@ -1064,6 +1085,10 @@ function fillSample(sampleIndex) {
   var fileName = "sample.json";
   var sampleTitle = "실제샘플1";
 
+  if (els.sampleSelect) {
+    els.sampleSelect.value = String(idx);
+  }
+
   if (idx === 2) {
     fileName = "sample2.json";
     sampleTitle = "실제샘플2";
@@ -1199,6 +1224,14 @@ function init() {
       if (els.sampleBtn2) els.sampleBtn2.addEventListener("click", function () { fillSample(2); });
       if (els.sampleBtn3) els.sampleBtn3.addEventListener("click", function () { fillSample(3); });
       if (els.sampleBtn4) els.sampleBtn4.addEventListener("click", function () { fillSample(4); });
+      if (els.sampleSelect) {
+        els.sampleSelect.addEventListener("change", function (e) {
+          var val = parseInt(e.target.value, 10);
+          if (val >= 1 && val <= 4) {
+            fillSample(val);
+          }
+        });
+      }
       els.clearBtn.addEventListener("click", clearResult);
       if (els.lookupBtn) els.lookupBtn.addEventListener("click", lookupExistingJob);
       if (els.copyJsonBtn) els.copyJsonBtn.addEventListener("click", copyJsonToClipboard);

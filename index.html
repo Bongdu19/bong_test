@@ -31,22 +31,31 @@
         <div class="card">
           <h2>⚙️ 실행 설정</h2>
 
-          <div class="label">
-            <span>API Key</span>
-            <span class="label-hint">Upstage API Key</span>
-          </div>
-          <input id="apiKey" class="input" type="password" placeholder="up_..." />
+          <!-- Collapsible API Settings (Folded by default) -->
+          <details class="api-settings-details">
+            <summary class="api-settings-summary">
+              <span>🔑 API 설정</span>
+              <span class="summary-hint">클릭하여 펼치기 / 접기</span>
+            </summary>
+            <div class="api-settings-body">
+              <div class="label">
+                <span>API Key</span>
+                <span class="label-hint">Upstage API Key</span>
+              </div>
+              <input id="apiKey" class="input" type="password" placeholder="up_..." />
 
-          <div class="label" style="margin-top: 14px;">
-            <span>Cloudflare Worker 프록시 URL</span>
-          </div>
-          <input id="workerUrl" class="input" type="text" value="https://bong.gehunmin19.workers.dev" placeholder="https://bong.gehunmin19.workers.dev" />
+              <div class="label" style="margin-top: 14px;">
+                <span>Cloudflare Worker 프록시 URL</span>
+              </div>
+              <input id="workerUrl" class="input" type="text" value="https://bong.gehunmin19.workers.dev" placeholder="https://bong.gehunmin19.workers.dev" />
 
-          <div class="label" style="margin-top: 14px;">
-            <span>Config ID</span>
-            <span class="label-hint">공란 시 최신버전 자동 적용</span>
-          </div>
-          <input id="configId" class="input" type="text" value="" placeholder="최신 버전 사용 (기본값: 공란)" />
+              <div class="label" style="margin-top: 14px;">
+                <span>Config ID</span>
+                <span class="label-hint">공란 시 최신버전 자동 적용</span>
+              </div>
+              <input id="configId" class="input" type="text" value="" placeholder="최신 버전 사용 (기본값: 공란)" />
+            </div>
+          </details>
 
           <div class="label" style="margin-top: 16px;">
             <span>문서 업로드</span>
@@ -86,16 +95,18 @@
           </div>
         </div>
 
-        <!-- 4️⃣ 📂 샘플 데이터 선택 (4개 샘플 불러오기) -->
+        <!-- 4️⃣ 📂 샘플 데이터 선택 (콤보박스 선택) -->
         <div class="card">
           <h2>📂 샘플 데이터 선택</h2>
-          <p class="sample-intro">확인할 샘플 데이터를 선택하면 대시보드에 즉시 반영됩니다.</p>
-          <div class="sample-grid-4">
-            <button id="sampleBtn1" class="sample-btn-item" type="button">1️⃣ 실제샘플1</button>
-            <button id="sampleBtn2" class="sample-btn-item" type="button">2️⃣ 실제샘플2</button>
-            <button id="sampleBtn3" class="sample-btn-item" type="button">3️⃣ 가상Match샘플</button>
-            <button id="sampleBtn4" class="sample-btn-item" type="button">4️⃣ 가상MisMatch샘플</button>
+          <div class="label" style="margin-top: 6px;">
+            <span>샘플 데이터셋 선택</span>
           </div>
+          <select id="sampleSelect" class="select sample-select-combo">
+            <option value="1">1️⃣ 실제샘플1 (기본 무역서류 세트)</option>
+            <option value="2">2️⃣ 실제샘플2 (L/C미제출 및 번호이슈)</option>
+            <option value="3">3️⃣ 가상Match샘플 (서류 정상 수용)</option>
+            <option value="4">4️⃣ 가상MisMatch샘플 (양하항·수량 불일치)</option>
+          </select>
         </div>
       </section>
 
@@ -103,13 +114,13 @@
       <section class="panel right-panel">
         <!-- 1️⃣ Flexible Metric Cards Grid -->
         <div class="summary-grid">
-          <div class="card metric-card">
+          <div id="overallStatusCard" class="card metric-card">
             <div class="metric-label">종합 상태 (Overall Status)</div>
             <div id="overallStatus" class="metric-value" style="display: none;">-</div>
             <div id="overallStatusDesc" class="metric-desc">결과 없음</div>
           </div>
 
-          <div class="card metric-card">
+          <div id="alertLevelCard" class="card metric-card">
             <div class="metric-label">위험도 수준 (Alert Level)</div>
             <div id="alertLevel" class="metric-value" style="display: none;">-</div>
             <div id="alertLevelDesc" class="metric-desc">결과 없음</div>
