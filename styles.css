@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg-primary: #f8fafc;
@@ -201,7 +201,7 @@ h1 {
 
 h2 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--text-main);
   display: flex;
@@ -244,33 +244,12 @@ h2 {
   background: var(--card-bg);
 }
 
-/* Security Notice Box */
-.notice-box {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.notice-info {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #1e40af;
-}
-
-.notice-warning {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
-}
-
 /* Dropzone */
 .dropzone {
   border: 2px dashed var(--border-hover);
   background: var(--bg-primary);
   border-radius: 14px;
-  padding: 28px 16px;
+  padding: 24px 14px;
   text-align: center;
   cursor: pointer;
   margin-top: 8px;
@@ -284,20 +263,20 @@ h2 {
 
 .dropzone-icon {
   font-size: 32px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .dropzone-title {
   margin: 0;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-main);
 }
 
 .dropzone-sub {
   margin-top: 4px;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .file-info {
@@ -310,26 +289,34 @@ h2 {
   word-break: break-all;
 }
 
-.button-row {
+/* Single line button row */
+.button-row-single {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   margin-top: 20px;
+  width: 100%;
 }
 
 .btn {
   border: 0;
   border-radius: var(--radius-btn);
-  padding: 11px 18px;
-  font-size: 14px;
+  padding: 11px 10px;
+  font-size: 13px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-flex {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .btn-primary {
@@ -358,7 +345,7 @@ h2 {
 .btn-ghost {
   background: transparent;
   color: var(--text-muted);
-  border: 1px solid transparent;
+  border: 1px solid var(--border-color);
 }
 
 .btn-ghost:hover:not(:disabled) {
@@ -372,21 +359,10 @@ h2 {
 }
 
 /* Status Panel */
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-}
-
 .status-text {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-main);
-
 }
 
 .meta-text {
@@ -411,8 +387,8 @@ h2 {
 
 .metric-label {
   color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -435,6 +411,39 @@ h2 {
   color: var(--text-main);
   font-weight: 600;
   font-size: 14px;
+}
+
+/* Usage Card */
+.usage-card {
+  background: var(--accent-light);
+  border-color: rgba(37, 99, 235, 0.2);
+  padding: 16px 20px;
+}
+
+.usage-grid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.usage-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.usage-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.usage-val {
+  color: var(--text-main);
+  font-weight: 700;
+  font-family: monospace;
 }
 
 /* Tables */
@@ -518,11 +527,11 @@ tbody tr:last-child td {
   border-color: var(--badge-neutral-border);
 }
 
-/* KV Lists and Issues */
-.kv-list, .issue-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* Key Value Grid */
+.kv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
 }
 
 .kv-item, .issue-item {
@@ -582,31 +591,6 @@ tbody tr:last-child td {
   max-height: 350px;
   overflow-y: auto;
   margin: 0;
-}
-
-/* Modal or Collapsible help */
-.help-box {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 14px;
-  font-size: 13px;
-}
-
-.help-box summary {
-  cursor: pointer;
-  font-weight: 700;
-  color: var(--accent-primary);
-}
-
-.help-box ol {
-  margin: 10px 0 0 0;
-  padding-left: 20px;
-}
-
-.help-box li {
-  margin-bottom: 6px;
 }
 
 @media (max-width: 1100px) {

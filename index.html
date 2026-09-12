@@ -7,15 +7,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_2" />
 </head>
 <body>
   <div class="container">
     <header class="page-header">
       <div class="header-title-group">
-        <p class="eyebrow"><span class="eyebrow-badge">PC Interactive</span> Document AI Verification</p>
+        <p class="eyebrow"><span class="eyebrow-badge">PC Interactive</span> Upstage Document AI Agent</p>
         <h1>신용장 서류 일치성 점검</h1>
-        <p class="subtext">Upstage Document AI 기반 수입/수출 무역 서류 일치성 자동 대조 데모</p>
+        <p class="subtext">무역 서류(LC, Invoice, B/L, Packing List, Insurance, COO) 일치성 자동 검증 대시보드</p>
       </div>
       <div class="header-actions">
         <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="테마 전환">
@@ -25,7 +25,7 @@
     </header>
 
     <main class="layout">
-      <!-- Left Panel: Configurations & Actions -->
+      <!-- Left Panel: Settings & Upload -->
       <section class="panel left-panel">
         <div class="card">
           <h2>⚙️ 실행 설정</h2>
@@ -36,37 +36,12 @@
           </div>
           <input id="apiKey" class="input" type="password" placeholder="up_..." />
 
-          <div class="label">
-            <span>CORS 우회 / 프록시 방식</span>
+          <div class="label" style="margin-top: 14px;">
+            <span>Cloudflare Worker 프록시 URL</span>
           </div>
-          <select id="proxyMode" class="select">
-            <option value="worker">Cloudflare Worker (안전/추천)</option>
-            <option value="public" selected>공개 CORS Proxy (corsproxy.io)</option>
-            <option value="direct">직접 연결 (Proxy 없음)</option>
-          </select>
+          <input id="workerUrl" class="input" type="text" value="https://bong.gehunmin19.workers.dev" placeholder="https://bong.gehunmin19.workers.dev" />
 
-          <div id="proxyUrlWrap" class="proxy-url-wrap" style="margin-top: 10px;">
-            <div class="label">
-              <span>Cloudflare Worker / 프록시 URL</span>
-            </div>
-            <input id="proxyUrl" class="input" type="text" placeholder="https://upstage-proxy.yourname.workers.dev" />
-          </div>
-
-          <div id="proxyNotice" class="notice-box notice-warning">
-            ⚠️ <strong>공개 프록시 주의</strong>: <code>corsproxy.io</code> 경유 시 제3자 서버를 거치므로 보안에 주의하세요. 실무 환경에서는 <strong>Cloudflare Worker</strong> 사용을 권장합니다.
-          </div>
-
-          <details class="help-box">
-            <summary>💡 Cloudflare Worker 1분 설치법 (무료)</summary>
-            <ol>
-              <li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">dash.cloudflare.com</a> 접속 및 로그인</li>
-              <li><strong>Workers & Pages</strong> ➔ <strong>Create Worker</strong> ➔ <strong>Deploy</strong> 클릭</li>
-              <li><strong>Edit Code</strong>에 <u>CORS 프록시 코드</u> 붙여넣기 ➔ <strong>Save and Deploy</strong></li>
-              <li>발급된 <code>.workers.dev</code> 주소를 위 입력란에 붙여넣기하면 끝!</li>
-            </ol>
-          </details>
-
-          <div class="label" style="margin-top: 16px;">
+          <div class="label" style="margin-top: 14px;">
             <span>Config ID (선택)</span>
           </div>
           <input id="configId" class="input" type="text" placeholder="비우면 최신 config 사용" />
@@ -76,17 +51,18 @@
           </div>
           <div id="dropzone" class="dropzone">
             <input id="fileInput" type="file" hidden />
-            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-icon">📁</div>
             <p class="dropzone-title">파일을 드래그하거나 클릭해 선택</p>
-            <p class="dropzone-sub">PDF / 이미지 (PNG, JPG) / Office 문서</p>
+            <p class="dropzone-sub">PDF / 이미지 / Office / 비디오 (최대 500MB)</p>
           </div>
 
           <div id="fileInfo" class="file-info">선택된 파일 없음</div>
 
-          <div class="button-row">
-            <button id="runBtn" class="btn btn-primary" type="button">🚀 검점 실행</button>
-            <button id="sampleBtn" class="btn btn-secondary" type="button">👁️ 샘플 보기</button>
-            <button id="clearBtn" class="btn btn-ghost" type="button">🔄 초기화</button>
+          <!-- Single line button row -->
+          <div class="button-row-single">
+            <button id="runBtn" class="btn btn-primary btn-flex" type="button">🚀 점검 실행</button>
+            <button id="sampleBtn" class="btn btn-secondary btn-flex" type="button">👁️ 샘플 보기</button>
+            <button id="clearBtn" class="btn btn-ghost btn-flex" type="button">🔄 초기화</button>
           </div>
         </div>
 
@@ -99,6 +75,7 @@
 
       <!-- Right Panel: Results & Metrics -->
       <section class="panel right-panel">
+        <!-- Metric Cards -->
         <div class="summary-grid">
           <div class="card metric-card">
             <div class="metric-label">Overall Status</div>
@@ -118,22 +95,44 @@
           </div>
         </div>
 
+        <!-- Token Usage & Model Metadata -->
+        <div id="usageCard" class="card usage-card" style="display: none;">
+          <div class="usage-grid">
+            <div class="usage-item">
+              <span class="usage-label">Execution Step:</span>
+              <span id="usageStepName" class="usage-val">-</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">Input Tokens:</span>
+              <span id="usageInputTokens" class="usage-val">-</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">Output Tokens:</span>
+              <span id="usageOutputTokens" class="usage-val">-</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">Total Tokens:</span>
+              <span id="usageTotalTokens" class="usage-val badge badge-ok">-</span>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
           <h2>📝 One-line Summary</h2>
           <p id="oneLineSummary" class="summary-text">결과 없음</p>
         </div>
 
         <div class="card">
-          <h2>📋 비교표</h2>
+          <h2>📋 무역서류 일치성 비교표</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>check_item</th>
-                  <th>result</th>
+                  <th>점검 항목 (check_item)</th>
+                  <th>결과 (result)</th>
                   <th>LC</th>
-                  <th>Invoice</th>
-                  <th>B/L</th>
+                  <th>Commercial Invoice</th>
+                  <th>Bill of Lading</th>
                   <th>Packing List</th>
                   <th>Insurance</th>
                   <th>COO</th>
@@ -149,23 +148,23 @@
         </div>
 
         <div class="card">
-          <h2>🔑 문서 키</h2>
-          <div id="documentKeys" class="kv-list empty">결과 없음</div>
+          <h2>🔑 주요 문서 키 (Document Keys)</h2>
+          <div id="documentKeys" class="kv-grid empty">결과 없음</div>
         </div>
 
         <div class="card">
-          <h2>🚨 핵심 이슈</h2>
+          <h2>🚨 핵심 검토 이슈 & 날짜 흐름</h2>
           <div id="issues" class="issue-list empty">결과 없음</div>
         </div>
 
         <div class="card">
-          <h2>💻 Raw JSON</h2>
+          <h2>💻 Raw JSON Response</h2>
           <pre id="rawJson" class="raw-json">결과 없음</pre>
         </div>
       </section>
     </main>
   </div>
 
-  <script src="./app.js?v=20260912"></script>
+  <script src="./app.js?v=20260912_2"></script>
 </body>
 </html>

@@ -10,11 +10,8 @@ function getEl(id) {
 
 function initElements() {
   els.apiKey = getEl("apiKey");
+  els.workerUrl = getEl("workerUrl");
   els.configId = getEl("configId");
-  els.proxyMode = getEl("proxyMode");
-  els.proxyUrl = getEl("proxyUrl");
-  els.proxyUrlWrap = getEl("proxyUrlWrap");
-  els.proxyNotice = getEl("proxyNotice");
   els.themeToggleBtn = getEl("themeToggleBtn");
   els.themeIcon = getEl("themeIcon");
   els.themeLabel = getEl("themeLabel");
@@ -32,6 +29,11 @@ function initElements() {
   els.alertLevelDesc = getEl("alertLevelDesc");
   els.recommendedAction = getEl("recommendedAction");
   els.oneLineSummary = getEl("oneLineSummary");
+  els.usageCard = getEl("usageCard");
+  els.usageStepName = getEl("usageStepName");
+  els.usageInputTokens = getEl("usageInputTokens");
+  els.usageOutputTokens = getEl("usageOutputTokens");
+  els.usageTotalTokens = getEl("usageTotalTokens");
   els.comparisonTableBody = getEl("comparisonTableBody");
   els.documentKeys = getEl("documentKeys");
   els.issues = getEl("issues");
@@ -86,48 +88,19 @@ function setTheme(theme) {
   }
 }
 
-/* Proxy Selector UI Update */
-function updateProxyUI() {
-  var mode = els.proxyMode.value;
-
-  if (mode === "worker") {
-    els.proxyUrlWrap.style.display = "block";
-    els.proxyNotice.className = "notice-box notice-info";
-    els.proxyNotice.innerHTML = "🔒 <strong>Cloudflare Worker 모드</strong>: API 키와 통신이 본인의 Worker 서버를 경유하므로 보안상 유출되지 않습니다.";
-  } else if (mode === "public") {
-    els.proxyUrlWrap.style.display = "none";
-    els.proxyNotice.className = "notice-box notice-warning";
-    els.proxyNotice.innerHTML = "⚠️ <strong>공개 프록시 경고</strong>: <code>corsproxy.io</code> 제3자 서버를 통과하므로 보안에 유의하세요. (테스트용 권장)";
-  } else {
-    els.proxyUrlWrap.style.display = "none";
-    els.proxyNotice.className = "notice-box notice-info";
-    els.proxyNotice.innerHTML = "🌐 <strong>직접 연결 모드</strong>: API 서버가 CORS를 허용하지 않는 경우 브라우저에서 요청이 차단될 수 있습니다.";
-  }
-}
-
-/* Construct Request URL based on Proxy Mode */
+/* API Endpoint Construction via Cloudflare Worker */
 function getApiEndpoint(path) {
-  var mode = els.proxyMode.value;
-  var targetUrl = (CONFIG.baseUrl || "https://api.upstage.ai/v2") + path;
-
-  if (mode === "public") {
-    return "https://corsproxy.io/?" + targetUrl;
-  } else if (mode === "worker") {
-    var workerBase = trimValue(els.proxyUrl.value);
-    if (!workerBase) {
-      throw new Error("Cloudflare Worker URL을 입력해 주세요.");
-    }
-    // Remove trailing slash
-    workerBase = workerBase.replace(/\/+$/, "");
-
-    // If worker base ends with /v2 or path starts with /v2
-    if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
-      return workerBase + "/v2" + path;
-    }
-    return workerBase + path;
-  } else {
-    return targetUrl;
+  var workerBase = trimValue(els.workerUrl ? els.workerUrl.value : "") || (CONFIG ? CONFIG.workerUrl : "");
+  if (!workerBase) {
+    workerBase = "https://bong.gehunmin19.workers.dev";
   }
+  
+  workerBase = workerBase.replace(/\/+$/, "");
+
+  if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
+    return workerBase + "/v2" + path;
+  }
+  return workerBase + path;
 }
 
 function setStatus(text, meta) {
@@ -168,6 +141,7 @@ function clearResult() {
   els.alertLevelDesc.textContent = "결과 없음";
   els.recommendedAction.textContent = "결과 없음";
   els.oneLineSummary.textContent = "결과 없음";
+  if (els.usageCard) els.usageCard.style.display = "none";
   els.documentKeys.innerHTML = "결과 없음";
   els.issues.innerHTML = "결과 없음";
   els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
@@ -180,6 +154,23 @@ function normalizeResultPayload(parsed) {
     return parsed.structured_result;
   }
   return parsed || {};
+}
+
+function renderUsage(finalJob) {
+  if (!els.usageCard) return;
+
+  var usage = finalJob.usage;
+  var stepName = (finalJob.output && finalJob.output[0] && finalJob.output[0].model) || finalJob.model || "Agent Job";
+
+  if (usage || stepName) {
+    els.usageCard.style.display = "block";
+    els.usageStepName.textContent = stepName;
+    els.usageInputTokens.textContent = (usage && usage.input_tokens != null) ? usage.input_tokens : "-";
+    els.usageOutputTokens.textContent = (usage && usage.output_tokens != null) ? usage.output_tokens : "-";
+    els.usageTotalTokens.textContent = (usage && usage.total_tokens != null) ? usage.total_tokens : "-";
+  } else {
+    els.usageCard.style.display = "none";
+  }
 }
 
 function renderDocumentKeys(documentKeys) {
@@ -332,11 +323,11 @@ function renderComparisonTable(rows) {
   els.comparisonTableBody.innerHTML = html;
 }
 
-function renderResult(parsed) {
+function renderResult(parsed, finalJob) {
   var data = normalizeResultPayload(parsed);
   var rows = [];
 
-  els.rawJson.textContent = JSON.stringify(parsed, null, 2);
+  els.rawJson.textContent = JSON.stringify(finalJob || parsed, null, 2);
   els.overallStatus.textContent = data.overall_status || "-";
   els.alertLevel.textContent = data.overall_alert_level || "-";
   els.oneLineSummary.textContent = data.one_line_summary || "-";
@@ -362,6 +353,10 @@ function renderResult(parsed) {
     els.alertLevelDesc.textContent = "결과 확인";
   }
 
+  if (finalJob) {
+    renderUsage(finalJob);
+  }
+
   renderDocumentKeys(data.document_keys);
   renderIssues(data);
   rows = data.comparison_matrix || [];
@@ -384,6 +379,9 @@ function loadConfig() {
       CONFIG = json;
       if (CONFIG.defaultApiKey && !els.apiKey.value) {
         els.apiKey.value = CONFIG.defaultApiKey;
+      }
+      if (CONFIG.workerUrl && els.workerUrl) {
+        els.workerUrl.value = CONFIG.workerUrl;
       }
     });
 }
@@ -586,7 +584,7 @@ function runWorkflow() {
       }
 
       parsed = parseResultText(rawText);
-      renderResult(parsed);
+      renderResult(parsed, finalJob);
       setStatus("완료", "job_id=" + currentJobId);
       els.runBtn.disabled = false;
     })
@@ -597,7 +595,7 @@ function runWorkflow() {
       if (String(error.message || "").indexOf("Failed to fetch") >= 0) {
         alert(
           "CORS 통신 오류가 발생했습니다.\n" +
-          "선택하신 프록시 모드 (공개 프록시 / Cloudflare Worker)의 설정 상태를 확인해 주세요."
+          "Cloudflare Worker 서버 주소 (" + (els.workerUrl ? els.workerUrl.value : "") + ") 연결 상태를 확인해 주세요."
         );
       } else if (String(error.message || "").indexOf("No access to file") >= 0) {
         alert(
@@ -612,67 +610,93 @@ function runWorkflow() {
 }
 
 function fillSample() {
-  var sample = {
-    structured_result: {
-      overall_status: "review_required",
-      overall_alert_level: "warning",
-      one_line_summary: "합본 무역서류 비교 결과 일부 검토가 필요합니다.",
-      recommended_action: "불일치 또는 누락 항목을 확인하고 원본 서류와 대조하세요.",
-      document_keys: {
-        lc_number: "M0201410ES04828",
-        invoice_number: "A4631-L032-61",
-        bl_number: "RKOE076",
-        policy_certificate_number: "15-H0065622"
-      },
-      date_checks: {
-        insurance_policy_issue_date: "2015-05-01",
-        invoice_date: "2015-05-07",
-        packing_list_date: "2015-05-07",
-        bl_shipment_date: "2015-05-07",
-        bl_on_board_date: "2015-05-07",
-        latest_shipment_date: "",
-        lc_issue_date: "",
-        certificate_issue_date: "",
-        date_sequence_status: "match",
-        date_sequence_notes: "보험증권 발행일 이후 송장/패킹리스트/B/L 날짜 흐름은 대체로 자연스럽습니다."
-      },
-      comparison_matrix: [
-        {
-          check_item: "invoice_number",
-          result: "match",
-          lc: "-",
-          commercial_invoice: "A4631-L032-61",
-          bill_of_lading: "-",
-          packing_list: "A4631-L032-61",
-          marine_cargo_insurance: "A4631-L032-61",
-          certificate_of_origin: "-"
-        },
-        {
-          check_item: "measurement_cbm",
-          result: "match",
-          lc: "-",
-          commercial_invoice: "-",
-          bill_of_lading: "22.948",
-          packing_list: "22.948",
-          marine_cargo_insurance: "-",
-          certificate_of_origin: "-"
-        },
-        {
-          check_item: "date_flow_timeline",
-          result: "match",
-          lc: "-",
-          commercial_invoice: "2015-05-07",
-          bill_of_lading: "2015-05-07",
-          packing_list: "2015-05-07",
-          marine_cargo_insurance: "2015-05-01",
-          certificate_of_origin: "-"
-        }
-      ]
-    }
+  var sampleJob = {
+    id: "job_demo_20260912",
+    object: "response",
+    status: "completed",
+    model: "agt_EpTRLGpvzaoGjJEEyPcWN8",
+    usage: {
+      input_tokens: 1840,
+      output_tokens: 720,
+      total_tokens: 2560
+    },
+    output: [
+      {
+        type: "message",
+        status: "completed",
+        role: "assistant",
+        model: "step_consistency_verification",
+        content: [
+          {
+            type: "output_text",
+            text: JSON.stringify({
+              structured_result: {
+                overall_status: "review_required",
+                overall_alert_level: "warning",
+                one_line_summary: "합본 무역서류 비교 결과, Invoice와 B/L 간 일부 일자 및 수량 항목에 검토가 필요합니다.",
+                recommended_action: "불일치 항목(invoice_number, measurement_cbm)을 확인하고 원본 서류와 대조하세요.",
+                document_keys: {
+                  lc_number: "M0201410ES04828",
+                  invoice_number: "A4631-L032-61",
+                  bl_number: "RKOE076",
+                  policy_certificate_number: "15-H0065622"
+                },
+                date_checks: {
+                  insurance_policy_issue_date: "2015-05-01",
+                  invoice_date: "2015-05-07",
+                  packing_list_date: "2015-05-07",
+                  bl_shipment_date: "2015-05-07",
+                  bl_on_board_date: "2015-05-07",
+                  latest_shipment_date: "2015-05-15",
+                  lc_issue_date: "2015-04-20",
+                  certificate_issue_date: "2015-05-06",
+                  date_sequence_status: "match",
+                  date_sequence_notes: "보험증권 발행일 이후 송장/패킹리스트/B/L 날짜 흐름은 정상이며 순서가 일치합니다."
+                },
+                comparison_matrix: [
+                  {
+                    check_item: "invoice_number",
+                    result: "match",
+                    lc: "-",
+                    commercial_invoice: "A4631-L032-61",
+                    bill_of_lading: "-",
+                    packing_list: "A4631-L032-61",
+                    marine_cargo_insurance: "A4631-L032-61",
+                    certificate_of_origin: "-"
+                  },
+                  {
+                    check_item: "measurement_cbm",
+                    result: "match",
+                    lc: "-",
+                    commercial_invoice: "-",
+                    bill_of_lading: "22.948",
+                    packing_list: "22.948",
+                    marine_cargo_insurance: "-",
+                    certificate_of_origin: "-"
+                  },
+                  {
+                    check_item: "date_flow_timeline",
+                    result: "match",
+                    lc: "2015-04-20",
+                    commercial_invoice: "2015-05-07",
+                    bill_of_lading: "2015-05-07",
+                    packing_list: "2015-05-07",
+                    marine_cargo_insurance: "2015-05-01",
+                    certificate_of_origin: "2015-05-06"
+                  }
+                ]
+              }
+            })
+          }
+        ]
+      }
+    ]
   };
 
-  renderResult(sample);
-  setStatus("샘플 결과 표시 중", "");
+  var rawText = extractResultText(sampleJob);
+  var parsed = parseResultText(rawText);
+  renderResult(parsed, sampleJob);
+  setStatus("샘플 결과 표시 중", "job_id=" + sampleJob.id);
 }
 
 function bindFileEvents() {
@@ -706,9 +730,6 @@ function bindFileEvents() {
 function init() {
   initElements();
   initTheme();
-
-  els.proxyMode.addEventListener("change", updateProxyUI);
-  updateProxyUI();
 
   loadConfig()
     .then(function () {
