@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_8" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_9" />
 </head>
 <body>
   <div class="container">
@@ -25,8 +25,9 @@
     </header>
 
     <main class="layout">
-      <!-- Left Panel: Settings & Upload -->
+      <!-- Left Panel: Settings, Status, Lookup & Samples -->
       <section class="panel left-panel">
+        <!-- 1️⃣ 실행 설정 -->
         <div class="card">
           <h2>⚙️ 실행 설정</h2>
 
@@ -62,12 +63,18 @@
           <!-- Single line button row -->
           <div class="button-row-single">
             <button id="runBtn" class="btn btn-primary btn-flex" type="button">🚀 점검 실행</button>
-            <button id="sampleBtn" class="btn btn-secondary btn-flex" type="button">👁️ 샘플 보기</button>
             <button id="clearBtn" class="btn btn-ghost btn-flex" type="button">🔄 초기화</button>
           </div>
         </div>
 
-        <!-- Job ID Lookup Panel -->
+        <!-- 2️⃣ 📌 실행 상태 (분리된 전용 카드) -->
+        <div class="card execution-status-card">
+          <h2>📌 실행 상태</h2>
+          <div id="jobStatus" class="status-banner">대기 중</div>
+          <div id="jobMeta" class="meta-text"></div>
+        </div>
+
+        <!-- 3️⃣ 🔍 기존 Job ID로 결과 불러오기 -->
         <div class="card">
           <h2>🔍 기존 Job ID로 결과 불러오기</h2>
           <div class="label" style="margin-top: 6px;">
@@ -77,8 +84,18 @@
             <input id="lookupJobId" class="input" type="text" placeholder="res_xxxxxxxxxxxx" />
             <button id="lookupBtn" class="btn btn-secondary" type="button" style="white-space: nowrap;">조회</button>
           </div>
-          <div id="jobStatus" class="status-text" style="margin-top: 14px;">대기 중</div>
-          <div id="jobMeta" class="meta-text"></div>
+        </div>
+
+        <!-- 4️⃣ 📂 샘플 데이터 선택 (4개 샘플 불러오기) -->
+        <div class="card">
+          <h2>📂 샘플 데이터 선택</h2>
+          <p class="sample-intro">확인할 샘플 데이터를 선택하면 대시보드에 즉시 반영됩니다.</p>
+          <div class="sample-grid-4">
+            <button id="sampleBtn1" class="sample-btn-item" type="button">1️⃣ 실제샘플1</button>
+            <button id="sampleBtn2" class="sample-btn-item" type="button">2️⃣ 실제샘플2</button>
+            <button id="sampleBtn3" class="sample-btn-item" type="button">3️⃣ 가상Match샘플</button>
+            <button id="sampleBtn4" class="sample-btn-item" type="button">4️⃣ 가상MisMatch샘플</button>
+          </div>
         </div>
       </section>
 
@@ -213,6 +230,6 @@
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_8"></script>
+  <script src="./app.js?v=20260912_9"></script>
 </body>
 </html>

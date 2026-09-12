@@ -23,6 +23,10 @@ function initElements() {
   els.fileInfo = getEl("fileInfo");
   els.runBtn = getEl("runBtn");
   els.sampleBtn = getEl("sampleBtn");
+  els.sampleBtn1 = getEl("sampleBtn1");
+  els.sampleBtn2 = getEl("sampleBtn2");
+  els.sampleBtn3 = getEl("sampleBtn3");
+  els.sampleBtn4 = getEl("sampleBtn4");
   els.clearBtn = getEl("clearBtn");
   els.lookupJobId = getEl("lookupJobId");
   els.lookupBtn = getEl("lookupBtn");
@@ -1055,41 +1059,61 @@ function runWorkflow() {
     });
 }
 
-function fillSample() {
-  var savedCustom = localStorage.getItem("myCustomSample");
-  var sampleJob = null;
+function fillSample(sampleIndex) {
+  var idx = sampleIndex || 1;
+  var fileName = "sample.json";
+  var sampleTitle = "실제샘플1";
 
-  if (savedCustom) {
-    try {
-      sampleJob = JSON.parse(savedCustom);
-    } catch (e) {
-      sampleJob = null;
-    }
+  if (idx === 2) {
+    fileName = "sample2.json";
+    sampleTitle = "실제샘플2";
+  } else if (idx === 3) {
+    fileName = "sample3.json";
+    sampleTitle = "가상Match샘플";
+  } else if (idx === 4) {
+    fileName = "sample4.json";
+    sampleTitle = "가상MisMatch샘플";
   }
 
-  if (sampleJob) {
-    try {
-      var rawText = extractResultText(sampleJob);
-      var parsed = parseResultText(rawText);
-      renderResult(parsed, sampleJob);
-      if (els.lookupJobId && sampleJob.id) {
-        els.lookupJobId.value = sampleJob.id;
+  if (idx === 1) {
+    var savedCustom = localStorage.getItem("myCustomSample");
+    var sampleJob = null;
+
+    if (savedCustom) {
+      try {
+        sampleJob = JSON.parse(savedCustom);
+      } catch (e) {
+        sampleJob = null;
       }
-      setStatus("커스텀 샘플 결과 표시 중", "job_id=" + sampleJob.id);
-      return;
-    } catch (e) {
-      console.warn("커스텀 샘플 파싱 실패, 기본 sample.json 로드:", e);
+    }
+
+    if (sampleJob) {
+      try {
+        var customRawText = extractResultText(sampleJob);
+        var customParsed = parseResultText(customRawText);
+        renderResult(customParsed, sampleJob);
+        if (els.lookupJobId && sampleJob.id) {
+          els.lookupJobId.value = sampleJob.id;
+        }
+        setStatus("커스텀 샘플 결과 표시 중", "job_id=" + (sampleJob.id || "custom"));
+        return;
+      } catch (e) {
+        console.warn("커스텀 샘플 파싱 실패, 기본 sample.json 로드:", e);
+      }
     }
   }
 
-  setStatus("서버 샘플 로딩 중...", "sample.json");
+  setStatus(sampleTitle + " 로딩 중...", fileName);
 
-  fetch("./sample.json?v=" + encodeURIComponent(getCacheBuster()), {
+  fetch("./" + fileName + "?v=" + encodeURIComponent(getCacheBuster()), {
     cache: "no-store"
   })
     .then(function (res) {
       if (!res.ok) {
-        throw new Error("sample.json 파일 로드 실패 (" + res.status + ")");
+        if (idx === 2 || idx === 4) {
+          throw new Error(sampleTitle + " JSON 데이터가 준비 중입니다. 파일 제공 후 바로 확인 가능합니다.");
+        }
+        throw new Error(fileName + " 로드 실패 (" + res.status + ")");
       }
       return res.json();
     })
@@ -1100,12 +1124,12 @@ function fillSample() {
       if (els.lookupJobId && sampleData.id) {
         els.lookupJobId.value = sampleData.id;
       }
-      setStatus("샘플 결과 표시 중 (서버 sample.json)", "job_id=" + sampleData.id);
+      setStatus("샘플 결과 표시 중 (" + sampleTitle + ")", "job_id=" + (sampleData.id || fileName));
     })
     .catch(function (error) {
       console.error(error);
-      setStatus("샘플 로드 실패", error.message);
-      alert("샘플 데이터 로드 실패: " + error.message);
+      setStatus(sampleTitle + " 로드 대기/실패", error.message);
+      alert(error.message);
     });
 }
 
@@ -1170,7 +1194,11 @@ function init() {
     .then(function () {
       bindFileEvents();
       els.runBtn.addEventListener("click", runWorkflow);
-      els.sampleBtn.addEventListener("click", fillSample);
+      if (els.sampleBtn) els.sampleBtn.addEventListener("click", function () { fillSample(1); });
+      if (els.sampleBtn1) els.sampleBtn1.addEventListener("click", function () { fillSample(1); });
+      if (els.sampleBtn2) els.sampleBtn2.addEventListener("click", function () { fillSample(2); });
+      if (els.sampleBtn3) els.sampleBtn3.addEventListener("click", function () { fillSample(3); });
+      if (els.sampleBtn4) els.sampleBtn4.addEventListener("click", function () { fillSample(4); });
       els.clearBtn.addEventListener("click", clearResult);
       if (els.lookupBtn) els.lookupBtn.addEventListener("click", lookupExistingJob);
       if (els.copyJsonBtn) els.copyJsonBtn.addEventListener("click", copyJsonToClipboard);
