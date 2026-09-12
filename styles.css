@@ -322,6 +322,12 @@ h2 {
   min-height: 44px;
 }
 
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-height: 34px;
+}
+
 .btn-flex {
   flex: 1 1 0;
   min-width: 0;
@@ -726,6 +732,15 @@ tr.row-warn {
   margin-top: 4px;
 }
 
+/* JSON Export Action Bar */
+.json-action-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  margin-bottom: 12px;
+}
+
 /* Raw JSON Collapsible Details */
 details.raw-json-details {
   background: var(--card-bg);
@@ -778,7 +793,7 @@ details.raw-json-details[open] {
   font-size: 12px;
   max-height: 400px;
   overflow-y: auto;
-  margin: 16px 0 0 0;
+  margin: 8px 0 0 0;
 }
 
 /* ==========================================================================

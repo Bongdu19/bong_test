@@ -4,6 +4,7 @@ var uploadedFileId = null;
 var currentJobId = null;
 var currentChecklistData = null;
 var activeChecklistTab = null;
+var currentRawPayload = null;
 var els = {};
 
 function getEl(id) {
@@ -23,6 +24,8 @@ function initElements() {
   els.runBtn = getEl("runBtn");
   els.sampleBtn = getEl("sampleBtn");
   els.clearBtn = getEl("clearBtn");
+  els.lookupJobId = getEl("lookupJobId");
+  els.lookupBtn = getEl("lookupBtn");
   els.jobStatus = getEl("jobStatus");
   els.jobMeta = getEl("jobMeta");
   els.overallStatus = getEl("overallStatus");
@@ -41,6 +44,9 @@ function initElements() {
   els.dateTimeline = getEl("dateTimeline");
   els.checklistTabs = getEl("checklistTabs");
   els.checklistContent = getEl("checklistContent");
+  els.copyJsonBtn = getEl("copyJsonBtn");
+  els.downloadJsonBtn = getEl("downloadJsonBtn");
+  els.setAsSampleBtn = getEl("setAsSampleBtn");
   els.rawJson = getEl("rawJson");
 }
 
@@ -192,6 +198,7 @@ function clearResult() {
   els.rawJson.textContent = "결과 없음";
   currentChecklistData = null;
   activeChecklistTab = null;
+  currentRawPayload = null;
   setStatus("대기 중", "");
 }
 
@@ -440,7 +447,8 @@ function renderResult(parsed, finalJob) {
   var overall = String(data.overall_status || "").toLowerCase();
   var alertLvl = String(data.overall_alert_level || "").toLowerCase();
 
-  els.rawJson.textContent = JSON.stringify(finalJob || parsed, null, 2);
+  currentRawPayload = finalJob || parsed;
+  els.rawJson.textContent = JSON.stringify(currentRawPayload, null, 2);
 
   /* Render Overall Status Pill */
   if (overall === "review_required") {
@@ -653,6 +661,99 @@ function parseResultText(rawText) {
   }
 }
 
+/* Run Job Lookup by Job ID */
+function lookupExistingJob() {
+  var apiKey = trimValue(els.apiKey.value);
+  var jobId = trimValue(els.lookupJobId ? els.lookupJobId.value : "");
+
+  if (!apiKey) {
+    alert("API Key를 입력하세요.");
+    return;
+  }
+
+  if (!jobId) {
+    alert("조회할 Job ID (res_...)를 입력하세요.");
+    return;
+  }
+
+  clearResult();
+  setStatus("Job 조회 중...", "job_id=" + jobId);
+
+  getJob(apiKey, jobId)
+    .then(function (finalJob) {
+      var rawText;
+      var parsed;
+
+      els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
+
+      if (finalJob.status === "failed") {
+        setStatus("실행 실패된 Job", "job_id=" + jobId);
+        alert("실행 실패된 Job입니다. Raw JSON을 확인하세요.");
+        return;
+      }
+
+      rawText = extractResultText(finalJob);
+
+      if (!rawText) {
+        setStatus("조회 완료 (결과 텍스트 없음)", "job_id=" + jobId);
+        return;
+      }
+
+      parsed = parseResultText(rawText);
+      renderResult(parsed, finalJob);
+      setStatus("조회 완료: " + finalJob.status, "job_id=" + jobId);
+    })
+    .catch(function (error) {
+      console.error(error);
+      setStatus("조회 실패", error.message);
+      alert("Job 조회 실패: " + error.message);
+    });
+}
+
+/* 1-Click JSON Helpers */
+function copyJsonToClipboard() {
+  if (!currentRawPayload) {
+    alert("복사할 결과가 없습니다.");
+    return;
+  }
+  var jsonStr = JSON.stringify(currentRawPayload, null, 2);
+  navigator.clipboard.writeText(jsonStr).then(function () {
+    alert("📋 Raw JSON이 클립보드에 복사되었습니다!");
+  }).catch(function (err) {
+    alert("복사 실패: " + err.message);
+  });
+}
+
+function downloadJsonFile() {
+  if (!currentRawPayload) {
+    alert("다운로드할 결과가 없습니다.");
+    return;
+  }
+  var jsonStr = JSON.stringify(currentRawPayload, null, 2);
+  var blob = new Blob([jsonStr], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "upstage_trade_job_result.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function setAsCustomSample() {
+  if (!currentRawPayload) {
+    alert("샘플로 지정할 결과가 없습니다.");
+    return;
+  }
+  try {
+    localStorage.setItem("myCustomSample", JSON.stringify(currentRawPayload));
+    alert("⭐ 현재 결과가 내 커스텀 샘플로 지정되었습니다!\n앞으로 '👁️ 샘플 보기' 버튼을 누르면 이 결과가 표시됩니다.");
+  } catch (e) {
+    alert("저장 실패: " + e.message);
+  }
+}
+
 function runWorkflow() {
   var apiKey = trimValue(els.apiKey.value);
   var configId = trimValue(els.configId.value);
@@ -685,6 +786,7 @@ function runWorkflow() {
     })
     .then(function (job) {
       currentJobId = job.id;
+      if (els.lookupJobId) els.lookupJobId.value = currentJobId;
       setStatus("실행 중...", "job_id=" + currentJobId);
       return pollJob(apiKey, currentJobId);
     })
@@ -736,119 +838,134 @@ function runWorkflow() {
 }
 
 function fillSample() {
-  var sampleJob = {
-    id: "job_demo_20260912_v22",
-    object: "response",
-    status: "completed",
-    model: "agt_EpTRLGpvzaoGjJEEyPcWN8",
-    usage: {
-      input_tokens: 33972,
-      output_tokens: 10712,
-      total_tokens: 44684
-    },
-    output: [
-      {
-        type: "message",
-        status: "completed",
-        role: "assistant",
-        model: "Instruct - final_trade_document_set_review_api_v1",
-        content: [
-          {
-            type: "output_text",
-            text: JSON.stringify({
-              structured_result: {
-                overall_status: "review_required",
-                overall_alert_level: "warning",
-                one_line_summary: "업로드된 서류 세트는 Invoice, B/L, Packing List, Insurance는 확인되나 L/C 원문과 COO는 확인되지 않았고, 도착통지의 L/C 번호가 다른 선적서류와 상이하여 추가 검토가 필요합니다.",
-                recommended_action: "도착통지의 L/C 번호 접미 -053의 의미를 원본 L/C 또는 amendment 기준으로 확인하고, L/C 원문 및 COO 확보 후 신적기한, 보험조건 요구서류 충족 여부를 재심사해보세요.",
-                document_keys: {
-                  lc_number: "M0201410ES04828-053",
-                  invoice_number: "A4631-L032-61",
-                  bl_number: "RKOE076",
-                  policy_certificate_number: "15-H0065622",
-                  certificate_number: "-"
-                },
-                date_checks: {
-                  insurance_policy_issue_date: "2015-05-01",
-                  invoice_date: "2015-05-07",
-                  packing_list_date: "2015-05-07",
-                  bl_shipment_date: "2015-05-07",
-                  bl_on_board_date: "2015-05-07",
-                  latest_shipment_date: "2015-05-15",
-                  lc_issue_date: "2015-04-20",
-                  certificate_issue_date: "-",
-                  date_sequence_status: "missing",
-                  date_sequence_notes: "보험증권 발행일은 2015-05-01, Invoice 및 Packing List 일자는 2015-05-07, B/L 선적일 및 On Board 일자는 2015-05-07로 시간 흐름은 대체로 자연스럽지만 L/C 발행일과 최종선적기한이 없어 완전 판정은 불가합니다."
-                },
-                comparison_matrix: [
-                  {
-                    category: "서류 구비 현황",
-                    check_item: "file_presence",
-                    check_item_ko: "서류 구비 현황",
-                    result: "missing",
-                    lc: "missing",
-                    commercial_invoice: "present",
-                    bill_of_lading: "present",
-                    packing_list: "present",
-                    marine_cargo_insurance: "present",
-                    certificate_of_origin: "missing"
+  var savedCustom = localStorage.getItem("myCustomSample");
+  var sampleJob = null;
+
+  if (savedCustom) {
+    try {
+      sampleJob = JSON.parse(savedCustom);
+    } catch (e) {
+      sampleJob = null;
+    }
+  }
+
+  if (!sampleJob) {
+    sampleJob = {
+      id: "res_demo_20260912_v22",
+      object: "response",
+      status: "completed",
+      model: "agt_EpTRLGpvzaoGjJEEyPcWN8",
+      usage: {
+        input_tokens: 33972,
+        output_tokens: 10712,
+        total_tokens: 44684
+      },
+      output: [
+        {
+          type: "message",
+          status: "completed",
+          role: "assistant",
+          model: "Instruct - final_trade_document_set_review_api_v1",
+          content: [
+            {
+              type: "output_text",
+              text: JSON.stringify({
+                structured_result: {
+                  overall_status: "review_required",
+                  overall_alert_level: "warning",
+                  one_line_summary: "업로드된 서류 세트는 Invoice, B/L, Packing List, Insurance는 확인되나 L/C 원문과 COO는 확인되지 않았고, 도착통지의 L/C 번호가 다른 선적서류와 상이하여 추가 검토가 필요합니다.",
+                  recommended_action: "도착통지의 L/C 번호 접미 -053의 의미를 원본 L/C 또는 amendment 기준으로 확인하고, L/C 원문 및 COO 확보 후 신적기한, 보험조건 요구서류 충족 여부를 재심사해보세요.",
+                  document_keys: {
+                    lc_number: "M0201410ES04828-053",
+                    invoice_number: "A4631-L032-61",
+                    bl_number: "RKOE076",
+                    policy_certificate_number: "15-H0065622",
+                    certificate_number: "-"
                   },
-                  {
-                    category: "당사자 정보",
-                    check_item: "seller_party_consistency",
-                    check_item_ko: "수출자(Beneficiary/Shipper) 정보 일치성",
-                    result: "match",
-                    lc: "not_available",
-                    commercial_invoice: "MITSUBISHI ELECTRIC CORPORATION",
-                    bill_of_lading: "MITSUBISHI ELECTRIC CORPORATION",
-                    packing_list: "MITSUBISHI ELECTRIC CORPORATION",
-                    marine_cargo_insurance: "MITSUBISHI ELECTRIC CORPORATION",
-                    certificate_of_origin: "missing"
+                  date_checks: {
+                    insurance_policy_issue_date: "2015-05-01",
+                    invoice_date: "2015-05-07",
+                    packing_list_date: "2015-05-07",
+                    bl_shipment_date: "2015-05-07",
+                    bl_on_board_date: "2015-05-07",
+                    latest_shipment_date: "2015-05-15",
+                    lc_issue_date: "2015-04-20",
+                    certificate_issue_date: "-",
+                    date_sequence_status: "missing",
+                    date_sequence_notes: "보험증권 발행일은 2015-05-01, Invoice 및 Packing List 일자는 2015-05-07, B/L 선적일 및 On Board 일자는 2015-05-07로 시간 흐름은 대체로 자연스럽지만 L/C 발행일과 최종선적기한이 없어 완전 판정은 불가합니다."
                   },
-                  {
-                    category: "당사자 정보",
-                    check_item: "buyer_party_consistency",
-                    check_item_ko: "수입자(Applicant/Consignee) 정보 일치성",
-                    result: "unclear",
-                    lc: "not_available",
-                    commercial_invoice: "Hyundai Rotem Company",
-                    bill_of_lading: "TO THE ORDER OF THE KOREA DEVELOPMENT BANK",
-                    packing_list: "Hyundai Rotem Company",
-                    marine_cargo_insurance: "not_available",
-                    certificate_of_origin: "-"
+                  comparison_matrix: [
+                    {
+                      category: "서류 구비 현황",
+                      check_item: "file_presence",
+                      check_item_ko: "서류 구비 현황",
+                      result: "missing",
+                      lc: "missing",
+                      commercial_invoice: "present",
+                      bill_of_lading: "present",
+                      packing_list: "present",
+                      marine_cargo_insurance: "present",
+                      certificate_of_origin: "missing"
+                    },
+                    {
+                      category: "당사자 정보",
+                      check_item: "seller_party_consistency",
+                      check_item_ko: "수출자(Beneficiary/Shipper) 정보 일치성",
+                      result: "match",
+                      lc: "not_available",
+                      commercial_invoice: "MITSUBISHI ELECTRIC CORPORATION",
+                      bill_of_lading: "MITSUBISHI ELECTRIC CORPORATION",
+                      packing_list: "MITSUBISHI ELECTRIC CORPORATION",
+                      marine_cargo_insurance: "MITSUBISHI ELECTRIC CORPORATION",
+                      certificate_of_origin: "missing"
+                    },
+                    {
+                      category: "당사자 정보",
+                      check_item: "buyer_party_consistency",
+                      check_item_ko: "수입자(Applicant/Consignee) 정보 일치성",
+                      result: "unclear",
+                      lc: "not_available",
+                      commercial_invoice: "Hyundai Rotem Company",
+                      bill_of_lading: "TO THE ORDER OF THE KOREA DEVELOPMENT BANK",
+                      packing_list: "Hyundai Rotem Company",
+                      marine_cargo_insurance: "not_available",
+                      certificate_of_origin: "-"
+                    }
+                  ],
+                  document_checklists: {
+                    lc: [
+                      { item: "신용장 유효기한 (Expiry Date)", status: "warning", details: "L/C 원문 미확인으로 유효기한 검증 필요" },
+                      { item: "분할선적 허용 여부 (Partial Shipment)", status: "pass", details: "Partial Shipment Allowed 기재됨" }
+                    ],
+                    invoice: [
+                      { item: "L/C 번호 표기 유무", status: "pass", details: "M0201410ES04828 기재 완료" },
+                      { item: "발행자 서명 및 인장", status: "pass", details: "MITSUBISHI ELECTRIC 서명 확인" }
+                    ],
+                    bl: [
+                      { item: "Clean On Board 표기", status: "pass", details: "2015-05-07 On Board 적재 확인" },
+                      { item: "운임 지급 조건 (Freight Prepaid)", status: "pass", details: "Freight Prepaid 기재됨" }
+                    ],
+                    packing_list: [
+                      { item: "포장 수량 및 CBM 산정", status: "pass", details: "22.948 CBM 산정 일치" }
+                    ],
+                    insurance: [
+                      { item: "보험증권 발행일 (선적일 이전)", status: "pass", details: "2015-05-01 발행으로 B/L 선적일(05-07) 이전 부보됨" }
+                    ]
                   }
-                ],
-                document_checklists: {
-                  lc: [
-                    { item: "신용장 유효기한 (Expiry Date)", status: "warning", details: "L/C 원문 미확인으로 유효기한 검증 필요" },
-                    { item: "분할선적 허용 여부 (Partial Shipment)", status: "pass", details: "Partial Shipment Allowed 기재됨" }
-                  ],
-                  invoice: [
-                    { item: "L/C 번호 표기 유무", status: "pass", details: "M0201410ES04828 기재 완료" },
-                    { item: "발행자 서명 및 인장", status: "pass", details: "MITSUBISHI ELECTRIC 서명 확인" }
-                  ],
-                  bl: [
-                    { item: "Clean On Board 표기", status: "pass", details: "2015-05-07 On Board 적재 확인" },
-                    { item: "운임 지급 조건 (Freight Prepaid)", status: "pass", details: "Freight Prepaid 기재됨" }
-                  ],
-                  packing_list: [
-                    { item: "포장 수량 및 CBM 산정", status: "pass", details: "22.948 CBM 산정 일치" }
-                  ],
-                  insurance: [
-                    { item: "보험증권 발행일 (선적일 이전)", status: "pass", details: "2015-05-01 발행으로 B/L 선적일(05-07) 이전 부보됨" }
-                  ]
                 }
-              }
-            })
-          }
-        ]
-      }
-    ]
-  };
+              })
+            }
+          ]
+        }
+      ];
+  }
 
   var rawText = extractResultText(sampleJob);
   var parsed = parseResultText(rawText);
   renderResult(parsed, sampleJob);
+  if (els.lookupJobId && sampleJob.id) {
+    els.lookupJobId.value = sampleJob.id;
+  }
   setStatus("샘플 결과 표시 중", "job_id=" + sampleJob.id);
 }
 
@@ -890,6 +1007,10 @@ function init() {
       els.runBtn.addEventListener("click", runWorkflow);
       els.sampleBtn.addEventListener("click", fillSample);
       els.clearBtn.addEventListener("click", clearResult);
+      if (els.lookupBtn) els.lookupBtn.addEventListener("click", lookupExistingJob);
+      if (els.copyJsonBtn) els.copyJsonBtn.addEventListener("click", copyJsonToClipboard);
+      if (els.downloadJsonBtn) els.downloadJsonBtn.addEventListener("click", downloadJsonFile);
+      if (els.setAsSampleBtn) els.setAsSampleBtn.addEventListener("click", setAsCustomSample);
       clearResult();
       setStatus("대기 중", "cache_buster=v=" + getCacheBuster());
     })

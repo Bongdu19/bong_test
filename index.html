@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_5" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_6" />
 </head>
 <body>
   <div class="container">
@@ -67,9 +67,17 @@
           </div>
         </div>
 
+        <!-- Job ID Lookup Panel -->
         <div class="card">
-          <h2>📊 실행 상태</h2>
-          <div id="jobStatus" class="status-text">대기 중</div>
+          <h2>🔍 기존 Job ID로 결과 불러오기</h2>
+          <div class="label" style="margin-top: 6px;">
+            <span>Job ID (res_...)</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input id="lookupJobId" class="input" type="text" placeholder="res_xxxxxxxxxxxx" />
+            <button id="lookupBtn" class="btn btn-secondary" type="button" style="white-space: nowrap;">조회</button>
+          </div>
+          <div id="jobStatus" class="status-text" style="margin-top: 14px;">대기 중</div>
           <div id="jobMeta" class="meta-text"></div>
         </div>
       </section>
@@ -162,7 +170,7 @@
           </div>
         </div>
 
-        <!-- 5️⃣ 🔍 Per-Document Checklists Tabs (신규 기능) -->
+        <!-- 5️⃣ 🔍 Per-Document Checklists Tabs -->
         <div class="card">
           <h2>🔍 서류별 개별 상세 체크리스트</h2>
           <div id="checklistTabs" class="checklist-tabs">
@@ -173,18 +181,25 @@
           </div>
         </div>
 
-        <!-- 6️⃣ Collapsible Raw JSON Response -->
+        <!-- 6️⃣ Collapsible Raw JSON Response with Quick Export Actions -->
         <details class="card raw-json-details">
           <summary class="raw-json-summary">
             <span>💻 Raw JSON Response</span>
             <span class="summary-hint">클릭하여 펼치기 / 접기</span>
           </summary>
+          
+          <div class="json-action-bar">
+            <button id="copyJsonBtn" class="btn btn-secondary btn-sm" type="button">📋 JSON 전체 복사</button>
+            <button id="downloadJsonBtn" class="btn btn-secondary btn-sm" type="button">💾 샘플 JSON 파일 다운로드</button>
+            <button id="setAsSampleBtn" class="btn btn-primary btn-sm" type="button">⭐ 내 결과 샘플로 지정</button>
+          </div>
+
           <pre id="rawJson" class="raw-json">결과 없음</pre>
         </details>
       </section>
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_5"></script>
+  <script src="./app.js?v=20260912_6"></script>
 </body>
 </html>
