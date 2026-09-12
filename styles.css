@@ -185,14 +185,14 @@ h1 {
 .layout {
   display: grid;
   grid-template-columns: 350px 1fr;
-  gap: 24px;
+  gap: 12px;
   align-items: start;
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   min-width: 0;
   width: 100%;
 }
@@ -201,7 +201,7 @@ h1 {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-card);
-  padding: 24px;
+  padding: 12px 16px;
   box-shadow: var(--shadow-md);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
@@ -216,8 +216,8 @@ h1 {
 }
 
 h2 {
-  margin: 0 0 16px 0;
-  font-size: 19px;
+  margin: 0 0 8px 0;
+  font-size: 18px;
   font-weight: 800;
   color: var(--text-main);
   display: flex;
@@ -522,7 +522,7 @@ details.api-settings-details[open] {
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.8fr;
-  gap: 16px;
+  gap: 10px;
   align-items: stretch;
   width: 100%;
   max-width: 100%;
@@ -531,29 +531,32 @@ details.api-settings-details[open] {
 .metric-card {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   min-width: 0;
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 .metric-card-centered {
-  text-align: center;
-  justify-content: center;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .metric-card-centered .metric-label,
 .metric-card-centered .header-metric-label {
-  text-align: center;
+  text-align: left !important;
+  align-self: flex-start !important;
   width: 100%;
 }
 
 .metric-card-centered .metric-desc {
-  text-align: center;
-  width: 100%;
+  flex: 1;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  text-align: center !important;
+  margin: auto 0;
+  width: 100%;
 }
 
 .metric-card-wide {
@@ -566,14 +569,16 @@ details.api-settings-details[open] {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  text-align: left !important;
 }
 
 .header-metric-label {
-  font-size: 17px !important;
+  font-size: 16px !important;
   font-weight: 800 !important;
   letter-spacing: -0.2px !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 4px !important;
+  text-align: left !important;
 }
 
 .metric-value {
@@ -585,7 +590,7 @@ details.api-settings-details[open] {
 }
 
 .metric-desc {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--text-main);
   font-size: 17px;
   font-weight: 700;
@@ -644,12 +649,13 @@ details.api-settings-details[open] {
 
 .desc-status-highlight {
   display: block;
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 800;
-  margin-top: 4px;
+  margin-top: 2px;
   letter-spacing: -0.3px;
-  line-height: 1.35;
+  line-height: 1.3;
   word-break: break-word;
+  text-align: center !important;
 }
 
 .desc-status-highlight.warn {
@@ -678,13 +684,13 @@ details.api-settings-details[open] {
 .metric-desc.large {
   color: var(--text-main);
   font-weight: 700;
-  font-size: 17px;
-  line-height: 1.65;
+  font-size: 20px;
+  line-height: 1.55;
   background: var(--bg-primary);
-  padding: 16px 18px;
-  border-radius: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
-  margin-top: 8px;
+  margin-top: 4px;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
