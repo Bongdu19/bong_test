@@ -134,14 +134,64 @@ function setStatus(text, meta) {
   els.jobMeta.textContent = meta || "";
 }
 
+function koreanStatus(statusStr) {
+  if (!statusStr) return "-";
+  var s = String(statusStr).toLowerCase().trim();
+
+  // Overall & Alert levels
+  if (s === "review_required" || s === "review required") return "검토 필요";
+  if (s === "proceed") return "진행 가능";
+  if (s === "on_hold" || s === "on hold") return "보류";
+  if (s === "critical") return "치명";
+  if (s === "warning" || s === "warn") return "주의";
+  if (s === "info") return "참고";
+
+  // Matrix/Checklist results
+  if (s === "match" || s === "ok") return "일치";
+  if (s === "mismatch") return "불일치";
+  if (s === "missing") return "미제출";
+  if (s === "unclear") return "확인 필요";
+  if (s === "pass") return "통과";
+  if (s === "fail" || s === "crit") return "미비";
+  if (s === "not_available" || s === "n/a") return "미해당";
+  if (s === "present") return "구비됨";
+
+  return statusStr;
+}
+
+function formatDocValue(val) {
+  if (val == null) return "-";
+  var str = cleanText(val);
+  var lower = str.toLowerCase().trim();
+  if (lower === "present") return "구비됨";
+  if (lower === "missing") return "미제출";
+  if (lower === "not_available" || lower === "n/a") return "미해당";
+  if (lower === "match") return "일치";
+  if (lower === "mismatch") return "불일치";
+  if (lower === "unclear") return "확인 필요";
+  return str;
+}
+
 function badgeClass(result) {
   var v = String(result || "").toLowerCase();
 
-  if (v.indexOf("일치") >= 0 || v === "match" || v === "ok" || v === "proceed" || v === "pass") {
+  if (
+    v.indexOf("일치") >= 0 ||
+    v.indexOf("진행") >= 0 ||
+    v.indexOf("통과") >= 0 ||
+    v.indexOf("구비") >= 0 ||
+    v === "match" ||
+    v === "ok" ||
+    v === "proceed" ||
+    v === "pass" ||
+    v === "present"
+  ) {
     return "badge badge-ok";
   }
   if (
     v.indexOf("검토") >= 0 ||
+    v.indexOf("주의") >= 0 ||
+    v.indexOf("확인") >= 0 ||
     v.indexOf("warning") >= 0 ||
     v === "review_required" ||
     v === "unclear" ||
@@ -151,6 +201,10 @@ function badgeClass(result) {
   }
   if (
     v.indexOf("불일치") >= 0 ||
+    v.indexOf("보류") >= 0 ||
+    v.indexOf("치명") >= 0 ||
+    v.indexOf("미제출") >= 0 ||
+    v.indexOf("미비") >= 0 ||
     v.indexOf("critical") >= 0 ||
     v === "mismatch" ||
     v === "on_hold" ||
@@ -167,15 +221,22 @@ function rowHighlightClass(result) {
 
   if (
     v.indexOf("불일치") >= 0 ||
+    v.indexOf("보류") >= 0 ||
+    v.indexOf("치명") >= 0 ||
+    v.indexOf("미제출") >= 0 ||
+    v.indexOf("미비") >= 0 ||
     v.indexOf("critical") >= 0 ||
     v === "mismatch" ||
     v === "missing" ||
-    v === "fail"
+    v === "fail" ||
+    v === "on_hold"
   ) {
     return "row-crit";
   }
   if (
     v.indexOf("검토") >= 0 ||
+    v.indexOf("주의") >= 0 ||
+    v.indexOf("확인") >= 0 ||
     v.indexOf("warning") >= 0 ||
     v === "review_required" ||
     v === "unclear" ||
@@ -295,8 +356,7 @@ function renderDateTimeline(dateChecks) {
 
   if (cleanedNotes) {
     html += '<div class="timeline-note-box">';
-    html += '<span class="timeline-note-icon">📌</span>';
-    html += '<div><strong>날짜 순서 종합 판정 (<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + '</span>):</strong> ' + escapeHtml(cleanedNotes) + '</div>';
+    html += '<div><strong>날짜 순서 종합 판정 (<span class="badge ' + statusClass + '">' + escapeHtml(koreanStatus(dateChecks.date_sequence_status)) + '</span>):</strong> ' + escapeHtml(cleanedNotes) + '</div>';
     html += '</div>';
   }
 
@@ -426,20 +486,20 @@ function renderComparisonTable(rows) {
       // Table Row
       html += '<tr class="' + rowClass + '">';
       html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
-      html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + '</span></td>';
-      html += '<td>' + escapeHtml(cleanText(row.lc || "-")) + '</td>';
-      html += '<td>' + escapeHtml(cleanText(row.commercial_invoice || row.invoice || "-")) + '</td>';
-      html += '<td>' + escapeHtml(cleanText(row.bill_of_lading || row.bl || "-")) + '</td>';
-      html += '<td>' + escapeHtml(cleanText(row.packing_list || "-")) + '</td>';
-      html += '<td>' + escapeHtml(cleanText(row.marine_cargo_insurance || row.insurance || "-")) + '</td>';
-      html += '<td>' + escapeHtml(cleanText(row.certificate_of_origin || row.coo || "-")) + '</td>';
+      html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.lc)) + '</td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.commercial_invoice || row.invoice)) + '</td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.bill_of_lading || row.bl)) + '</td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.packing_list)) + '</td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.marine_cargo_insurance || row.insurance)) + '</td>';
+      html += '<td>' + escapeHtml(formatDocValue(row.certificate_of_origin || row.coo)) + '</td>';
       html += '</tr>';
 
       // Mobile Card Item
       cardsHtml += '<div class="mobile-matrix-card ' + rowClass + '">';
       cardsHtml += '<div class="mobile-card-top">';
       cardsHtml += '<span class="mobile-card-title">' + escapeHtml(cleanText(itemTitle)) + '</span>';
-      cardsHtml += '<span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + '</span>';
+      cardsHtml += '<span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span>';
       cardsHtml += '</div>';
       cardsHtml += '<div class="mobile-card-doc-grid">';
 
@@ -453,12 +513,12 @@ function renderComparisonTable(rows) {
       ];
 
       docs.forEach(function (d) {
-        var cleanV = cleanText(d.val || "-");
-        var isMissing = cleanV === "missing" || cleanV === "-" || cleanV === "";
+        var cleanV = formatDocValue(d.val);
+        var isMissing = cleanV === "미제출" || cleanV === "-" || cleanV === "";
         var valClass = isMissing ? "doc-val-missing" : "doc-val-present";
         cardsHtml += '<div class="mobile-doc-item">';
         cardsHtml += '<span class="mobile-doc-tag">' + escapeHtml(d.label) + '</span>';
-        cardsHtml += '<span class="mobile-doc-val ' + valClass + '">' + escapeHtml(cleanV || "-") + '</span>';
+        cardsHtml += '<span class="mobile-doc-val ' + valClass + '">' + escapeHtml(cleanV) + '</span>';
         cardsHtml += '</div>';
       });
 
@@ -512,7 +572,7 @@ function selectChecklistTab(docKey) {
       html += '<div class="checklist-item-details">' + escapeHtml(cleanText(item.details || item.desc)) + '</div>';
     }
     html += '</div>';
-    html += '<div><span class="' + statusBadge + '">' + escapeHtml(item.status || "CHECK") + '</span></div>';
+    html += '<div><span class="' + statusBadge + '">' + escapeHtml(koreanStatus(item.status)) + '</span></div>';
     html += '</div>';
   }
 
@@ -571,13 +631,13 @@ function renderChecklists(documentChecklists) {
 
     if (critCount > 0) {
       tabClass = "tab-btn-crit";
-      tabPillHtml = '<span class="tab-pill pill-crit">🚨 미비 ' + critCount + '</span>';
+      tabPillHtml = '<span class="tab-pill pill-crit">미비 ' + critCount + '</span>';
     } else if (warnCount > 0) {
       tabClass = "tab-btn-warn";
-      tabPillHtml = '<span class="tab-pill pill-warn">⚠️ 주의 ' + warnCount + '</span>';
+      tabPillHtml = '<span class="tab-pill pill-warn">주의 ' + warnCount + '</span>';
     } else if (passCount > 0) {
       tabClass = "tab-btn-ok";
-      tabPillHtml = '<span class="tab-pill pill-ok">✅ 정상 ' + passCount + '</span>';
+      tabPillHtml = '<span class="tab-pill pill-ok">정상 ' + passCount + '</span>';
     } else {
       tabPillHtml = '<span class="tab-pill pill-neutral">' + items.length + '</span>';
     }
@@ -613,33 +673,33 @@ function renderResult(parsed, finalJob) {
   els.rawJson.textContent = JSON.stringify(currentRawPayload, null, 2);
 
   /* Render Overall Status Pill & Large Korean Desc */
-  if (overall === "review_required") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-warn">Review Required</span>';
-    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">⚠️ 진행 전 추가 검토 필요</span>';
-  } else if (overall === "proceed") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-ok">Proceed</span>';
-    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">✅ 서류 일치 (진행 가능)</span>';
-  } else if (overall === "on_hold") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-crit">On Hold</span>';
-    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">🚨 불일치 발생 (보류)</span>';
+  if (overall === "review_required" || overall === "검토 필요") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-warn">검토 필요</span>';
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">진행 전 추가 검토 필요</span>';
+  } else if (overall === "proceed" || overall === "진행 가능") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-ok">진행 가능</span>';
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">서류 일치 (진행 가능)</span>';
+  } else if (overall === "on_hold" || overall === "보류") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-crit">보류</span>';
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">불일치 발생 (보류)</span>';
   } else {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_status || "-") + '</span>';
-    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(data.overall_status || "결과 확인") + '</span>';
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(koreanStatus(data.overall_status)) + '</span>';
+    els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_status) || "결과 확인") + '</span>';
   }
 
   /* Render Alert Level Pill & Large Korean Desc */
-  if (alertLvl === "critical") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-crit">Critical</span>';
-    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight crit">🚨 치명 이슈 포함</span>';
-  } else if (alertLvl === "warning") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-warn">Warning</span>';
-    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight warn">⚠️ 주의 필요</span>';
-  } else if (alertLvl === "info") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-ok">Info</span>';
-    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight ok">ℹ️ 참고 수준</span>';
+  if (alertLvl === "critical" || alertLvl === "치명") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-crit">치명</span>';
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight crit">치명 이슈 포함</span>';
+  } else if (alertLvl === "warning" || alertLvl === "warn" || alertLvl === "주의") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-warn">주의</span>';
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight warn">주의 필요</span>';
+  } else if (alertLvl === "info" || alertLvl === "참고") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-ok">참고</span>';
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight ok">참고 수준</span>';
   } else {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_alert_level || "-") + '</span>';
-    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(data.overall_alert_level || "결과 확인") + '</span>';
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(koreanStatus(data.overall_alert_level)) + '</span>';
+    els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_alert_level) || "결과 확인") + '</span>';
   }
 
   els.oneLineSummary.textContent = cleanText(data.one_line_summary) || "-";
