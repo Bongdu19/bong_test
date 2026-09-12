@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_12" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_13" />
 </head>
 <body>
   <div class="container">
@@ -57,15 +57,26 @@
             </div>
           </details>
 
-          <div class="label" style="margin-top: 16px;">
-            <span>문서 업로드</span>
+          <div class="label" style="margin-top: 14px;">
+            <span>문서 업로드 및 샘플 선택</span>
           </div>
           <div id="dropzone" class="dropzone">
             <input id="fileInput" type="file" hidden />
             <div class="dropzone-icon">📁</div>
-            <p class="dropzone-title">파일을 드래그하거나 클릭해 선택</p>
+            <p class="dropzone-title">내 PC 파일 선택 또는 드래그</p>
             <p class="dropzone-sub">PDF / 이미지 / Office / 비디오 (최대 500MB)</p>
           </div>
+
+          <div class="label" style="margin-top: 12px;">
+            <span>📂 또는 샘플 데이터셋 선택</span>
+          </div>
+          <select id="sampleSelect" class="select sample-select-combo">
+            <option value="">-- 샘플 데이터선택 (클릭) --</option>
+            <option value="1">1️⃣ 실제샘플1 (기본 무역서류 세트)</option>
+            <option value="2">2️⃣ 실제샘플2 (L/C미제출 및 번호이슈)</option>
+            <option value="3">3️⃣ 가상Match샘플 (서류 정상 수용)</option>
+            <option value="4">4️⃣ 가상MisMatch샘플 (양하항·수량 불일치)</option>
+          </select>
 
           <div id="fileInfo" class="file-info">선택된 파일 없음</div>
 
@@ -93,20 +104,6 @@
             <input id="lookupJobId" class="input" type="text" placeholder="res_xxxxxxxxxxxx" />
             <button id="lookupBtn" class="btn btn-secondary" type="button" style="white-space: nowrap;">조회</button>
           </div>
-        </div>
-
-        <!-- 4️⃣ 📂 샘플 데이터 선택 (콤보박스 선택) -->
-        <div class="card">
-          <h2>📂 샘플 데이터 선택</h2>
-          <div class="label" style="margin-top: 6px;">
-            <span>샘플 데이터셋 선택</span>
-          </div>
-          <select id="sampleSelect" class="select sample-select-combo">
-            <option value="1">1️⃣ 실제샘플1 (기본 무역서류 세트)</option>
-            <option value="2">2️⃣ 실제샘플2 (L/C미제출 및 번호이슈)</option>
-            <option value="3">3️⃣ 가상Match샘플 (서류 정상 수용)</option>
-            <option value="4">4️⃣ 가상MisMatch샘플 (양하항·수량 불일치)</option>
-          </select>
         </div>
       </section>
 
@@ -217,6 +214,6 @@
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_12"></script>
+  <script src="./app.js?v=20260912_13"></script>
 </body>
 </html>

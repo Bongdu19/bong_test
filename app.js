@@ -267,6 +267,11 @@ function clearResult() {
   applyCardTheme(els.overallStatusCard, null);
   applyCardTheme(els.alertLevelCard, null);
   applyCardTheme(els.recommendedActionCard, null);
+  if (els.sampleSelect) els.sampleSelect.value = "";
+  if (els.fileInfo) els.fileInfo.textContent = "선택된 파일 없음";
+  selectedFile = null;
+  uploadedFileId = null;
+  currentJobId = null;
   if (els.overallStatus) els.overallStatus.style.display = "none";
   els.overallStatusDesc.textContent = "결과 없음";
   if (els.alertLevel) els.alertLevel.style.display = "none";
@@ -1091,6 +1096,8 @@ function fillSample(sampleIndex) {
   var fileName = "sample.json";
   var sampleTitle = "실제샘플1";
 
+  selectedFile = null;
+
   if (els.sampleSelect) {
     els.sampleSelect.value = String(idx);
   }
@@ -1104,6 +1111,10 @@ function fillSample(sampleIndex) {
   } else if (idx === 4) {
     fileName = "sample4.json";
     sampleTitle = "가상MisMatch샘플";
+  }
+
+  if (els.fileInfo) {
+    els.fileInfo.innerHTML = "<strong>[샘플선택] " + escapeHtml(sampleTitle) + "</strong> <span class=\"meta-text\">(" + escapeHtml(fileName) + ")</span>";
   }
 
   if (idx === 1) {
@@ -1171,6 +1182,7 @@ function bindFileEvents() {
 
   els.fileInput.addEventListener("change", function (e) {
     selectedFile = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+    if (els.sampleSelect && selectedFile) els.sampleSelect.value = "";
     els.fileInfo.textContent = selectedFile ? selectedFile.name : "선택된 파일 없음";
   });
 
@@ -1188,6 +1200,7 @@ function bindFileEvents() {
     e.preventDefault();
     els.dropzone.classList.remove("dragover");
     selectedFile = e.dataTransfer.files && e.dataTransfer.files[0] ? e.dataTransfer.files[0] : null;
+    if (els.sampleSelect && selectedFile) els.sampleSelect.value = "";
     els.fileInfo.textContent = selectedFile ? selectedFile.name : "선택된 파일 없음";
   });
 }
