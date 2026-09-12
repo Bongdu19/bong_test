@@ -50,6 +50,14 @@ function escapeHtml(value) {
   return str;
 }
 
+/* Remove raw citation markers like 【†16】, [†80], 【80】 */
+function cleanText(value) {
+  if (value == null) return "";
+  var str = String(value);
+  str = str.replace(/【†?\d+】/g, "").replace(/\[†?\d+\]/g, "");
+  return str.trim();
+}
+
 function trimValue(value) {
   return String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
 }
@@ -135,9 +143,9 @@ function badgeClass(result) {
 }
 
 function clearResult() {
-  els.overallStatus.textContent = "-";
+  els.overallStatus.innerHTML = "-";
   els.overallStatusDesc.textContent = "결과 없음";
-  els.alertLevel.textContent = "-";
+  els.alertLevel.innerHTML = "-";
   els.alertLevelDesc.textContent = "결과 없음";
   els.recommendedAction.textContent = "결과 없음";
   els.oneLineSummary.textContent = "결과 없음";
@@ -165,9 +173,9 @@ function renderUsage(finalJob) {
   if (usage || stepName) {
     els.usageCard.style.display = "block";
     els.usageStepName.textContent = stepName;
-    els.usageInputTokens.textContent = (usage && usage.input_tokens != null) ? usage.input_tokens : "-";
-    els.usageOutputTokens.textContent = (usage && usage.output_tokens != null) ? usage.output_tokens : "-";
-    els.usageTotalTokens.textContent = (usage && usage.total_tokens != null) ? usage.total_tokens : "-";
+    els.usageInputTokens.textContent = (usage && usage.input_tokens != null) ? usage.input_tokens.toLocaleString() : "-";
+    els.usageOutputTokens.textContent = (usage && usage.output_tokens != null) ? usage.output_tokens.toLocaleString() : "-";
+    els.usageTotalTokens.textContent = (usage && usage.total_tokens != null) ? usage.total_tokens.toLocaleString() : "-";
   } else {
     els.usageCard.style.display = "none";
   }
@@ -176,6 +184,7 @@ function renderUsage(finalJob) {
 function renderDocumentKeys(documentKeys) {
   var html = "";
   var key;
+  var cleanedVal;
 
   if (!documentKeys || typeof documentKeys !== "object") {
     els.documentKeys.innerHTML = "결과 없음";
@@ -184,9 +193,10 @@ function renderDocumentKeys(documentKeys) {
 
   for (key in documentKeys) {
     if (Object.prototype.hasOwnProperty.call(documentKeys, key)) {
+      cleanedVal = cleanText(documentKeys[key]);
       html += '<div class="kv-item">';
       html += '<div class="kv-key">' + escapeHtml(key) + "</div>";
-      html += '<div class="kv-value">' + escapeHtml(documentKeys[key] || "-") + "</div>";
+      html += '<div class="kv-value">' + escapeHtml(cleanedVal || "-") + "</div>";
       html += "</div>";
     }
   }
@@ -211,6 +221,7 @@ function buildDateTimeline(dateChecks) {
   var item;
   var value;
   var statusClass = "badge-neutral";
+  var cleanedNotes = "";
 
   if (!dateChecks || typeof dateChecks !== "object") {
     return "";
@@ -227,29 +238,38 @@ function buildDateTimeline(dateChecks) {
     statusClass = "badge-warn";
   }
 
-  html += '<div class="issue-item">';
-  html += '<div class="issue-title">Date Flow Timeline</div>';
-  html += '<div class="issue-desc" style="margin-top:6px;">';
-  html += '<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + "</span>";
-  html += " " + escapeHtml(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
-  html += "</div>";
-  html += '<div class="timeline-wrap" style="margin-top:12px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;">';
+  cleanedNotes = cleanText(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
+
+  html += '<div class="issue-card" style="margin-bottom:16px;">';
+  html += '<div class="issue-header">';
+  html += '<div class="issue-title">🗓️ 서류 날짜 순서 검증 (Date Flow Timeline)</div>';
+  html += '<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + '</span>';
+  html += '</div>';
+
+  if (cleanedNotes) {
+    html += '<div class="timeline-note-box" style="margin-top:12px;">';
+    html += '<span class="timeline-note-icon">📌</span>';
+    html += '<div>' + escapeHtml(cleanedNotes) + '</div>';
+    html += '</div>';
+  }
+
+  html += '<div class="doc-comparison-grid" style="margin-top:12px;">';
 
   for (i = 0; i < items.length; i += 1) {
     item = items[i];
-    value = trimValue(dateChecks[item.key] || "");
+    value = cleanText(dateChecks[item.key] || "");
     if (!value) {
       continue;
     }
 
-    html += '<div class="kv-item" style="padding: 8px 10px;">';
-    html += '<div class="kv-key" style="font-size:12px;">' + escapeHtml(item.label) + "</div>";
-    html += '<div class="kv-value" style="font-size:13px; margin-top:2px;">' + escapeHtml(value) + "</div>";
-    html += "</div>";
+    html += '<div class="doc-box">';
+    html += '<div class="doc-box-label">' + escapeHtml(item.label) + '</div>';
+    html += '<div class="doc-box-val">' + escapeHtml(value) + '</div>';
+    html += '</div>';
   }
 
-  html += "</div>";
-  html += "</div>";
+  html += '</div>';
+  html += '</div>';
 
   return html;
 }
@@ -261,6 +281,7 @@ function renderIssues(data) {
   var row;
   var result;
   var isIssue;
+  var lcVal, invVal, blVal, pkVal, insVal, cooVal;
 
   html += buildDateTimeline(data.date_checks);
 
@@ -278,22 +299,35 @@ function renderIssues(data) {
         result.toLowerCase() === "unclear";
 
       if (isIssue) {
-        html += '<div class="issue-item">';
-        html += '<span class="' + badgeClass(result) + '">' + escapeHtml(result) + "</span>";
-        html += '<div class="issue-title">' + escapeHtml(row.check_item || "-") + "</div>";
-        html += '<div class="issue-desc">';
-        html += "LC: " + escapeHtml(row.lc || "-");
-        html += " / Invoice: " + escapeHtml(row.commercial_invoice || "-");
-        html += " / B/L: " + escapeHtml(row.bill_of_lading || "-");
-        html += " / Packing List: " + escapeHtml(row.packing_list || "-");
-        html += " / Insurance: " + escapeHtml(row.marine_cargo_insurance || "-");
-        html += "</div>";
-        html += "</div>";
+        lcVal = cleanText(row.lc) || "-";
+        invVal = cleanText(row.commercial_invoice) || "-";
+        blVal = cleanText(row.bill_of_lading) || "-";
+        pkVal = cleanText(row.packing_list) || "-";
+        insVal = cleanText(row.marine_cargo_insurance) || "-";
+        cooVal = cleanText(row.certificate_of_origin) || "-";
+
+        html += '<div class="issue-card">';
+        html += '<div class="issue-header">';
+        html += '<div class="issue-title">🔍 ' + escapeHtml(cleanText(row.check_item || "-")) + '</div>';
+        html += '<span class="' + badgeClass(result) + '">' + escapeHtml(result) + '</span>';
+        html += '</div>';
+
+        html += '<div class="doc-comparison-grid">';
+        html += '<div class="doc-box"><div class="doc-box-label">LC</div><div class="doc-box-val">' + escapeHtml(lcVal) + '</div></div>';
+        html += '<div class="doc-box"><div class="doc-box-label">Invoice</div><div class="doc-box-val">' + escapeHtml(invVal) + '</div></div>';
+        html += '<div class="doc-box"><div class="doc-box-label">B/L</div><div class="doc-box-val">' + escapeHtml(blVal) + '</div></div>';
+        html += '<div class="doc-box"><div class="doc-box-label">Packing List</div><div class="doc-box-val">' + escapeHtml(pkVal) + '</div></div>';
+        html += '<div class="doc-box"><div class="doc-box-label">Insurance</div><div class="doc-box-val">' + escapeHtml(insVal) + '</div></div>';
+        if (cooVal !== "-") {
+          html += '<div class="doc-box"><div class="doc-box-label">COO</div><div class="doc-box-val">' + escapeHtml(cooVal) + '</div></div>';
+        }
+        html += '</div>';
+        html += '</div>';
       }
     }
   }
 
-  els.issues.innerHTML = html || "이슈 없음";
+  els.issues.innerHTML = html || '<div class="issue-card"><div class="issue-title" style="color:var(--text-muted); text-align:center;">🎉 검토가 필요한 특이 이슈가 없습니다.</div></div>';
 }
 
 function renderComparisonTable(rows) {
@@ -309,14 +343,14 @@ function renderComparisonTable(rows) {
   for (i = 0; i < rows.length; i += 1) {
     row = rows[i];
     html += "<tr>";
-    html += "<td><strong>" + escapeHtml(row.check_item || "-") + "</strong></td>";
+    html += "<td><strong>" + escapeHtml(cleanText(row.check_item || "-")) + "</strong></td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
-    html += "<td>" + escapeHtml(row.lc || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.commercial_invoice || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.bill_of_lading || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.packing_list || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.marine_cargo_insurance || "-") + "</td>";
-    html += "<td>" + escapeHtml(row.certificate_of_origin || "-") + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.lc || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.commercial_invoice || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.bill_of_lading || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.packing_list || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.marine_cargo_insurance || "-")) + "</td>";
+    html += "<td>" + escapeHtml(cleanText(row.certificate_of_origin || "-")) + "</td>";
     html += "</tr>";
   }
 
@@ -326,32 +360,43 @@ function renderComparisonTable(rows) {
 function renderResult(parsed, finalJob) {
   var data = normalizeResultPayload(parsed);
   var rows = [];
+  var overall = String(data.overall_status || "").toLowerCase();
+  var alertLvl = String(data.overall_alert_level || "").toLowerCase();
 
   els.rawJson.textContent = JSON.stringify(finalJob || parsed, null, 2);
-  els.overallStatus.textContent = data.overall_status || "-";
-  els.alertLevel.textContent = data.overall_alert_level || "-";
-  els.oneLineSummary.textContent = data.one_line_summary || "-";
-  els.recommendedAction.textContent = data.recommended_action || "-";
 
-  if (data.overall_status === "review_required") {
-    els.overallStatusDesc.textContent = "진행 전 검토 필요";
-  } else if (data.overall_status === "proceed") {
-    els.overallStatusDesc.textContent = "진행 가능";
-  } else if (data.overall_status === "on_hold") {
-    els.overallStatusDesc.textContent = "보류";
+  /* Render Overall Status Pill */
+  if (overall === "review_required") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-warn">Review Required</span>';
+    els.overallStatusDesc.textContent = "진행 전 추가 검토 필요";
+  } else if (overall === "proceed") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-ok">Proceed</span>';
+    els.overallStatusDesc.textContent = "서류 일치 (진행 가능)";
+  } else if (overall === "on_hold") {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-crit">On Hold</span>';
+    els.overallStatusDesc.textContent = "불일치 발생 (보류)";
   } else {
+    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_status || "-") + '</span>';
     els.overallStatusDesc.textContent = "결과 확인";
   }
 
-  if (data.overall_alert_level === "critical") {
+  /* Render Alert Level Pill */
+  if (alertLvl === "critical") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-crit">Critical</span>';
     els.alertLevelDesc.textContent = "치명 이슈 포함";
-  } else if (data.overall_alert_level === "warning") {
+  } else if (alertLvl === "warning") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-warn">Warning</span>';
     els.alertLevelDesc.textContent = "주의 필요";
-  } else if (data.overall_alert_level === "info") {
+  } else if (alertLvl === "info") {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-ok">Info</span>';
     els.alertLevelDesc.textContent = "참고 수준";
   } else {
+    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(data.overall_alert_level || "-") + '</span>';
     els.alertLevelDesc.textContent = "결과 확인";
   }
+
+  els.oneLineSummary.textContent = cleanText(data.one_line_summary) || "-";
+  els.recommendedAction.textContent = cleanText(data.recommended_action) || "-";
 
   if (finalJob) {
     renderUsage(finalJob);
@@ -616,16 +661,16 @@ function fillSample() {
     status: "completed",
     model: "agt_EpTRLGpvzaoGjJEEyPcWN8",
     usage: {
-      input_tokens: 1840,
-      output_tokens: 720,
-      total_tokens: 2560
+      input_tokens: 33972,
+      output_tokens: 10712,
+      total_tokens: 44684
     },
     output: [
       {
         type: "message",
         status: "completed",
         role: "assistant",
-        model: "step_consistency_verification",
+        model: "Instruct - final_trade_document_set_review_api_v1",
         content: [
           {
             type: "output_text",
@@ -633,13 +678,14 @@ function fillSample() {
               structured_result: {
                 overall_status: "review_required",
                 overall_alert_level: "warning",
-                one_line_summary: "합본 무역서류 비교 결과, Invoice와 B/L 간 일부 일자 및 수량 항목에 검토가 필요합니다.",
-                recommended_action: "불일치 항목(invoice_number, measurement_cbm)을 확인하고 원본 서류와 대조하세요.",
+                one_line_summary: "업로드된 서류 세트는 Invoice, B/L, Packing List, Insurance는 확인되나 L/C 원문과 COO는 확인되지 않았고, 도착통지의 L/C 번호가 다른 선적서류와 상이하여 추가 검토가 필요합니다.",
+                recommended_action: "도착통지의 L/C 번호 접미 -053의 의미를 원본 L/C 또는 amendment 기준으로 확인하고, L/C 원문 및 COO 확보 후 신적기한, 보험조건 요구서류 충족 여부를 재심사해보세요.",
                 document_keys: {
-                  lc_number: "M0201410ES04828",
+                  lc_number: "M0201410ES04828-053",
                   invoice_number: "A4631-L032-61",
                   bl_number: "RKOE076",
-                  policy_certificate_number: "15-H0065622"
+                  policy_certificate_number: "15-H0065622",
+                  certificate_number: "-"
                 },
                 date_checks: {
                   insurance_policy_issue_date: "2015-05-01",
@@ -647,42 +693,42 @@ function fillSample() {
                   packing_list_date: "2015-05-07",
                   bl_shipment_date: "2015-05-07",
                   bl_on_board_date: "2015-05-07",
-                  latest_shipment_date: "2015-05-15",
-                  lc_issue_date: "2015-04-20",
-                  certificate_issue_date: "2015-05-06",
-                  date_sequence_status: "match",
-                  date_sequence_notes: "보험증권 발행일 이후 송장/패킹리스트/B/L 날짜 흐름은 정상이며 순서가 일치합니다."
+                  latest_shipment_date: "",
+                  lc_issue_date: "",
+                  certificate_issue_date: "",
+                  date_sequence_status: "missing",
+                  date_sequence_notes: "보험증권 발행일은 2015-05-01, Invoice 및 Packing List 일자는 2015-05-07, B/L 선적일 및 On Board 일자는 2015-05-07로 시간 흐름은 대체로 자연스럽지만 L/C 발행일과 최종선적기한이 없어 완전 판정은 불가합니다."
                 },
                 comparison_matrix: [
                   {
-                    check_item: "invoice_number",
-                    result: "match",
-                    lc: "-",
-                    commercial_invoice: "A4631-L032-61",
-                    bill_of_lading: "-",
-                    packing_list: "A4631-L032-61",
-                    marine_cargo_insurance: "A4631-L032-61",
-                    certificate_of_origin: "-"
+                    check_item: "file_presence",
+                    result: "missing",
+                    lc: "missing",
+                    commercial_invoice: "present",
+                    bill_of_lading: "present",
+                    packing_list: "present",
+                    marine_cargo_insurance: "present",
+                    certificate_of_origin: "missing"
                   },
                   {
-                    check_item: "measurement_cbm",
+                    check_item: "seller_party_consistency",
                     result: "match",
-                    lc: "-",
-                    commercial_invoice: "-",
-                    bill_of_lading: "22.948",
-                    packing_list: "22.948",
-                    marine_cargo_insurance: "-",
-                    certificate_of_origin: "-"
+                    lc: "not_available",
+                    commercial_invoice: "MITSUBISHI ELECTRIC CORPORATION",
+                    bill_of_lading: "MITSUBISHI ELECTRIC CORPORATION",
+                    packing_list: "MITSUBISHI ELECTRIC CORPORATION",
+                    marine_cargo_insurance: "MITSUBISHI ELECTRIC CORPORATION",
+                    certificate_of_origin: "missing"
                   },
                   {
-                    check_item: "date_flow_timeline",
-                    result: "match",
-                    lc: "2015-04-20",
-                    commercial_invoice: "2015-05-07",
-                    bill_of_lading: "2015-05-07",
-                    packing_list: "2015-05-07",
-                    marine_cargo_insurance: "2015-05-01",
-                    certificate_of_origin: "2015-05-06"
+                    check_item: "buyer_party_consistency",
+                    result: "unclear",
+                    lc: "not_available",
+                    commercial_invoice: "Hyundai Rotem Company",
+                    bill_of_lading: "TO THE ORDER OF THE KOREA DEVELOPMENT BANK",
+                    packing_list: "Hyundai Rotem Company",
+                    marine_cargo_insurance: "not_available",
+                    certificate_of_origin: "-"
                   }
                 ]
               }

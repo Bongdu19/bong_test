@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_2" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_3" />
 </head>
 <body>
   <div class="container">
@@ -75,22 +75,22 @@
 
       <!-- Right Panel: Results & Metrics -->
       <section class="panel right-panel">
-        <!-- Metric Cards -->
+        <!-- Flexible Metric Cards Grid -->
         <div class="summary-grid">
           <div class="card metric-card">
-            <div class="metric-label">Overall Status</div>
+            <div class="metric-label">OVERALL STATUS</div>
             <div id="overallStatus" class="metric-value">-</div>
             <div id="overallStatusDesc" class="metric-desc">결과 없음</div>
           </div>
 
           <div class="card metric-card">
-            <div class="metric-label">Alert Level</div>
+            <div class="metric-label">ALERT LEVEL</div>
             <div id="alertLevel" class="metric-value">-</div>
             <div id="alertLevelDesc" class="metric-desc">결과 없음</div>
           </div>
 
-          <div class="card metric-card">
-            <div class="metric-label">Recommended Action</div>
+          <div class="card metric-card metric-card-wide">
+            <div class="metric-label">RECOMMENDED ACTION</div>
             <div id="recommendedAction" class="metric-desc large">결과 없음</div>
           </div>
         </div>
@@ -157,14 +157,18 @@
           <div id="issues" class="issue-list empty">결과 없음</div>
         </div>
 
-        <div class="card">
-          <h2>💻 Raw JSON Response</h2>
+        <!-- Collapsible Raw JSON Response -->
+        <details class="card raw-json-details">
+          <summary class="raw-json-summary">
+            <span>💻 Raw JSON Response</span>
+            <span class="summary-hint">클릭하여 펼치기 / 접기</span>
+          </summary>
           <pre id="rawJson" class="raw-json">결과 없음</pre>
-        </div>
+        </details>
       </section>
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_2"></script>
+  <script src="./app.js?v=20260912_3"></script>
 </body>
 </html>
