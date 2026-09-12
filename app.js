@@ -1052,14 +1052,20 @@ function initComparisonViewToggle() {
     els.viewCardBtn.classList.add("active");
     els.viewTableBtn.classList.remove("active");
     if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "flex";
-    if (els.comparisonTableWrap) els.comparisonTableWrap.style.display = "none";
+    if (els.comparisonTableWrap) {
+      els.comparisonTableWrap.style.display = "none";
+      els.comparisonTableWrap.classList.remove("active-mobile-table");
+    }
   });
 
   els.viewTableBtn.addEventListener("click", function () {
     els.viewTableBtn.classList.add("active");
     els.viewCardBtn.classList.remove("active");
     if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "none";
-    if (els.comparisonTableWrap) els.comparisonTableWrap.style.display = "block";
+    if (els.comparisonTableWrap) {
+      els.comparisonTableWrap.style.display = "block";
+      els.comparisonTableWrap.classList.add("active-mobile-table");
+    }
   });
 }
 
