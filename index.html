@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=20260912_3" />
+  <link rel="stylesheet" href="./styles.css?v=20260912_4" />
 </head>
 <body>
   <div class="container">
@@ -122,8 +122,21 @@
           <p id="oneLineSummary" class="summary-text">결과 없음</p>
         </div>
 
+        <!-- Document Keys & Date Flow Summary -->
         <div class="card">
-          <h2>📋 무역서류 일치성 비교표</h2>
+          <h2>🔑 주요 문서 번호 (Document Keys)</h2>
+          <div id="documentKeys" class="kv-grid empty">결과 없음</div>
+        </div>
+
+        <!-- Date Flow Timeline Card -->
+        <div class="card">
+          <h2>🗓️ 서류 날짜 순서 및 흐름 (Date Flow Timeline)</h2>
+          <div id="dateTimeline" class="empty">결과 없음</div>
+        </div>
+
+        <!-- Streamlined Integrated Comparison Table -->
+        <div class="card">
+          <h2>📋 무역서류 일치성 상세 비교표</h2>
           <div class="table-wrap">
             <table>
               <thead>
@@ -147,16 +160,6 @@
           </div>
         </div>
 
-        <div class="card">
-          <h2>🔑 주요 문서 키 (Document Keys)</h2>
-          <div id="documentKeys" class="kv-grid empty">결과 없음</div>
-        </div>
-
-        <div class="card">
-          <h2>🚨 핵심 검토 이슈 & 날짜 흐름</h2>
-          <div id="issues" class="issue-list empty">결과 없음</div>
-        </div>
-
         <!-- Collapsible Raw JSON Response -->
         <details class="card raw-json-details">
           <summary class="raw-json-summary">
@@ -169,6 +172,6 @@
     </main>
   </div>
 
-  <script src="./app.js?v=20260912_3"></script>
+  <script src="./app.js?v=20260912_4"></script>
 </body>
 </html>

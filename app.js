@@ -36,7 +36,7 @@ function initElements() {
   els.usageTotalTokens = getEl("usageTotalTokens");
   els.comparisonTableBody = getEl("comparisonTableBody");
   els.documentKeys = getEl("documentKeys");
-  els.issues = getEl("issues");
+  els.dateTimeline = getEl("dateTimeline");
   els.rawJson = getEl("rawJson");
 }
 
@@ -142,6 +142,28 @@ function badgeClass(result) {
   return "badge badge-neutral";
 }
 
+function rowHighlightClass(result) {
+  var v = String(result || "").toLowerCase();
+
+  if (
+    v.indexOf("불일치") >= 0 ||
+    v.indexOf("critical") >= 0 ||
+    v === "mismatch" ||
+    v === "missing"
+  ) {
+    return "row-crit";
+  }
+  if (
+    v.indexOf("검토") >= 0 ||
+    v.indexOf("warning") >= 0 ||
+    v === "review_required" ||
+    v === "unclear"
+  ) {
+    return "row-warn";
+  }
+  return "";
+}
+
 function clearResult() {
   els.overallStatus.innerHTML = "-";
   els.overallStatusDesc.textContent = "결과 없음";
@@ -151,7 +173,7 @@ function clearResult() {
   els.oneLineSummary.textContent = "결과 없음";
   if (els.usageCard) els.usageCard.style.display = "none";
   els.documentKeys.innerHTML = "결과 없음";
-  els.issues.innerHTML = "결과 없음";
+  if (els.dateTimeline) els.dateTimeline.innerHTML = "결과 없음";
   els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
   els.rawJson.textContent = "결과 없음";
   setStatus("대기 중", "");
@@ -204,7 +226,9 @@ function renderDocumentKeys(documentKeys) {
   els.documentKeys.innerHTML = html || "결과 없음";
 }
 
-function buildDateTimeline(dateChecks) {
+function renderDateTimeline(dateChecks) {
+  if (!els.dateTimeline) return;
+
   var items = [
     { key: "insurance_policy_issue_date", label: "Insurance Issue" },
     { key: "invoice_date", label: "Invoice" },
@@ -224,7 +248,8 @@ function buildDateTimeline(dateChecks) {
   var cleanedNotes = "";
 
   if (!dateChecks || typeof dateChecks !== "object") {
-    return "";
+    els.dateTimeline.innerHTML = "결과 없음";
+    return;
   }
 
   if (dateChecks.date_sequence_status === "match") {
@@ -240,20 +265,14 @@ function buildDateTimeline(dateChecks) {
 
   cleanedNotes = cleanText(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
 
-  html += '<div class="issue-card" style="margin-bottom:16px;">';
-  html += '<div class="issue-header">';
-  html += '<div class="issue-title">🗓️ 서류 날짜 순서 검증 (Date Flow Timeline)</div>';
-  html += '<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + '</span>';
-  html += '</div>';
-
   if (cleanedNotes) {
-    html += '<div class="timeline-note-box" style="margin-top:12px;">';
+    html += '<div class="timeline-note-box">';
     html += '<span class="timeline-note-icon">📌</span>';
-    html += '<div>' + escapeHtml(cleanedNotes) + '</div>';
+    html += '<div><strong>날짜 순서 종합 판정 (<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + '</span>):</strong> ' + escapeHtml(cleanedNotes) + '</div>';
     html += '</div>';
   }
 
-  html += '<div class="doc-comparison-grid" style="margin-top:12px;">';
+  html += '<div class="doc-comparison-grid">';
 
   for (i = 0; i < items.length; i += 1) {
     item = items[i];
@@ -269,71 +288,15 @@ function buildDateTimeline(dateChecks) {
   }
 
   html += '</div>';
-  html += '</div>';
 
-  return html;
-}
-
-function renderIssues(data) {
-  var html = "";
-  var rows = data && data.comparison_matrix ? data.comparison_matrix : [];
-  var i;
-  var row;
-  var result;
-  var isIssue;
-  var lcVal, invVal, blVal, pkVal, insVal, cooVal;
-
-  html += buildDateTimeline(data.date_checks);
-
-  if (rows && rows.length) {
-    for (i = 0; i < rows.length; i += 1) {
-      row = rows[i];
-      result = String(row.result || "");
-      isIssue =
-        result.indexOf("불일치") >= 0 ||
-        result.indexOf("검토") >= 0 ||
-        result.toLowerCase().indexOf("warning") >= 0 ||
-        result.toLowerCase().indexOf("critical") >= 0 ||
-        result.toLowerCase() === "mismatch" ||
-        result.toLowerCase() === "missing" ||
-        result.toLowerCase() === "unclear";
-
-      if (isIssue) {
-        lcVal = cleanText(row.lc) || "-";
-        invVal = cleanText(row.commercial_invoice) || "-";
-        blVal = cleanText(row.bill_of_lading) || "-";
-        pkVal = cleanText(row.packing_list) || "-";
-        insVal = cleanText(row.marine_cargo_insurance) || "-";
-        cooVal = cleanText(row.certificate_of_origin) || "-";
-
-        html += '<div class="issue-card">';
-        html += '<div class="issue-header">';
-        html += '<div class="issue-title">🔍 ' + escapeHtml(cleanText(row.check_item || "-")) + '</div>';
-        html += '<span class="' + badgeClass(result) + '">' + escapeHtml(result) + '</span>';
-        html += '</div>';
-
-        html += '<div class="doc-comparison-grid">';
-        html += '<div class="doc-box"><div class="doc-box-label">LC</div><div class="doc-box-val">' + escapeHtml(lcVal) + '</div></div>';
-        html += '<div class="doc-box"><div class="doc-box-label">Invoice</div><div class="doc-box-val">' + escapeHtml(invVal) + '</div></div>';
-        html += '<div class="doc-box"><div class="doc-box-label">B/L</div><div class="doc-box-val">' + escapeHtml(blVal) + '</div></div>';
-        html += '<div class="doc-box"><div class="doc-box-label">Packing List</div><div class="doc-box-val">' + escapeHtml(pkVal) + '</div></div>';
-        html += '<div class="doc-box"><div class="doc-box-label">Insurance</div><div class="doc-box-val">' + escapeHtml(insVal) + '</div></div>';
-        if (cooVal !== "-") {
-          html += '<div class="doc-box"><div class="doc-box-label">COO</div><div class="doc-box-val">' + escapeHtml(cooVal) + '</div></div>';
-        }
-        html += '</div>';
-        html += '</div>';
-      }
-    }
-  }
-
-  els.issues.innerHTML = html || '<div class="issue-card"><div class="issue-title" style="color:var(--text-muted); text-align:center;">🎉 검토가 필요한 특이 이슈가 없습니다.</div></div>';
+  els.dateTimeline.innerHTML = html || "날짜 정보 없음";
 }
 
 function renderComparisonTable(rows) {
   var html = "";
   var i;
   var row;
+  var rowClass = "";
 
   if (!rows || !rows.length) {
     els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
@@ -342,7 +305,8 @@ function renderComparisonTable(rows) {
 
   for (i = 0; i < rows.length; i += 1) {
     row = rows[i];
-    html += "<tr>";
+    rowClass = rowHighlightClass(row.result);
+    html += '<tr class="' + rowClass + '">';
     html += "<td><strong>" + escapeHtml(cleanText(row.check_item || "-")) + "</strong></td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
     html += "<td>" + escapeHtml(cleanText(row.lc || "-")) + "</td>";
@@ -403,7 +367,7 @@ function renderResult(parsed, finalJob) {
   }
 
   renderDocumentKeys(data.document_keys);
-  renderIssues(data);
+  renderDateTimeline(data.date_checks);
   rows = data.comparison_matrix || [];
   renderComparisonTable(rows);
 }
