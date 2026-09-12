@@ -317,32 +317,109 @@ function renderDateTimeline(dateChecks) {
 
 function renderComparisonTable(rows) {
   var html = "";
-  var i;
-  var row;
-  var rowClass = "";
-  var itemTitle = "";
 
   if (!rows || !rows.length) {
     els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
     return;
   }
 
-  for (i = 0; i < rows.length; i += 1) {
-    row = rows[i];
-    rowClass = rowHighlightClass(row.result);
-    itemTitle = row.check_item_ko || row.check_item || "-";
+  /* Group rows by category */
+  var categoryMap = {};
+  var categoryOrder = [];
 
-    html += '<tr class="' + rowClass + '">';
-    html += "<td><strong>" + escapeHtml(cleanText(itemTitle)) + "</strong></td>";
-    html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
-    html += "<td>" + escapeHtml(cleanText(row.lc || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.commercial_invoice || row.invoice || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.bill_of_lading || row.bl || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.packing_list || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.marine_cargo_insurance || row.insurance || "-")) + "</td>";
-    html += "<td>" + escapeHtml(cleanText(row.certificate_of_origin || row.coo || "-")) + "</td>";
-    html += "</tr>";
-  }
+  var catIcons = {
+    "서류 구비 현황": "📁",
+    "당사자 정보": "👥",
+    "물품 및 조건": "📦",
+    "식별번호": "🔢",
+    "날짜 및 선적": "🗓️"
+  };
+
+  rows.forEach(function (row) {
+    var cat = row.category || "기타 검토 항목";
+    if (!categoryMap[cat]) {
+      categoryMap[cat] = [];
+      categoryOrder.push(cat);
+    }
+    categoryMap[cat].push(row);
+  });
+
+  categoryOrder.forEach(function (catName) {
+    var catRows = categoryMap[catName];
+    var icon = catIcons[catName] || "📌";
+
+    var matchCount = 0;
+    var warnCount = 0;
+    var critCount = 0;
+
+    catRows.forEach(function (r) {
+      var res = String(r.result || "").toLowerCase();
+      if (
+        res.indexOf("불일치") >= 0 ||
+        res === "mismatch" ||
+        res === "missing" ||
+        res === "fail"
+      ) {
+        critCount += 1;
+      } else if (
+        res.indexOf("검토") >= 0 ||
+        res === "review_required" ||
+        res === "unclear" ||
+        res === "warn"
+      ) {
+        warnCount += 1;
+      } else if (
+        res.indexOf("일치") >= 0 ||
+        res === "match" ||
+        res === "ok" ||
+        res === "pass"
+      ) {
+        matchCount += 1;
+      }
+    });
+
+    var summaryBadgeHtml = "";
+    if (critCount > 0) {
+      summaryBadgeHtml += '<span class="badge badge-crit">불일치/미비 ' + critCount + '</span> ';
+    }
+    if (warnCount > 0) {
+      summaryBadgeHtml += '<span class="badge badge-warn">검토 필요 ' + warnCount + '</span> ';
+    }
+    if (matchCount > 0) {
+      summaryBadgeHtml += '<span class="badge badge-ok">일치 ' + matchCount + '</span>';
+    }
+
+    /* Group Category Header Row */
+    html += '<tr class="group-header-row">';
+    html += '<td colspan="8">';
+    html += '<div class="group-header-flex">';
+    html += '<div class="group-header-title">';
+    html += '<span class="group-icon">' + icon + '</span> ';
+    html += '<strong>' + escapeHtml(catName) + '</strong> ';
+    html += '<span class="group-count">(' + catRows.length + '개 항목)</span>';
+    html += '</div>';
+    html += '<div class="group-header-badges">' + summaryBadgeHtml + '</div>';
+    html += '</div>';
+    html += '</td>';
+    html += '</tr>';
+
+    /* Member Rows */
+    catRows.forEach(function (row) {
+      var rowClass = rowHighlightClass(row.result);
+      var itemTitle = row.check_item_ko || row.check_item || "-";
+
+      html += '<tr class="' + rowClass + '">';
+      html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
+      html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + '</span></td>';
+      html += '<td>' + escapeHtml(cleanText(row.lc || "-")) + '</td>';
+      html += '<td>' + escapeHtml(cleanText(row.commercial_invoice || row.invoice || "-")) + '</td>';
+      html += '<td>' + escapeHtml(cleanText(row.bill_of_lading || row.bl || "-")) + '</td>';
+      html += '<td>' + escapeHtml(cleanText(row.packing_list || "-")) + '</td>';
+      html += '<td>' + escapeHtml(cleanText(row.marine_cargo_insurance || row.insurance || "-")) + '</td>';
+      html += '<td>' + escapeHtml(cleanText(row.certificate_of_origin || row.coo || "-")) + '</td>';
+      html += '</tr>';
+    });
+  });
 
   els.comparisonTableBody.innerHTML = html;
 }
