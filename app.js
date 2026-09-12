@@ -277,9 +277,6 @@ function clearResult() {
   applyCardTheme(els.overallStatusCard, null);
   applyCardTheme(els.alertLevelCard, null);
   applyCardTheme(els.recommendedActionCard, null);
-  if (els.sampleSelect) els.sampleSelect.value = "";
-  if (els.fileInfo) els.fileInfo.textContent = "선택된 파일 없음";
-  selectedFile = null;
   uploadedFileId = null;
   currentJobId = null;
   if (els.overallStatus) els.overallStatus.style.display = "none";
@@ -300,6 +297,14 @@ function clearResult() {
   activeChecklistTab = null;
   currentRawPayload = null;
   setStatus("대기 중", "");
+}
+
+function clearAll() {
+  selectedFile = null;
+  if (els.fileInput) els.fileInput.value = "";
+  if (els.sampleSelect) els.sampleSelect.value = "";
+  if (els.fileInfo) els.fileInfo.textContent = "선택된 파일 없음";
+  clearResult();
 }
 
 function normalizeResultPayload(parsed) {
@@ -785,6 +790,10 @@ function loadConfig() {
 }
 
 function uploadFile(apiKey, file) {
+  if (!file || !(file instanceof Blob)) {
+    return Promise.reject(new Error("업로드할 파일 객체가 유효하지 않습니다. 파일을 다시 선택해주세요."));
+  }
+
   var form = new FormData();
   var filename = (file && file.name) ? file.name : "document.pdf";
   form.append("file", file, filename);
@@ -1267,7 +1276,7 @@ function init() {
           }
         });
       }
-      els.clearBtn.addEventListener("click", clearResult);
+      els.clearBtn.addEventListener("click", clearAll);
       if (els.lookupBtn) els.lookupBtn.addEventListener("click", lookupExistingJob);
       if (els.copyJsonBtn) els.copyJsonBtn.addEventListener("click", copyJsonToClipboard);
       if (els.downloadJsonBtn) els.downloadJsonBtn.addEventListener("click", downloadJsonFile);
