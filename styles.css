@@ -89,6 +89,7 @@ body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
   transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-text-size-adjust: 100%;
 }
 
 /* Centered Responsive Container */
@@ -167,6 +168,7 @@ h1 {
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
 .theme-toggle-btn:hover {
@@ -237,6 +239,9 @@ h2 {
   font-size: 14px;
   font-family: inherit;
   transition: all 0.2s ease;
+
+  /* Mobile safari input fix */
+  -webkit-appearance: none;
 }
 
 .input:focus, .select:focus {
@@ -256,6 +261,7 @@ h2 {
   cursor: pointer;
   margin-top: 8px;
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
 .dropzone:hover, .dropzone.dragover {
@@ -303,7 +309,7 @@ h2 {
 .btn {
   border: 0;
   border-radius: var(--radius-btn);
-  padding: 11px 10px;
+  padding: 12px 10px;
   font-size: 13px;
   font-weight: 700;
   font-family: inherit;
@@ -314,6 +320,8 @@ h2 {
   gap: 4px;
   transition: all 0.2s ease;
   white-space: nowrap;
+  touch-action: manipulation;
+  min-height: 44px; /* Mobile touch accessibility requirement */
 }
 
 .btn-flex {
@@ -327,7 +335,7 @@ h2 {
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled), .btn-primary:active {
   background: var(--accent-primary-hover);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
@@ -339,7 +347,7 @@ h2 {
   border: 1px solid var(--border-color);
 }
 
-.btn-secondary:hover:not(:disabled) {
+.btn-secondary:hover:not(:disabled), .btn-secondary:active {
   border-color: var(--border-hover);
   background: var(--card-bg);
 }
@@ -350,7 +358,7 @@ h2 {
   border: 1px solid var(--border-color);
 }
 
-.btn-ghost:hover:not(:disabled) {
+.btn-ghost:hover:not(:disabled), .btn-ghost:active {
   color: var(--text-main);
   background: var(--bg-primary);
 }
@@ -473,6 +481,7 @@ h2 {
   overflow-x: auto;
   border-radius: 12px;
   border: 1px solid var(--border-color);
+  -webkit-overflow-scrolling: touch; /* Smooth touch scrolling on mobile */
 }
 
 table {
@@ -712,12 +721,113 @@ details.raw-json-details[open] {
   margin: 16px 0 0 0;
 }
 
-@media (max-width: 1200px) {
+/* ==========================================================================
+   📱 Mobile Responsive Layout (& Tablet Adaptations)
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .container {
+    width: 96%;
+    padding: 20px 12px;
+  }
+
   .layout {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .metric-card-wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: 100%;
+    padding: 16px 12px;
+  }
+
+  /* Compact Mobile Header */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .subtext {
+    font-size: 13px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  /* Single Column Mobile Metric Cards */
+  .summary-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .metric-card-wide {
+    grid-column: span 1;
+  }
+
+  .status-pill-lg {
+    font-size: 14px;
+    padding: 5px 12px;
+  }
+
+  /* Mobile Optimized Buttons */
+  .button-row-single {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .btn {
+    padding: 12px 6px;
+    font-size: 12px;
+    min-height: 46px;
+  }
+
+  /* Mobile Key Value Grid */
+  .kv-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-comparison-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .usage-grid {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Table Mobile Scroll Helper */
+  .table-wrap {
+    margin: 0 -4px;
+    border-radius: 10px;
+  }
+
+  th, td {
+    padding: 10px 10px;
+    font-size: 12px;
   }
 }

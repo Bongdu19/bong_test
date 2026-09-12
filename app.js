@@ -103,6 +103,11 @@ function getApiEndpoint(path) {
     workerBase = "https://bong.gehunmin19.workers.dev";
   }
   
+  // Ensure protocol
+  if (!/^https?:\/\//i.test(workerBase)) {
+    workerBase = "https://" + workerBase;
+  }
+  
   workerBase = workerBase.replace(/\/+$/, "");
 
   if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
