@@ -321,9 +321,22 @@ function renderUsage(finalJob) {
   }
 }
 
+function simplifyKeyName(rawKey) {
+  if (!rawKey) return "";
+  var k = String(rawKey).toLowerCase().trim();
+  if (k === "lc_number" || k === "lc_no") return "LC_NO";
+  if (k === "invoice_number" || k === "invoice_no" || k === "commercial_invoice_number") return "INV_NO";
+  if (k === "bl_number" || k === "bl_no" || k === "bill_of_lading_number") return "BL_NO";
+  if (k === "policy_certificate_number" || k === "insurance_policy_number" || k === "insurance_number") return "INS_NO";
+  if (k === "certificate_number" || k === "coo_number" || k === "coo_no") return "COO_NO";
+
+  return k.replace(/_number$/, "_no").replace(/_no$/, "_NO").toUpperCase();
+}
+
 function renderDocumentKeys(documentKeys) {
   var html = "";
   var key;
+  var displayKey;
   var cleanedVal;
 
   if (!documentKeys || typeof documentKeys !== "object") {
@@ -334,9 +347,10 @@ function renderDocumentKeys(documentKeys) {
   for (key in documentKeys) {
     if (Object.prototype.hasOwnProperty.call(documentKeys, key)) {
       cleanedVal = cleanText(documentKeys[key]);
+      displayKey = simplifyKeyName(key);
       html += '<div class="kv-item">';
-      html += '<div class="kv-key">' + escapeHtml(key) + "</div>";
-      html += '<div class="kv-value">' + escapeHtml(cleanedVal || "-") + "</div>";
+      html += '<span class="kv-key">' + escapeHtml(displayKey) + ':</span>';
+      html += '<span class="kv-value">' + escapeHtml(cleanedVal || "-") + "</span>";
       html += "</div>";
     }
   }
@@ -620,16 +634,16 @@ function renderChecklists(documentChecklists) {
   currentChecklistData = documentChecklists;
 
   var docLabels = {
-    lc: '<i class="bi bi-file-earmark-richtext"></i> L/C 신용장',
-    invoice: '<i class="bi bi-receipt"></i> 상업송장 (INV)',
-    commercial_invoice: '<i class="bi bi-receipt"></i> 상업송장 (INV)',
-    bl: '<i class="bi bi-ship"></i> 선하증권 (B/L)',
-    bill_of_lading: '<i class="bi bi-ship"></i> 선하증권 (B/L)',
-    packing_list: '<i class="bi bi-box-seam"></i> 포장명세서 (PK)',
-    insurance: '<i class="bi bi-shield-check"></i> 해상보험 (INS)',
-    marine_cargo_insurance: '<i class="bi bi-shield-check"></i> 해상보험 (INS)',
-    coo: '<i class="bi bi-bank"></i> 원산지증명 (COO)',
-    certificate_of_origin: '<i class="bi bi-bank"></i> 원산지증명 (COO)'
+    lc: "L/C 신용장",
+    invoice: "상업송장 (INV)",
+    commercial_invoice: "상업송장 (INV)",
+    bl: "선하증권 (B/L)",
+    bill_of_lading: "선하증권 (B/L)",
+    packing_list: "포장명세서 (PK)",
+    insurance: "해상보험 (INS)",
+    marine_cargo_insurance: "해상보험 (INS)",
+    coo: "원산지증명 (COO)",
+    certificate_of_origin: "원산지증명 (COO)"
   };
 
   var tabsHtml = "";
@@ -656,24 +670,17 @@ function renderChecklists(documentChecklists) {
     });
 
     var tabClass = "tab-btn-neutral";
-    var tabPillHtml = "";
 
     if (critCount > 0) {
       tabClass = "tab-btn-crit";
-      tabPillHtml = '<span class="tab-pill pill-crit">미비 ' + critCount + '</span>';
     } else if (warnCount > 0) {
       tabClass = "tab-btn-warn";
-      tabPillHtml = '<span class="tab-pill pill-warn">주의 ' + warnCount + '</span>';
     } else if (passCount > 0) {
       tabClass = "tab-btn-ok";
-      tabPillHtml = '<span class="tab-pill pill-ok">정상 ' + passCount + '</span>';
-    } else {
-      tabPillHtml = '<span class="tab-pill pill-neutral">' + items.length + '</span>';
     }
 
     tabsHtml += '<button type="button" class="tab-btn ' + tabClass + '" data-key="' + escapeHtml(key) + '">';
-    tabsHtml += '<span class="tab-label">' + label + '</span>';
-    tabsHtml += tabPillHtml;
+    tabsHtml += '<span class="tab-label">' + escapeHtml(label) + '</span>';
     tabsHtml += '</button>';
   });
 
@@ -1220,28 +1227,39 @@ function bindFileEvents() {
   });
 }
 
-function initComparisonViewToggle() {
-  if (!els.viewCardBtn || !els.viewTableBtn) return;
-
-  els.viewCardBtn.addEventListener("click", function () {
-    els.viewCardBtn.classList.add("active");
-    els.viewTableBtn.classList.remove("active");
-    if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "flex";
-    if (els.comparisonTableWrap) {
-      els.comparisonTableWrap.style.display = "none";
-      els.comparisonTableWrap.classList.remove("active-mobile-table");
-    }
-  });
-
-  els.viewTableBtn.addEventListener("click", function () {
-    els.viewTableBtn.classList.add("active");
-    els.viewCardBtn.classList.remove("active");
+function setComparisonView(viewMode) {
+  if (viewMode === "table") {
+    if (els.viewTableBtn) els.viewTableBtn.classList.add("active");
+    if (els.viewCardBtn) els.viewCardBtn.classList.remove("active");
     if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "none";
     if (els.comparisonTableWrap) {
       els.comparisonTableWrap.style.display = "block";
       els.comparisonTableWrap.classList.add("active-mobile-table");
     }
+  } else {
+    if (els.viewCardBtn) els.viewCardBtn.classList.add("active");
+    if (els.viewTableBtn) els.viewTableBtn.classList.remove("active");
+    if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "flex";
+    if (els.comparisonTableWrap) {
+      els.comparisonTableWrap.style.display = "none";
+      els.comparisonTableWrap.classList.remove("active-mobile-table");
+    }
+  }
+}
+
+function initComparisonViewToggle() {
+  if (!els.viewCardBtn || !els.viewTableBtn) return;
+
+  els.viewCardBtn.addEventListener("click", function () {
+    setComparisonView("card");
   });
+
+  els.viewTableBtn.addEventListener("click", function () {
+    setComparisonView("table");
+  });
+
+  var isMobile = window.innerWidth < 768;
+  setComparisonView(isMobile ? "card" : "table");
 }
 
 function init() {

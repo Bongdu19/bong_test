@@ -1081,40 +1081,43 @@ tr.row-warn {
   border-color: var(--badge-neutral-border);
 }
 
-/* Key Value Grid */
+/* Key Value Grid - Single Line Compact Row Layout */
 .kv-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
   width: 100%;
 }
 
 .kv-item {
-  padding: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 8px;
   min-width: 0;
-  width: 100%;
   box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .kv-key {
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--accent-primary);
   font-size: 13px;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .kv-value {
-  margin-top: 6px;
+  margin-top: 0;
   word-break: break-all;
   overflow-wrap: anywhere;
   color: var(--text-main);
   font-weight: 700;
   font-family: monospace;
-  font-size: 15.5px;
+  font-size: 14.5px;
 }
 
 /* Timeline Callout Note & Flow Grid */
