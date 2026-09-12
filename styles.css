@@ -289,6 +289,17 @@ h2 {
   margin-bottom: 6px;
 }
 
+.dropzone-icon .bi {
+  font-size: 38px;
+  color: var(--accent-primary);
+}
+
+.bi {
+  display: inline-block;
+  vertical-align: -0.1em;
+  line-height: 1;
+}
+
 .dropzone-title {
   margin: 0;
   font-weight: 800;

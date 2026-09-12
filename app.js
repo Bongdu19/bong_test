@@ -109,10 +109,10 @@ function setTheme(theme) {
 
   if (els.themeIcon && els.themeLabel) {
     if (theme === "dark") {
-      els.themeIcon.textContent = "🌙";
+      els.themeIcon.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
       els.themeLabel.textContent = "어두운 화면";
     } else {
-      els.themeIcon.textContent = "☀️";
+      els.themeIcon.innerHTML = '<i class="bi bi-sun-fill"></i>';
       els.themeLabel.textContent = "밝은 화면";
     }
   }
@@ -436,11 +436,11 @@ function renderComparisonTable(rows) {
   var categoryOrder = [];
 
   var catIcons = {
-    "서류 구비 현황": "📁",
-    "당사자 정보": "👥",
-    "물품 및 조건": "📦",
-    "식별번호": "🔢",
-    "날짜 및 선적": "🗓️"
+    "서류 구비 현황": '<i class="bi bi-folder2-open"></i>',
+    "당사자 정보": '<i class="bi bi-people-fill"></i>',
+    "물품 및 조건": '<i class="bi bi-box-seam-fill"></i>',
+    "식별번호": '<i class="bi bi-hash"></i>',
+    "날짜 및 선적": '<i class="bi bi-calendar-range-fill"></i>'
   };
 
   rows.forEach(function (row) {
@@ -630,16 +630,16 @@ function renderChecklists(documentChecklists) {
   currentChecklistData = documentChecklists;
 
   var docLabels = {
-    lc: "📜 L/C 신용장",
-    invoice: "📄 상업송장 (INV)",
-    commercial_invoice: "📄 상업송장 (INV)",
-    bl: "🚢 선하증권 (B/L)",
-    bill_of_lading: "🚢 선하증권 (B/L)",
-    packing_list: "📦 포장명세서 (PK)",
-    insurance: "🛡️ 해상보험 (INS)",
-    marine_cargo_insurance: "🛡️ 해상보험 (INS)",
-    coo: "🏛️ 원산지증명 (COO)",
-    certificate_of_origin: "🏛️ 원산지증명 (COO)"
+    lc: '<i class="bi bi-file-earmark-richtext"></i> L/C 신용장',
+    invoice: '<i class="bi bi-receipt"></i> 상업송장 (INV)',
+    commercial_invoice: '<i class="bi bi-receipt"></i> 상업송장 (INV)',
+    bl: '<i class="bi bi-ship"></i> 선하증권 (B/L)',
+    bill_of_lading: '<i class="bi bi-ship"></i> 선하증권 (B/L)',
+    packing_list: '<i class="bi bi-box-seam"></i> 포장명세서 (PK)',
+    insurance: '<i class="bi bi-shield-check"></i> 해상보험 (INS)',
+    marine_cargo_insurance: '<i class="bi bi-shield-check"></i> 해상보험 (INS)',
+    coo: '<i class="bi bi-bank"></i> 원산지증명 (COO)',
+    certificate_of_origin: '<i class="bi bi-bank"></i> 원산지증명 (COO)'
   };
 
   var tabsHtml = "";
@@ -682,7 +682,7 @@ function renderChecklists(documentChecklists) {
     }
 
     tabsHtml += '<button type="button" class="tab-btn ' + tabClass + '" data-key="' + escapeHtml(key) + '">';
-    tabsHtml += '<span class="tab-label">' + escapeHtml(label) + '</span>';
+    tabsHtml += '<span class="tab-label">' + label + '</span>';
     tabsHtml += tabPillHtml;
     tabsHtml += '</button>';
   });
