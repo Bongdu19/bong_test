@@ -131,16 +131,6 @@ function getApiEndpoint(path) {
 
   workerBase = workerBase.replace(/\/+$/, "");
 
-  if (path.indexOf("/files") >= 0) {
-    if (workerBase.endsWith("/v2")) {
-      workerBase = workerBase.substring(0, workerBase.length - 3);
-    }
-    if (!workerBase.endsWith("/v1")) {
-      return workerBase + "/v1" + path;
-    }
-    return workerBase + path;
-  }
-
   if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
     return workerBase + "/v2" + path;
   }
