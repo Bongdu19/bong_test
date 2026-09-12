@@ -423,7 +423,7 @@ h2 {
 .metric-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   min-width: 0;
 }
 
@@ -433,32 +433,25 @@ h2 {
 
 .metric-label {
   color: var(--text-muted);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-bottom: 6px;
 }
 
 .metric-value {
-  margin-top: 10px;
+  display: none !important;
 }
 
 .status-pill-lg {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  display: none !important;
 }
 
 .metric-desc {
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--text-main);
-  font-size: 15.5px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.5;
   word-break: break-word;
@@ -468,43 +461,49 @@ h2 {
 .desc-status-highlight {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 16.5px;
+  justify-content: center;
+  gap: 8px;
+  font-size: 20px;
   font-weight: 800;
-  padding: 6px 12px;
-  border-radius: 8px;
-  margin-top: 4px;
-  letter-spacing: -0.2px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-top: 6px;
+  letter-spacing: -0.3px;
+  line-height: 1.35;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-sm);
 }
 
 .desc-status-highlight.crit {
   color: var(--badge-crit-text);
   background: var(--badge-crit-bg);
-  border: 1px solid var(--badge-crit-border);
+  border: 1.5px solid var(--badge-crit-border);
 }
 
 .desc-status-highlight.warn {
   color: var(--badge-warn-text);
   background: var(--badge-warn-bg);
-  border: 1px solid var(--badge-warn-border);
+  border: 1.5px solid var(--badge-warn-border);
 }
 
 .desc-status-highlight.ok {
   color: var(--badge-ok-text);
   background: var(--badge-ok-bg);
-  border: 1px solid var(--badge-ok-border);
+  border: 1.5px solid var(--badge-ok-border);
 }
 
 .metric-desc.large {
   color: var(--text-main);
-  font-weight: 600;
-  font-size: 15.5px;
+  font-weight: 700;
+  font-size: 17px;
   line-height: 1.65;
   background: var(--bg-primary);
-  padding: 14px 16px;
+  padding: 16px 18px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  margin-top: 10px;
+  margin-top: 8px;
   word-break: break-word;
   overflow-wrap: anywhere;
 }

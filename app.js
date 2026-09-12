@@ -248,9 +248,9 @@ function rowHighlightClass(result) {
 }
 
 function clearResult() {
-  els.overallStatus.innerHTML = "-";
+  if (els.overallStatus) els.overallStatus.style.display = "none";
   els.overallStatusDesc.textContent = "결과 없음";
-  els.alertLevel.innerHTML = "-";
+  if (els.alertLevel) els.alertLevel.style.display = "none";
   els.alertLevelDesc.textContent = "결과 없음";
   els.recommendedAction.textContent = "결과 없음";
   els.oneLineSummary.textContent = "결과 없음";
@@ -672,33 +672,29 @@ function renderResult(parsed, finalJob) {
   currentRawPayload = finalJob || parsed;
   els.rawJson.textContent = JSON.stringify(currentRawPayload, null, 2);
 
-  /* Render Overall Status Pill & Large Korean Desc */
+  /* Hide upper duplicated pills, keep only bottom description status badge */
+  if (els.overallStatus) els.overallStatus.style.display = "none";
+  if (els.alertLevel) els.alertLevel.style.display = "none";
+
+  /* Render Single Korean Status Highlight */
   if (overall === "review_required" || overall === "검토 필요") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-warn">검토 필요</span>';
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight warn">진행 전 추가 검토 필요</span>';
   } else if (overall === "proceed" || overall === "진행 가능") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-ok">진행 가능</span>';
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight ok">서류 일치 (진행 가능)</span>';
   } else if (overall === "on_hold" || overall === "보류") {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-crit">보류</span>';
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight crit">불일치 발생 (보류)</span>';
   } else {
-    els.overallStatus.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(koreanStatus(data.overall_status)) + '</span>';
     els.overallStatusDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_status) || "결과 확인") + '</span>';
   }
 
-  /* Render Alert Level Pill & Large Korean Desc */
+  /* Render Single Korean Alert Level Highlight */
   if (alertLvl === "critical" || alertLvl === "치명") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-crit">치명</span>';
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight crit">치명 이슈 포함</span>';
   } else if (alertLvl === "warning" || alertLvl === "warn" || alertLvl === "주의") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-warn">주의</span>';
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight warn">주의 필요</span>';
   } else if (alertLvl === "info" || alertLvl === "참고") {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-ok">참고</span>';
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight ok">참고 수준</span>';
   } else {
-    els.alertLevel.innerHTML = '<span class="status-pill-lg badge-neutral">' + escapeHtml(koreanStatus(data.overall_alert_level)) + '</span>';
     els.alertLevelDesc.innerHTML = '<span class="desc-status-highlight">' + escapeHtml(cleanText(data.overall_alert_level) || "결과 확인") + '</span>';
   }
 
