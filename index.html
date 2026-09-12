@@ -73,7 +73,7 @@
           <div class="label" style="margin-top: 6px;">
             <span>Job ID (res_...)</span>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div class="lookup-input-group">
             <input id="lookupJobId" class="input" type="text" placeholder="res_xxxxxxxxxxxx" />
             <button id="lookupBtn" class="btn btn-secondary" type="button" style="white-space: nowrap;">조회</button>
           </div>
@@ -148,9 +148,19 @@
         <div class="card">
           <div class="table-card-header">
             <h2>📋 무역서류 일치성 상세 교차 비교표</h2>
-            <span class="mobile-table-hint">👈 👉 좌우로 스크롤 가능</span>
+            <div class="view-toggle-group">
+              <button id="viewCardBtn" class="btn-toggle active" type="button">📱 카드형</button>
+              <button id="viewTableBtn" class="btn-toggle" type="button">📊 표형</button>
+            </div>
           </div>
-          <div class="table-wrap">
+
+          <!-- Mobile Cards List -->
+          <div id="comparisonCardsContainer" class="mobile-matrix-container">
+            <div class="empty-cell">결과 없음</div>
+          </div>
+
+          <!-- Desktop Table -->
+          <div id="comparisonTableWrap" class="table-wrap">
             <table>
               <thead>
                 <tr>

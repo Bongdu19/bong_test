@@ -40,6 +40,10 @@ function initElements() {
   els.usageOutputTokens = getEl("usageOutputTokens");
   els.usageTotalTokens = getEl("usageTotalTokens");
   els.comparisonTableBody = getEl("comparisonTableBody");
+  els.comparisonCardsContainer = getEl("comparisonCardsContainer");
+  els.comparisonTableWrap = getEl("comparisonTableWrap");
+  els.viewCardBtn = getEl("viewCardBtn");
+  els.viewTableBtn = getEl("viewTableBtn");
   els.documentKeys = getEl("documentKeys");
   els.dateTimeline = getEl("dateTimeline");
   els.checklistTabs = getEl("checklistTabs");
@@ -193,6 +197,7 @@ function clearResult() {
   els.documentKeys.innerHTML = "결과 없음";
   if (els.dateTimeline) els.dateTimeline.innerHTML = "결과 없음";
   els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
+  if (els.comparisonCardsContainer) els.comparisonCardsContainer.innerHTML = '<div class="empty-cell">결과 없음</div>';
   if (els.checklistTabs) els.checklistTabs.innerHTML = "";
   if (els.checklistContent) els.checklistContent.innerHTML = '<div class="empty-cell">결과 없음</div>';
   els.rawJson.textContent = "결과 없음";
@@ -317,9 +322,13 @@ function renderDateTimeline(dateChecks) {
 
 function renderComparisonTable(rows) {
   var html = "";
+  var cardsHtml = "";
 
   if (!rows || !rows.length) {
     els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
+    if (els.comparisonCardsContainer) {
+      els.comparisonCardsContainer.innerHTML = '<div class="empty-cell">비교표 데이터가 없습니다.</div>';
+    }
     return;
   }
 
@@ -380,16 +389,16 @@ function renderComparisonTable(rows) {
 
     var summaryBadgeHtml = "";
     if (critCount > 0) {
-      summaryBadgeHtml += '<span class="badge badge-crit">불일치/미비 ' + critCount + '</span> ';
+      summaryBadgeHtml += '<span class="badge badge-crit">불일치 ' + critCount + '</span> ';
     }
     if (warnCount > 0) {
-      summaryBadgeHtml += '<span class="badge badge-warn">검토 필요 ' + warnCount + '</span> ';
+      summaryBadgeHtml += '<span class="badge badge-warn">검토필요 ' + warnCount + '</span> ';
     }
     if (matchCount > 0) {
       summaryBadgeHtml += '<span class="badge badge-ok">일치 ' + matchCount + '</span>';
     }
 
-    /* Group Category Header Row */
+    /* Group Category Header Row (Table View) */
     html += '<tr class="group-header-row">';
     html += '<td colspan="8">';
     html += '<div class="group-header-flex">';
@@ -403,11 +412,18 @@ function renderComparisonTable(rows) {
     html += '</td>';
     html += '</tr>';
 
-    /* Member Rows */
+    /* Group Category Header (Card View) */
+    cardsHtml += '<div class="mobile-group-header">';
+    cardsHtml += '<div class="mobile-group-title"><span class="group-icon">' + icon + '</span> <strong>' + escapeHtml(catName) + '</strong> <span class="group-count">(' + catRows.length + ')</span></div>';
+    cardsHtml += '<div>' + summaryBadgeHtml + '</div>';
+    cardsHtml += '</div>';
+
+    /* Member Rows & Mobile Cards */
     catRows.forEach(function (row) {
       var rowClass = rowHighlightClass(row.result);
       var itemTitle = row.check_item_ko || row.check_item || "-";
 
+      // Table Row
       html += '<tr class="' + rowClass + '">';
       html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
       html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + '</span></td>';
@@ -418,10 +434,43 @@ function renderComparisonTable(rows) {
       html += '<td>' + escapeHtml(cleanText(row.marine_cargo_insurance || row.insurance || "-")) + '</td>';
       html += '<td>' + escapeHtml(cleanText(row.certificate_of_origin || row.coo || "-")) + '</td>';
       html += '</tr>';
+
+      // Mobile Card Item
+      cardsHtml += '<div class="mobile-matrix-card ' + rowClass + '">';
+      cardsHtml += '<div class="mobile-card-top">';
+      cardsHtml += '<span class="mobile-card-title">' + escapeHtml(cleanText(itemTitle)) + '</span>';
+      cardsHtml += '<span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + '</span>';
+      cardsHtml += '</div>';
+      cardsHtml += '<div class="mobile-card-doc-grid">';
+
+      var docs = [
+        { label: "LC", val: row.lc },
+        { label: "송장", val: row.commercial_invoice || row.invoice },
+        { label: "B/L", val: row.bill_of_lading || row.bl },
+        { label: "포장", val: row.packing_list },
+        { label: "보험", val: row.marine_cargo_insurance || row.insurance },
+        { label: "COO", val: row.certificate_of_origin || row.coo }
+      ];
+
+      docs.forEach(function (d) {
+        var cleanV = cleanText(d.val || "-");
+        var isMissing = cleanV === "missing" || cleanV === "-" || cleanV === "";
+        var valClass = isMissing ? "doc-val-missing" : "doc-val-present";
+        cardsHtml += '<div class="mobile-doc-item">';
+        cardsHtml += '<span class="mobile-doc-tag">' + escapeHtml(d.label) + '</span>';
+        cardsHtml += '<span class="mobile-doc-val ' + valClass + '">' + escapeHtml(cleanV || "-") + '</span>';
+        cardsHtml += '</div>';
+      });
+
+      cardsHtml += '</div>';
+      cardsHtml += '</div>';
     });
   });
 
   els.comparisonTableBody.innerHTML = html;
+  if (els.comparisonCardsContainer) {
+    els.comparisonCardsContainer.innerHTML = cardsHtml;
+  }
 }
 
 /* Render Per-Document Checklist Tabs & Content */
@@ -996,9 +1045,28 @@ function bindFileEvents() {
   });
 }
 
+function initComparisonViewToggle() {
+  if (!els.viewCardBtn || !els.viewTableBtn) return;
+
+  els.viewCardBtn.addEventListener("click", function () {
+    els.viewCardBtn.classList.add("active");
+    els.viewTableBtn.classList.remove("active");
+    if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "flex";
+    if (els.comparisonTableWrap) els.comparisonTableWrap.style.display = "none";
+  });
+
+  els.viewTableBtn.addEventListener("click", function () {
+    els.viewTableBtn.classList.add("active");
+    els.viewCardBtn.classList.remove("active");
+    if (els.comparisonCardsContainer) els.comparisonCardsContainer.style.display = "none";
+    if (els.comparisonTableWrap) els.comparisonTableWrap.style.display = "block";
+  });
+}
+
 function init() {
   initElements();
   initTheme();
+  initComparisonViewToggle();
 
   loadConfig()
     .then(function () {

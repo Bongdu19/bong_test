@@ -82,8 +82,15 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   margin: 0;
+  padding: 0;
+}
+
+body {
   background-color: var(--bg-primary);
   color: var(--text-main);
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -98,6 +105,7 @@ body {
   width: 94%;
   margin: 0 auto;
   padding: 32px 16px;
+  box-sizing: border-box;
 }
 
 /* Header Section */
@@ -198,6 +206,10 @@ h1 {
   padding: 24px;
   box-shadow: var(--shadow-md);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .card:hover {
@@ -245,6 +257,7 @@ h2 {
   font-family: inherit;
   transition: all 0.2s ease;
   -webkit-appearance: none;
+  box-sizing: border-box;
 }
 
 .input:focus, .select:focus {
@@ -307,6 +320,12 @@ h2 {
   gap: 8px;
   flex-wrap: nowrap;
   margin-top: 20px;
+  width: 100%;
+}
+
+.lookup-input-group {
+  display: flex;
+  gap: 8px;
   width: 100%;
 }
 
@@ -486,33 +505,141 @@ h2 {
   font-family: monospace;
 }
 
-/* Table Header & Mobile Scroll Hint */
+/* Table Header & View Toggle */
 .table-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .table-card-header h2 {
   margin: 0;
 }
 
-.mobile-table-hint {
-  display: none;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--accent-primary);
-  background: var(--accent-light);
-  padding: 4px 10px;
+.view-toggle-group {
+  display: inline-flex;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 3px;
   border-radius: 999px;
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  gap: 4px;
+}
+
+.btn-toggle {
+  background: transparent;
+  border: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+}
+
+/* Mobile Matrix Cards Container */
+.mobile-matrix-container {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.mobile-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 6px;
+}
+
+.mobile-group-title {
+  font-size: 15px;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobile-matrix-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.mobile-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.mobile-card-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 10px;
+}
+
+.mobile-doc-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--card-bg);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.mobile-doc-tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.mobile-doc-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.mobile-doc-val.doc-val-present {
+  color: var(--text-main);
+}
+
+.mobile-doc-val.doc-val-missing {
+  color: var(--text-subtle);
+  font-style: italic;
 }
 
 /* Tables */
 .table-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   border-radius: 12px;
   border: 1px solid var(--border-color);
@@ -911,24 +1038,29 @@ details.raw-json-details[open] {
   .metric-card-wide {
     grid-column: span 2;
   }
-
-  .mobile-table-hint {
-    display: inline-block;
-  }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  /* Lock page canvas strictly to smartphone screen width */
+  html, body {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
   .container {
-    width: 100%;
-    padding: 16px 12px;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 14px 10px !important;
+    overflow-x: hidden !important;
   }
 
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
   }
 
   .header-actions {
@@ -937,21 +1069,21 @@ details.raw-json-details[open] {
   }
 
   h1 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .subtext {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .card {
-    padding: 18px 16px;
+    padding: 16px 14px !important;
     border-radius: 14px;
   }
 
   .summary-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 
   .metric-card-wide {
@@ -959,18 +1091,33 @@ details.raw-json-details[open] {
   }
 
   .status-pill-lg {
-    font-size: 15px;
-    padding: 7px 14px;
+    font-size: 14.5px;
+    padding: 6px 14px;
   }
 
+  /* Stack buttons vertically on mobile */
   .button-row-single {
-    flex-direction: row;
-    gap: 6px;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .button-row-single .btn {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .lookup-input-group {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .lookup-input-group .btn {
+    width: 100% !important;
   }
 
   .btn {
-    padding: 12px 6px;
-    font-size: 13px;
+    padding: 12px 10px;
+    font-size: 14px;
     min-height: 48px;
   }
 
@@ -988,14 +1135,13 @@ details.raw-json-details[open] {
     gap: 10px;
   }
 
-  .table-wrap {
-    margin: 0 -4px;
-    border-radius: 10px;
+  /* Show Mobile Cards by default on mobile, hide table */
+  .mobile-matrix-container {
+    display: flex !important;
   }
 
-  th, td {
-    padding: 11px 10px;
-    font-size: 13.5px;
+  .table-wrap {
+    display: none;
   }
 
   .checklist-item {
@@ -1009,6 +1155,7 @@ details.raw-json-details[open] {
     flex-wrap: nowrap;
     padding-bottom: 6px;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
 
   .tab-btn {
