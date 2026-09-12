@@ -11,6 +11,13 @@ function getEl(id) {
 function initElements() {
   els.apiKey = getEl("apiKey");
   els.configId = getEl("configId");
+  els.proxyMode = getEl("proxyMode");
+  els.proxyUrl = getEl("proxyUrl");
+  els.proxyUrlWrap = getEl("proxyUrlWrap");
+  els.proxyNotice = getEl("proxyNotice");
+  els.themeToggleBtn = getEl("themeToggleBtn");
+  els.themeIcon = getEl("themeIcon");
+  els.themeLabel = getEl("themeLabel");
   els.fileInput = getEl("fileInput");
   els.dropzone = getEl("dropzone");
   els.fileInfo = getEl("fileInfo");
@@ -34,20 +41,93 @@ function initElements() {
 function escapeHtml(value) {
   var str = String(value == null ? "" : value);
   str = str.replace(/&/g, "&amp;");
-  str = str.replace(/</g, "<");
-  str = str.replace(/>/g, ">");
+  str = str.replace(/</g, "&lt;");
+  str = str.replace(/>/g, "&gt;");
   str = str.replace(/"/g, "&quot;");
   str = str.replace(/'/g, "&#039;");
   return str;
 }
 
 function trimValue(value) {
-  return String(value == null ? "" : value).replace(/^\s+|\s+\$/g, "");
+  return String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
 }
 
 function getCacheBuster() {
   var url = new URL(window.location.href);
   return url.searchParams.get("v") || String(Date.now());
+}
+
+/* Theme Toggle */
+function initTheme() {
+  var savedTheme = localStorage.getItem("theme") || "light";
+  setTheme(savedTheme);
+
+  if (els.themeToggleBtn) {
+    els.themeToggleBtn.addEventListener("click", function () {
+      var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+      var nextTheme = currentTheme === "light" ? "dark" : "light";
+      setTheme(nextTheme);
+    });
+  }
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+
+  if (els.themeIcon && els.themeLabel) {
+    if (theme === "dark") {
+      els.themeIcon.textContent = "🌙";
+      els.themeLabel.textContent = "어두운 화면";
+    } else {
+      els.themeIcon.textContent = "☀️";
+      els.themeLabel.textContent = "밝은 화면";
+    }
+  }
+}
+
+/* Proxy Selector UI Update */
+function updateProxyUI() {
+  var mode = els.proxyMode.value;
+
+  if (mode === "worker") {
+    els.proxyUrlWrap.style.display = "block";
+    els.proxyNotice.className = "notice-box notice-info";
+    els.proxyNotice.innerHTML = "🔒 <strong>Cloudflare Worker 모드</strong>: API 키와 통신이 본인의 Worker 서버를 경유하므로 보안상 유출되지 않습니다.";
+  } else if (mode === "public") {
+    els.proxyUrlWrap.style.display = "none";
+    els.proxyNotice.className = "notice-box notice-warning";
+    els.proxyNotice.innerHTML = "⚠️ <strong>공개 프록시 경고</strong>: <code>corsproxy.io</code> 제3자 서버를 통과하므로 보안에 유의하세요. (테스트용 권장)";
+  } else {
+    els.proxyUrlWrap.style.display = "none";
+    els.proxyNotice.className = "notice-box notice-info";
+    els.proxyNotice.innerHTML = "🌐 <strong>직접 연결 모드</strong>: API 서버가 CORS를 허용하지 않는 경우 브라우저에서 요청이 차단될 수 있습니다.";
+  }
+}
+
+/* Construct Request URL based on Proxy Mode */
+function getApiEndpoint(path) {
+  var mode = els.proxyMode.value;
+  var targetUrl = (CONFIG.baseUrl || "https://api.upstage.ai/v2") + path;
+
+  if (mode === "public") {
+    return "https://corsproxy.io/?" + targetUrl;
+  } else if (mode === "worker") {
+    var workerBase = trimValue(els.proxyUrl.value);
+    if (!workerBase) {
+      throw new Error("Cloudflare Worker URL을 입력해 주세요.");
+    }
+    // Remove trailing slash
+    workerBase = workerBase.replace(/\/+$/, "");
+
+    // If worker base ends with /v2 or path starts with /v2
+    if (!workerBase.endsWith("/v2") && !workerBase.endsWith("/v1")) {
+      return workerBase + "/v2" + path;
+    }
+    return workerBase + path;
+  } else {
+    return targetUrl;
+  }
 }
 
 function setStatus(text, meta) {
@@ -157,12 +237,12 @@ function buildDateTimeline(dateChecks) {
   }
 
   html += '<div class="issue-item">';
-  html += '<div class="issue-title">Date Flow</div>';
-  html += '<div class="issue-desc">';
+  html += '<div class="issue-title">Date Flow Timeline</div>';
+  html += '<div class="issue-desc" style="margin-top:6px;">';
   html += '<span class="badge ' + statusClass + '">' + escapeHtml(dateChecks.date_sequence_status || "-") + "</span>";
   html += " " + escapeHtml(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
   html += "</div>";
-  html += '<div class="timeline-wrap" style="margin-top:10px;">';
+  html += '<div class="timeline-wrap" style="margin-top:12px; display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;">';
 
   for (i = 0; i < items.length; i += 1) {
     item = items[i];
@@ -171,9 +251,9 @@ function buildDateTimeline(dateChecks) {
       continue;
     }
 
-    html += '<div class="kv-item" style="margin-bottom:8px;">';
-    html += '<div class="kv-key">' + escapeHtml(item.label) + "</div>";
-    html += '<div class="kv-value">' + escapeHtml(value) + "</div>";
+    html += '<div class="kv-item" style="padding: 8px 10px;">';
+    html += '<div class="kv-key" style="font-size:12px;">' + escapeHtml(item.label) + "</div>";
+    html += '<div class="kv-value" style="font-size:13px; margin-top:2px;">' + escapeHtml(value) + "</div>";
     html += "</div>";
   }
 
@@ -238,7 +318,7 @@ function renderComparisonTable(rows) {
   for (i = 0; i < rows.length; i += 1) {
     row = rows[i];
     html += "<tr>";
-    html += "<td>" + escapeHtml(row.check_item || "-") + "</td>";
+    html += "<td><strong>" + escapeHtml(row.check_item || "-") + "</strong></td>";
     html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(row.result || "-") + "</span></td>";
     html += "<td>" + escapeHtml(row.lc || "-") + "</td>";
     html += "<td>" + escapeHtml(row.commercial_invoice || "-") + "</td>";
@@ -302,7 +382,7 @@ function loadConfig() {
     })
     .then(function (json) {
       CONFIG = json;
-      if (CONFIG.defaultApiKey) {
+      if (CONFIG.defaultApiKey && !els.apiKey.value) {
         els.apiKey.value = CONFIG.defaultApiKey;
       }
     });
@@ -313,7 +393,9 @@ function uploadFile(apiKey, file) {
   form.append("file", file);
   form.append("purpose", CONFIG.filePurpose || "user_data");
 
-  return fetch(CONFIG.baseUrl + "/files", {
+  var endpoint = getApiEndpoint("/files");
+
+  return fetch(endpoint, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + apiKey
@@ -357,9 +439,9 @@ function createJob(apiKey, fileId, configId) {
     body.config_id = configId;
   }
 
-  console.log("createJob request body", JSON.stringify(body, null, 2));
+  var endpoint = getApiEndpoint("/responses");
 
-  return fetch(CONFIG.baseUrl + "/responses", {
+  return fetch(endpoint, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + apiKey,
@@ -377,7 +459,9 @@ function createJob(apiKey, fileId, configId) {
 }
 
 function getJob(apiKey, jobId) {
-  return fetch(CONFIG.baseUrl + "/responses/" + encodeURIComponent(jobId) + "?include[]=last", {
+  var endpoint = getApiEndpoint("/responses/" + encodeURIComponent(jobId) + "?include[]=last");
+
+  return fetch(endpoint, {
     method: "GET",
     headers: {
       Authorization: "Bearer " + apiKey
@@ -468,9 +552,6 @@ function runWorkflow() {
     .then(function (uploaded) {
       uploadedFileId = uploaded.id;
 
-      console.log("uploaded file response", uploaded);
-      console.log("uploaded file id", uploadedFileId);
-
       els.fileInfo.innerHTML =
         "<strong>" + escapeHtml(selectedFile.name) + "</strong><br>" +
         '<span class="meta-text">file_id=' + escapeHtml(uploadedFileId) + "</span>";
@@ -480,7 +561,6 @@ function runWorkflow() {
     })
     .then(function (job) {
       currentJobId = job.id;
-      console.log("job created", job);
       setStatus("실행 중...", "job_id=" + currentJobId);
       return pollJob(apiKey, currentJobId);
     })
@@ -488,7 +568,6 @@ function runWorkflow() {
       var rawText;
       var parsed;
 
-      console.log("final job", finalJob);
       els.rawJson.textContent = JSON.stringify(finalJob, null, 2);
 
       if (finalJob.status === "failed") {
@@ -513,12 +592,16 @@ function runWorkflow() {
     })
     .catch(function (error) {
       console.error(error);
-      setStatus("오류 발생", "");
+      setStatus("오류 발생", error.message);
 
-      if (String(error.message || "").indexOf("No access to file") >= 0) {
+      if (String(error.message || "").indexOf("Failed to fetch") >= 0) {
         alert(
-          "업로드된 file_id를 현재 에이전트 실행에서 바로 사용할 수 없어 403이 발생했습니다.\n" +
-          "이 경우 파일 업로드 목적값 또는 실행 방식이 현재 API/에이전트 컨텍스트와 맞지 않습니다."
+          "CORS 통신 오류가 발생했습니다.\n" +
+          "선택하신 프록시 모드 (공개 프록시 / Cloudflare Worker)의 설정 상태를 확인해 주세요."
+        );
+      } else if (String(error.message || "").indexOf("No access to file") >= 0) {
+        alert(
+          "업로드된 file_id를 현재 에이전트 실행에서 바로 사용할 수 없어 403이 발생했습니다."
         );
       } else {
         alert(error.message || "오류가 발생했습니다.");
@@ -622,6 +705,10 @@ function bindFileEvents() {
 
 function init() {
   initElements();
+  initTheme();
+
+  els.proxyMode.addEventListener("change", updateProxyUI);
+  updateProxyUI();
 
   loadConfig()
     .then(function () {

@@ -1,55 +1,103 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>신용장 서류 일치성 점검</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css?v=20260912" />
 </head>
 <body>
   <div class="container">
     <header class="page-header">
-      <div>
-        <p class="eyebrow">PC Interactive</p>
+      <div class="header-title-group">
+        <p class="eyebrow"><span class="eyebrow-badge">PC Interactive</span> Document AI Verification</p>
         <h1>신용장 서류 일치성 점검</h1>
-        <p class="subtext">정적 웹페이지 데모</p>
+        <p class="subtext">Upstage Document AI 기반 수입/수출 무역 서류 일치성 자동 대조 데모</p>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="테마 전환">
+          <span id="themeIcon">☀️</span> <span id="themeLabel">밝은 화면</span>
+        </button>
       </div>
     </header>
 
     <main class="layout">
+      <!-- Left Panel: Configurations & Actions -->
       <section class="panel left-panel">
         <div class="card">
-          <h2>실행 설정</h2>
+          <h2>⚙️ 실행 설정</h2>
 
-          <label class="label" for="apiKey">API Key</label>
+          <div class="label">
+            <span>API Key</span>
+            <span class="label-hint">Upstage API Key</span>
+          </div>
           <input id="apiKey" class="input" type="password" placeholder="up_..." />
 
-          <label class="label" for="configId">Config ID (선택)</label>
+          <div class="label">
+            <span>CORS 우회 / 프록시 방식</span>
+          </div>
+          <select id="proxyMode" class="select">
+            <option value="worker">Cloudflare Worker (안전/추천)</option>
+            <option value="public" selected>공개 CORS Proxy (corsproxy.io)</option>
+            <option value="direct">직접 연결 (Proxy 없음)</option>
+          </select>
+
+          <div id="proxyUrlWrap" class="proxy-url-wrap" style="margin-top: 10px;">
+            <div class="label">
+              <span>Cloudflare Worker / 프록시 URL</span>
+            </div>
+            <input id="proxyUrl" class="input" type="text" placeholder="https://upstage-proxy.yourname.workers.dev" />
+          </div>
+
+          <div id="proxyNotice" class="notice-box notice-warning">
+            ⚠️ <strong>공개 프록시 주의</strong>: <code>corsproxy.io</code> 경유 시 제3자 서버를 거치므로 보안에 주의하세요. 실무 환경에서는 <strong>Cloudflare Worker</strong> 사용을 권장합니다.
+          </div>
+
+          <details class="help-box">
+            <summary>💡 Cloudflare Worker 1분 설치법 (무료)</summary>
+            <ol>
+              <li><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">dash.cloudflare.com</a> 접속 및 로그인</li>
+              <li><strong>Workers & Pages</strong> ➔ <strong>Create Worker</strong> ➔ <strong>Deploy</strong> 클릭</li>
+              <li><strong>Edit Code</strong>에 <u>CORS 프록시 코드</u> 붙여넣기 ➔ <strong>Save and Deploy</strong></li>
+              <li>발급된 <code>.workers.dev</code> 주소를 위 입력란에 붙여넣기하면 끝!</li>
+            </ol>
+          </details>
+
+          <div class="label" style="margin-top: 16px;">
+            <span>Config ID (선택)</span>
+          </div>
           <input id="configId" class="input" type="text" placeholder="비우면 최신 config 사용" />
 
-          <label class="label">문서 업로드</label>
+          <div class="label" style="margin-top: 16px;">
+            <span>문서 업로드</span>
+          </div>
           <div id="dropzone" class="dropzone">
             <input id="fileInput" type="file" hidden />
+            <div class="dropzone-icon">📄</div>
             <p class="dropzone-title">파일을 드래그하거나 클릭해 선택</p>
-            <p class="dropzone-sub">PDF / 이미지 / Office 파일</p>
+            <p class="dropzone-sub">PDF / 이미지 (PNG, JPG) / Office 문서</p>
           </div>
 
           <div id="fileInfo" class="file-info">선택된 파일 없음</div>
 
           <div class="button-row">
-            <button id="runBtn" class="btn btn-primary" type="button">실행</button>
-            <button id="sampleBtn" class="btn btn-secondary" type="button">샘플 보기</button>
-            <button id="clearBtn" class="btn btn-ghost" type="button">초기화</button>
+            <button id="runBtn" class="btn btn-primary" type="button">🚀 검점 실행</button>
+            <button id="sampleBtn" class="btn btn-secondary" type="button">👁️ 샘플 보기</button>
+            <button id="clearBtn" class="btn btn-ghost" type="button">🔄 초기화</button>
           </div>
         </div>
 
         <div class="card">
-          <h2>실행 상태</h2>
+          <h2>📊 실행 상태</h2>
           <div id="jobStatus" class="status-text">대기 중</div>
           <div id="jobMeta" class="meta-text"></div>
         </div>
       </section>
 
+      <!-- Right Panel: Results & Metrics -->
       <section class="panel right-panel">
         <div class="summary-grid">
           <div class="card metric-card">
@@ -71,12 +119,12 @@
         </div>
 
         <div class="card">
-          <h2>One-line Summary</h2>
+          <h2>📝 One-line Summary</h2>
           <p id="oneLineSummary" class="summary-text">결과 없음</p>
         </div>
 
         <div class="card">
-          <h2>비교표</h2>
+          <h2>📋 비교표</h2>
           <div class="table-wrap">
             <table>
               <thead>
@@ -101,23 +149,23 @@
         </div>
 
         <div class="card">
-          <h2>문서 키</h2>
+          <h2>🔑 문서 키</h2>
           <div id="documentKeys" class="kv-list empty">결과 없음</div>
         </div>
 
         <div class="card">
-          <h2>핵심 이슈</h2>
+          <h2>🚨 핵심 이슈</h2>
           <div id="issues" class="issue-list empty">결과 없음</div>
         </div>
 
         <div class="card">
-          <h2>Raw JSON</h2>
+          <h2>💻 Raw JSON</h2>
           <pre id="rawJson" class="raw-json">결과 없음</pre>
         </div>
       </section>
     </main>
   </div>
 
-  <script src="./app.js?v=20250814"></script>
+  <script src="./app.js?v=20260912"></script>
 </body>
 </html>

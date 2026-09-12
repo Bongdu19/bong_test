@@ -1,6 +1,6 @@
 {
   "baseUrl": "https://api.upstage.ai/v2",
-  "__agentId_old": "agt_nhYFmSZojMGTsHzEBN3xVq",
+  "proxyUrl": "https://corsproxy.io/?",
   "agentId": "agt_EpTRLGpvzaoGjJEEyPcWN8",
   "pollIntervalMs": 2500,
   "filePurpose": "user_data",
