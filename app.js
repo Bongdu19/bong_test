@@ -515,11 +515,13 @@ function renderComparisonTable(rows) {
     html += '</td>';
     html += '</tr>';
 
-    /* Group Category Header (Card View) */
+    /* Group Category Section (Card View) */
+    cardsHtml += '<div class="card-category-section">';
     cardsHtml += '<div class="mobile-group-header">';
-    cardsHtml += '<div class="mobile-group-title"><span class="group-icon">' + icon + '</span> <strong>' + escapeHtml(catName) + '</strong> <span class="group-count">(' + catRows.length + ')</span></div>';
-    cardsHtml += '<div>' + summaryBadgeHtml + '</div>';
+    cardsHtml += '<div class="mobile-group-title"><span class="group-icon">' + icon + '</span> <strong>' + escapeHtml(catName) + '</strong> <span class="group-count">(' + catRows.length + '개 항목)</span></div>';
+    cardsHtml += '<div class="group-header-badges">' + summaryBadgeHtml + '</div>';
     cardsHtml += '</div>';
+    cardsHtml += '<div class="card-category-grid">';
 
     /* Member Rows & Mobile Cards */
     catRows.forEach(function (row) {
@@ -568,6 +570,9 @@ function renderComparisonTable(rows) {
       cardsHtml += '</div>';
       cardsHtml += '</div>';
     });
+
+    cardsHtml += '</div>'; // close card-category-grid
+    cardsHtml += '</div>'; // close card-category-section
   });
 
   els.comparisonTableBody.innerHTML = html;

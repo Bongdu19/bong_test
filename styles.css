@@ -812,13 +812,21 @@ details.api-settings-details[open] {
   box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
 }
 
-/* Mobile Matrix Cards Container */
-.mobile-matrix-container {
-  display: none;
+/* Card View Layout (.mobile-cards-grid & #comparisonCardsContainer) */
+.mobile-cards-grid, #comparisonCardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.card-category-section {
+  display: flex;
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -826,28 +834,36 @@ details.api-settings-details[open] {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 12px 16px;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  margin-top: 6px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .mobile-group-title {
   font-size: 15px;
+  font-weight: 800;
   color: var(--text-main);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+}
+
+.card-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mobile-matrix-card {
-  background: var(--bg-primary);
+  background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -855,6 +871,29 @@ details.api-settings-details[open] {
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.mobile-matrix-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-hover);
+}
+
+/* Card highlight variants based on result */
+.mobile-matrix-card.row-crit {
+  border-left: 4px solid var(--badge-crit-border) !important;
+  background-color: var(--badge-crit-bg) !important;
+}
+
+.mobile-matrix-card.row-warn {
+  border-left: 4px solid var(--badge-warn-border) !important;
+  background-color: var(--badge-warn-bg) !important;
+}
+
+.mobile-matrix-card.row-ok {
+  border-left: 4px solid var(--badge-ok-border) !important;
 }
 
 .mobile-card-top {
@@ -869,7 +908,7 @@ details.api-settings-details[open] {
 }
 
 .mobile-card-title {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 800;
   color: var(--text-main);
   min-width: 0;
@@ -879,16 +918,26 @@ details.api-settings-details[open] {
 
 .mobile-card-doc-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
   width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .card-category-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .mobile-card-doc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
 }
 
 .mobile-doc-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  background: var(--card-bg);
+  gap: 3px;
+  background: var(--bg-primary);
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--border-color);
@@ -901,15 +950,17 @@ details.api-settings-details[open] {
 .mobile-doc-tag {
   font-size: 11px;
   font-weight: 800;
-  color: var(--text-muted);
+  color: var(--text-subtle);
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .mobile-doc-val {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   word-break: break-all;
   overflow-wrap: anywhere;
+  line-height: 1.35;
 }
 
 .mobile-doc-val.doc-val-present {
@@ -1521,7 +1572,7 @@ details.raw-json-details[open] {
   }
 
   /* Show Mobile Cards by default on mobile, hide table */
-  .mobile-matrix-container {
+  .mobile-cards-grid, #comparisonCardsContainer {
     display: flex !important;
   }
 
