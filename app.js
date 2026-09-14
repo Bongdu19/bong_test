@@ -253,6 +253,49 @@ function badgeClass(result) {
   return "badge badge-neutral";
 }
 
+function resultCellClass(result) {
+  var v = String(result || "").toLowerCase();
+  if (
+    v.indexOf("일치") >= 0 ||
+    v.indexOf("진행") >= 0 ||
+    v.indexOf("통과") >= 0 ||
+    v.indexOf("구비") >= 0 ||
+    v === "match" ||
+    v === "ok" ||
+    v === "proceed" ||
+    v === "pass" ||
+    v === "present"
+  ) {
+    return "res-cell res-cell-ok";
+  }
+  if (
+    v.indexOf("검토") >= 0 ||
+    v.indexOf("주의") >= 0 ||
+    v.indexOf("확인") >= 0 ||
+    v.indexOf("warning") >= 0 ||
+    v === "review_required" ||
+    v === "unclear" ||
+    v === "warn"
+  ) {
+    return "res-cell res-cell-warn";
+  }
+  if (
+    v.indexOf("불일치") >= 0 ||
+    v.indexOf("보류") >= 0 ||
+    v.indexOf("치명") >= 0 ||
+    v.indexOf("미제출") >= 0 ||
+    v.indexOf("미비") >= 0 ||
+    v.indexOf("critical") >= 0 ||
+    v === "mismatch" ||
+    v === "on_hold" ||
+    v === "missing" ||
+    v === "fail"
+  ) {
+    return "res-cell res-cell-crit";
+  }
+  return "res-cell res-cell-neutral";
+}
+
 function rowHighlightClass(result) {
   var v = String(result || "").toLowerCase();
 
@@ -566,7 +609,7 @@ function renderComparisonTable(rows) {
       // Table Row
       html += '<tr class="' + rowClass + '">';
       html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
-      html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
+      html += '<td class="' + resultCellClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</td>';
       html += '<td>' + formatTableCellHtml(row.lc) + '</td>';
       html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice) + '</td>';
       html += '<td>' + formatTableCellHtml(row.bill_of_lading || row.bl) + '</td>';

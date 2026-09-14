@@ -1098,6 +1098,51 @@ td:first-child {
   text-align: left;
 }
 
+/* Table Result Column Cell (Full cell background color, bold text, no badge pill) */
+td.res-cell {
+  text-align: center !important;
+  font-size: 13px;
+  font-weight: 800 !important;
+  padding: 8px 4px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+td.res-cell-crit {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+td.res-cell-warn {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+td.res-cell-ok {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+td.res-cell-neutral {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] td.res-cell-crit {
+  background-color: #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+[data-theme="dark"] td.res-cell-warn {
+  background-color: #78350f !important;
+  color: #fde68a !important;
+}
+
+[data-theme="dark"] td.res-cell-ok {
+  background-color: #14532d !important;
+  color: #bbf7d0 !important;
+}
+
 .item-title-cell {
   font-size: 13.5px;
   font-weight: 800;
