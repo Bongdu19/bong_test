@@ -180,6 +180,35 @@ function formatDocValue(val) {
   return str;
 }
 
+function formatTableCellHtml(val) {
+  if (val == null || val === "") {
+    return '<span class="cell-val cell-val-subtle">-</span>';
+  }
+  var str = cleanText(val);
+  var lower = str.toLowerCase().trim();
+
+  if (lower === "present" || lower === "구비됨") {
+    return '<span class="cell-val cell-val-ok"><i class="bi bi-check-circle-fill"></i> 구비됨</span>';
+  }
+  if (lower === "match" || lower === "일치") {
+    return '<span class="cell-val cell-val-ok"><i class="bi bi-check-lg"></i> 일치</span>';
+  }
+  if (lower === "missing" || lower === "미제출") {
+    return '<span class="cell-val cell-val-crit"><i class="bi bi-x-circle-fill"></i> 미제출</span>';
+  }
+  if (lower === "mismatch" || lower === "불일치") {
+    return '<span class="cell-val cell-val-crit"><i class="bi bi-exclamation-octagon-fill"></i> 불일치</span>';
+  }
+  if (lower === "unclear" || lower === "확인 필요" || lower === "확인필요") {
+    return '<span class="cell-val cell-val-warn"><i class="bi bi-question-circle-fill"></i> 확인필요</span>';
+  }
+  if (lower === "not_available" || lower === "n/a" || lower === "미해당") {
+    return '<span class="cell-val cell-val-subtle">미해당</span>';
+  }
+
+  return '<span class="cell-val cell-val-text">' + escapeHtml(str) + '</span>';
+}
+
 function badgeClass(result) {
   var v = String(result || "").toLowerCase();
 
@@ -532,12 +561,12 @@ function renderComparisonTable(rows) {
       html += '<tr class="' + rowClass + '">';
       html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
       html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.lc)) + '</td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.commercial_invoice || row.invoice)) + '</td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.bill_of_lading || row.bl)) + '</td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.packing_list)) + '</td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.marine_cargo_insurance || row.insurance)) + '</td>';
-      html += '<td>' + escapeHtml(formatDocValue(row.certificate_of_origin || row.coo)) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.lc) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.bill_of_lading || row.bl) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.packing_list) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.marine_cargo_insurance || row.insurance) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.certificate_of_origin || row.coo) + '</td>';
       html += '</tr>';
 
       // Mobile Card Item
