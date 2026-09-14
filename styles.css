@@ -1060,11 +1060,47 @@ td {
   word-break: break-word;
 }
 
-.item-title-cell {
-  font-size: 14.5px;
-  font-weight: 800;
-  color: var(--text-main);
+/* Subitem tree indent */
+td.subitem-cell {
+  padding-left: 30px !important;
+  position: relative;
 }
+
+.subitem-tree-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-subtle);
+  font-weight: 800;
+  font-size: 12px;
+  opacity: 0.65;
+  user-select: none;
+}
+
+/* Category Sub-Header Rows (Repeats Column Titles per Group) */
+tr.group-subheader-row th {
+  background-color: var(--bg-primary);
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-subtle);
+  padding: 6px 12px;
+  border-bottom: 1.5px solid var(--border-color);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+tr.group-subheader-row th .bi {
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+tr.group-subheader-row th.col-lc { color: #2563eb; }
+tr.group-subheader-row th.col-inv { color: #7c3aed; }
+tr.group-subheader-row th.col-bl { color: #0891b2; }
+tr.group-subheader-row th.col-pk { color: #d97706; }
+tr.group-subheader-row th.col-ins { color: #059669; }
+tr.group-subheader-row th.col-coo { color: #4f46e5; }
 
 /* Category Group Header Rows */
 tr.group-header-row td {
@@ -1383,11 +1419,12 @@ tr.row-warn {
 }
 
 /* Checklist Tabs & Content */
-.checklist-tabs {
+.checklist-tabs, #checklistTabs, .tabs-header {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 18px;
+  margin-bottom: 22px !important;
+  margin-top: 10px;
   width: 100%;
 }
 

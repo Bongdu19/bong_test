@@ -544,6 +544,18 @@ function renderComparisonTable(rows) {
     html += '</td>';
     html += '</tr>';
 
+    /* Group Sub-Header Row (Repeats column headers per category group) */
+    html += '<tr class="group-subheader-row">';
+    html += '<th class="col-sub col-item">검토 항목</th>';
+    html += '<th class="col-sub col-result">결과</th>';
+    html += '<th class="col-sub col-lc"><i class="bi bi-file-earmark-text"></i> L/C</th>';
+    html += '<th class="col-sub col-inv"><i class="bi bi-receipt"></i> 송장</th>';
+    html += '<th class="col-sub col-bl"><i class="bi bi-water"></i> B/L</th>';
+    html += '<th class="col-sub col-pk"><i class="bi bi-box-seam"></i> 포장</th>';
+    html += '<th class="col-sub col-ins"><i class="bi bi-shield-check"></i> 보험</th>';
+    html += '<th class="col-sub col-coo"><i class="bi bi-bank"></i> COO</th>';
+    html += '</tr>';
+
     /* Group Category Section (Card View) */
     cardsHtml += '<div class="card-category-section">';
     cardsHtml += '<div class="mobile-group-header">';
@@ -557,9 +569,9 @@ function renderComparisonTable(rows) {
       var rowClass = rowHighlightClass(row.result);
       var itemTitle = row.check_item_ko || row.check_item || "-";
 
-      // Table Row
+      // Table Row (Indented under category)
       html += '<tr class="' + rowClass + '">';
-      html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
+      html += '<td class="subitem-cell"><span class="subitem-tree-icon">└</span><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
       html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
       html += '<td>' + formatTableCellHtml(row.lc) + '</td>';
       html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice) + '</td>';
