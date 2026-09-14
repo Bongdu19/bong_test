@@ -622,17 +622,29 @@ function renderComparisonTable(rows) {
     html += '<table class="data-table">';
     html += '<thead>';
     html += '<tr class="group-subheader-row">';
-    html += '<th class="col-item" style="width: 22%;"><i class="bi bi-card-checklist"></i> 검토 항목</th>';
-    html += '<th class="col-result" style="width: 10%;"><i class="bi bi-shield-check"></i> 결과</th>';
-    html += '<th class="col-doc col-lc" style="width: 11.33%;"><i class="bi bi-file-earmark-text"></i> L/C</th>';
-    html += '<th class="col-doc col-inv" style="width: 11.33%;"><i class="bi bi-receipt"></i> 송장</th>';
-    html += '<th class="col-doc col-bl" style="width: 11.33%;"><i class="bi bi-water"></i> B/L</th>';
-    html += '<th class="col-doc col-pk" style="width: 11.33%;"><i class="bi bi-box-seam"></i> 포장</th>';
-    html += '<th class="col-doc col-ins" style="width: 11.33%;"><i class="bi bi-shield-check"></i> 보험</th>';
-    html += '<th class="col-doc col-coo" style="width: 11.33%;"><i class="bi bi-bank"></i> COO</th>';
+    html += '<th class="col-item" style="width: 18%;"><i class="bi bi-card-checklist"></i> 검토 항목</th>';
+    html += '<th class="col-result" style="width: 8%;"><i class="bi bi-shield-check"></i> 결과</th>';
+    html += '<th class="col-doc col-lc" style="width: 12.33%;"><i class="bi bi-file-earmark-text"></i> L/C</th>';
+    html += '<th class="col-doc col-inv" style="width: 12.33%;"><i class="bi bi-receipt"></i> 송장</th>';
+    html += '<th class="col-doc col-bl" style="width: 12.33%;"><i class="bi bi-water"></i> B/L</th>';
+    html += '<th class="col-doc col-pk" style="width: 12.33%;"><i class="bi bi-box-seam"></i> 포장</th>';
+    html += '<th class="col-doc col-ins" style="width: 12.33%;"><i class="bi bi-shield-check"></i> 보험</th>';
+    html += '<th class="col-doc col-coo" style="width: 12.33%;"><i class="bi bi-bank"></i> COO</th>';
     html += '</tr>';
     html += '</thead>';
     html += '<tbody>';
+
+    /* Category Cards Section (Card View - Grid Layout) */
+    cardsHtml += '<div class="card-category-section">';
+    cardsHtml += '<div class="mobile-group-header">';
+    cardsHtml += '<div class="mobile-group-title">';
+    cardsHtml += '<span class="group-icon">' + icon + '</span> ';
+    cardsHtml += '<strong>' + escapeHtml(catName) + '</strong> ';
+    cardsHtml += '<span class="group-count">(' + catRows.length + '개 항목)</span>';
+    cardsHtml += '</div>';
+    cardsHtml += '<div class="group-header-badges">' + summaryBadgeHtml + '</div>';
+    cardsHtml += '</div>';
+    cardsHtml += '<div class="card-category-grid">';
 
     /* Member Rows & Mobile Cards */
     catRows.forEach(function (row) {

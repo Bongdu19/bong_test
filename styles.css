@@ -101,11 +101,12 @@ body {
 
 /* Centered Responsive Container */
 .container {
-  max-width: 1550px;
-  width: 94%;
+  max-width: 1460px;
+  width: 92%;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 24px 16px;
   box-sizing: border-box;
+  zoom: 0.92;
 }
 
 /* Header Section */
@@ -853,10 +854,22 @@ details.api-settings-details[open] {
 
 .card-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 14px;
   width: 100%;
   box-sizing: border-box;
+}
+
+@media (min-width: 1200px) {
+  .card-category-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .card-category-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 .mobile-matrix-card {
@@ -881,20 +894,38 @@ details.api-settings-details[open] {
   border-color: var(--border-hover);
 }
 
-/* Card highlight variants based on result (Clean card background with left status accent bar) */
+/* Card highlight variants based on result (Soft pastel result background tint + status left accent bar) */
 .mobile-matrix-card.row-crit {
   border-left: 5px solid #dc2626 !important;
-  background-color: var(--card-bg) !important;
+  border-color: #fca5a5 !important;
+  background-color: #fff5f5 !important;
 }
 
 .mobile-matrix-card.row-warn {
   border-left: 5px solid #d97706 !important;
-  background-color: var(--card-bg) !important;
+  border-color: #fde047 !important;
+  background-color: #fffbeb !important;
 }
 
 .mobile-matrix-card.row-ok {
   border-left: 5px solid #16a34a !important;
-  background-color: var(--card-bg) !important;
+  border-color: #86efac !important;
+  background-color: #f0fdf4 !important;
+}
+
+[data-theme="dark"] .mobile-matrix-card.row-crit {
+  background-color: rgba(127, 29, 29, 0.3) !important;
+  border-color: #b91c1c !important;
+}
+
+[data-theme="dark"] .mobile-matrix-card.row-warn {
+  background-color: rgba(120, 53, 15, 0.3) !important;
+  border-color: #b45309 !important;
+}
+
+[data-theme="dark"] .mobile-matrix-card.row-ok {
+  background-color: rgba(6, 78, 59, 0.3) !important;
+  border-color: #047857 !important;
 }
 
 .mobile-card-top {
@@ -1207,17 +1238,18 @@ td.res-cell-neutral {
   color: var(--text-main);
 }
 
-/* Compact cell values for 12% equal column widths */
+/* Compact cell values for equal column widths */
 .cell-val {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 2.5px 6px;
+  padding: 1.5px 4px;
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
   line-height: 1.3;
   max-width: 100%;
   box-sizing: border-box;
@@ -1253,14 +1285,15 @@ td.res-cell-neutral {
   background: var(--bg-primary);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
   font-family: inherit;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
   border-radius: 5px;
-  padding: 2px 4px;
-  line-height: 1.25;
+  padding: 1.5px 3.5px;
+  line-height: 1.2;
   display: inline-block;
   max-width: 100%;
   box-sizing: border-box;
