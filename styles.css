@@ -101,12 +101,11 @@ body {
 
 /* Centered Responsive Container */
 .container {
-  max-width: 1460px;
-  width: 92%;
+  max-width: 1550px;
+  width: 94%;
   margin: 0 auto;
   padding: 24px 16px;
   box-sizing: border-box;
-  zoom: 0.92;
 }
 
 /* Header Section */
@@ -1182,9 +1181,12 @@ td:first-child {
   text-align: left;
   background-color: var(--bg-primary);
   font-weight: 800;
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-main);
   border-right: 1.5px solid var(--border-color);
+  padding: 8px 6px;
+  white-space: nowrap !important;
+  letter-spacing: -0.4px;
 }
 
 /* Table Result Column Cell (Full cell background color, bold text, no badge pill) */
@@ -1233,9 +1235,11 @@ td.res-cell-neutral {
 }
 
 .item-title-cell {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--text-main);
+  white-space: nowrap !important;
+  letter-spacing: -0.4px;
 }
 
 /* Compact cell values for equal column widths */
@@ -1244,12 +1248,11 @@ td.res-cell-neutral {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  padding: 1.5px 4px;
+  padding: 2px 5px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  white-space: nowrap !important;
-  word-break: keep-all !important;
+  white-space: nowrap;
   line-height: 1.3;
   max-width: 100%;
   box-sizing: border-box;
@@ -1285,21 +1288,20 @@ td.res-cell-neutral {
   background: var(--bg-primary);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: -0.4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
   font-family: inherit;
-  white-space: nowrap !important;
-  word-break: keep-all !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
   border-radius: 5px;
-  padding: 1.5px 3.5px;
-  line-height: 1.2;
+  padding: 3px 5px;
+  line-height: 1.25;
   display: inline-block;
   max-width: 100%;
   box-sizing: border-box;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .group-icon {
