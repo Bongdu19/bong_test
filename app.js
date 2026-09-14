@@ -307,7 +307,7 @@ function clearResult() {
   if (els.usageCard) els.usageCard.style.display = "none";
   els.documentKeys.innerHTML = "결과 없음";
   if (els.dateTimeline) els.dateTimeline.innerHTML = "결과 없음";
-  els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">결과 없음</td></tr>';
+  if (els.comparisonTableBody) els.comparisonTableBody.innerHTML = '<div class="empty-cell">결과 없음</div>';
   if (els.comparisonCardsContainer) els.comparisonCardsContainer.innerHTML = '<div class="empty-cell">결과 없음</div>';
   if (els.checklistTabs) els.checklistTabs.innerHTML = "";
   if (els.checklistContent) els.checklistContent.innerHTML = '<div class="empty-cell">결과 없음</div>';
@@ -457,7 +457,9 @@ function renderComparisonTable(rows) {
   var cardsHtml = "";
 
   if (!rows || !rows.length) {
-    els.comparisonTableBody.innerHTML = '<tr><td colspan="8" class="empty-cell">비교표 데이터가 없습니다.</td></tr>';
+    if (els.comparisonTableBody) {
+      els.comparisonTableBody.innerHTML = '<div class="empty-cell">비교표 데이터가 없습니다.</div>';
+    }
     if (els.comparisonCardsContainer) {
       els.comparisonCardsContainer.innerHTML = '<div class="empty-cell">비교표 데이터가 없습니다.</div>';
     }
@@ -530,10 +532,9 @@ function renderComparisonTable(rows) {
       summaryBadgeHtml += '<span class="badge badge-ok">일치 ' + matchCount + '</span>';
     }
 
-    /* Group Category Header Row (Table View) */
-    html += '<tr class="group-header-row">';
-    html += '<td colspan="8">';
-    html += '<div class="group-header-flex">';
+    /* Category Table Block (Table View - Nested Group Container) */
+    html += '<div class="category-table-block">';
+    html += '<div class="category-block-header">';
     html += '<div class="group-header-title">';
     html += '<span class="group-icon">' + icon + '</span> ';
     html += '<strong>' + escapeHtml(catName) + '</strong> ';
@@ -541,37 +542,30 @@ function renderComparisonTable(rows) {
     html += '</div>';
     html += '<div class="group-header-badges">' + summaryBadgeHtml + '</div>';
     html += '</div>';
-    html += '</td>';
-    html += '</tr>';
 
-    /* Group Sub-Header Row (Repeats column headers per category group) */
+    html += '<table class="data-table">';
+    html += '<thead>';
     html += '<tr class="group-subheader-row">';
-    html += '<th class="col-sub col-item">검토 항목</th>';
-    html += '<th class="col-sub col-result">결과</th>';
-    html += '<th class="col-sub col-lc"><i class="bi bi-file-earmark-text"></i> L/C</th>';
-    html += '<th class="col-sub col-inv"><i class="bi bi-receipt"></i> 송장</th>';
-    html += '<th class="col-sub col-bl"><i class="bi bi-water"></i> B/L</th>';
-    html += '<th class="col-sub col-pk"><i class="bi bi-box-seam"></i> 포장</th>';
-    html += '<th class="col-sub col-ins"><i class="bi bi-shield-check"></i> 보험</th>';
-    html += '<th class="col-sub col-coo"><i class="bi bi-bank"></i> COO</th>';
+    html += '<th class="col-item" style="width: 20%;">검토 항목</th>';
+    html += '<th class="col-result" style="width: 8%;">결과</th>';
+    html += '<th class="col-doc col-lc" style="width: 12%;"><i class="bi bi-file-earmark-text"></i> L/C</th>';
+    html += '<th class="col-doc col-inv" style="width: 12%;"><i class="bi bi-receipt"></i> 송장</th>';
+    html += '<th class="col-doc col-bl" style="width: 12%;"><i class="bi bi-water"></i> B/L</th>';
+    html += '<th class="col-doc col-pk" style="width: 12%;"><i class="bi bi-box-seam"></i> 포장</th>';
+    html += '<th class="col-doc col-ins" style="width: 12%;"><i class="bi bi-shield-check"></i> 보험</th>';
+    html += '<th class="col-doc col-coo" style="width: 12%;"><i class="bi bi-bank"></i> COO</th>';
     html += '</tr>';
-
-    /* Group Category Section (Card View) */
-    cardsHtml += '<div class="card-category-section">';
-    cardsHtml += '<div class="mobile-group-header">';
-    cardsHtml += '<div class="mobile-group-title"><span class="group-icon">' + icon + '</span> <strong>' + escapeHtml(catName) + '</strong> <span class="group-count">(' + catRows.length + '개 항목)</span></div>';
-    cardsHtml += '<div class="group-header-badges">' + summaryBadgeHtml + '</div>';
-    cardsHtml += '</div>';
-    cardsHtml += '<div class="card-category-grid">';
+    html += '</thead>';
+    html += '<tbody>';
 
     /* Member Rows & Mobile Cards */
     catRows.forEach(function (row) {
       var rowClass = rowHighlightClass(row.result);
       var itemTitle = row.check_item_ko || row.check_item || "-";
 
-      // Table Row (Indented under category)
+      // Table Row
       html += '<tr class="' + rowClass + '">';
-      html += '<td class="subitem-cell"><span class="subitem-tree-icon">└</span><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
+      html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
       html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
       html += '<td>' + formatTableCellHtml(row.lc) + '</td>';
       html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice) + '</td>';
@@ -612,11 +606,17 @@ function renderComparisonTable(rows) {
       cardsHtml += '</div>';
     });
 
+    html += '</tbody>';
+    html += '</table>';
+    html += '</div>'; // close category-table-block
+
     cardsHtml += '</div>'; // close card-category-grid
     cardsHtml += '</div>'; // close card-category-section
   });
 
-  els.comparisonTableBody.innerHTML = html;
+  if (els.comparisonTableBody) {
+    els.comparisonTableBody.innerHTML = html;
+  }
   if (els.comparisonCardsContainer) {
     els.comparisonCardsContainer.innerHTML = cardsHtml;
   }
