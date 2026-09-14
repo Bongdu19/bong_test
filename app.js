@@ -180,33 +180,35 @@ function formatDocValue(val) {
   return str;
 }
 
-function formatTableCellHtml(val) {
+function formatTableCellHtml(val, docTag) {
+  var tagHtml = docTag ? '<span class="cell-doc-tag">' + escapeHtml(docTag) + '</span>' : '';
+
   if (val == null || val === "") {
-    return '<span class="cell-val cell-val-subtle">-</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-subtle">-</span></div>';
   }
   var str = cleanText(val);
   var lower = str.toLowerCase().trim();
 
   if (lower === "present" || lower === "구비됨") {
-    return '<span class="cell-val cell-val-ok"><i class="bi bi-check-circle-fill"></i> 구비됨</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-ok"><i class="bi bi-check-circle-fill"></i> 구비됨</span></div>';
   }
   if (lower === "match" || lower === "일치") {
-    return '<span class="cell-val cell-val-ok"><i class="bi bi-check-lg"></i> 일치</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-ok"><i class="bi bi-check-lg"></i> 일치</span></div>';
   }
   if (lower === "missing" || lower === "미제출") {
-    return '<span class="cell-val cell-val-crit"><i class="bi bi-x-circle-fill"></i> 미제출</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-crit"><i class="bi bi-x-circle-fill"></i> 미제출</span></div>';
   }
   if (lower === "mismatch" || lower === "불일치") {
-    return '<span class="cell-val cell-val-crit"><i class="bi bi-exclamation-octagon-fill"></i> 불일치</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-crit"><i class="bi bi-exclamation-octagon-fill"></i> 불일치</span></div>';
   }
   if (lower === "unclear" || lower === "확인 필요" || lower === "확인필요") {
-    return '<span class="cell-val cell-val-warn"><i class="bi bi-question-circle-fill"></i> 확인필요</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-warn"><i class="bi bi-question-circle-fill"></i> 확인필요</span></div>';
   }
   if (lower === "not_available" || lower === "n/a" || lower === "미해당") {
-    return '<span class="cell-val cell-val-subtle">미해당</span>';
+    return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-subtle">미해당</span></div>';
   }
 
-  return '<span class="cell-val cell-val-text">' + escapeHtml(str) + '</span>';
+  return '<div class="table-cell-content">' + tagHtml + '<span class="cell-val cell-val-text">' + escapeHtml(str) + '</span></div>';
 }
 
 function badgeClass(result) {
@@ -561,12 +563,12 @@ function renderComparisonTable(rows) {
       html += '<tr class="' + rowClass + '">';
       html += '<td><strong class="item-title-cell">' + escapeHtml(cleanText(itemTitle)) + '</strong></td>';
       html += '<td><span class="' + badgeClass(row.result) + '">' + escapeHtml(koreanStatus(row.result)) + '</span></td>';
-      html += '<td>' + formatTableCellHtml(row.lc) + '</td>';
-      html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice) + '</td>';
-      html += '<td>' + formatTableCellHtml(row.bill_of_lading || row.bl) + '</td>';
-      html += '<td>' + formatTableCellHtml(row.packing_list) + '</td>';
-      html += '<td>' + formatTableCellHtml(row.marine_cargo_insurance || row.insurance) + '</td>';
-      html += '<td>' + formatTableCellHtml(row.certificate_of_origin || row.coo) + '</td>';
+      html += '<td>' + formatTableCellHtml(row.lc, "LC") + '</td>';
+      html += '<td>' + formatTableCellHtml(row.commercial_invoice || row.invoice, "송장") + '</td>';
+      html += '<td>' + formatTableCellHtml(row.bill_of_lading || row.bl, "B/L") + '</td>';
+      html += '<td>' + formatTableCellHtml(row.packing_list, "포장") + '</td>';
+      html += '<td>' + formatTableCellHtml(row.marine_cargo_insurance || row.insurance, "보험") + '</td>';
+      html += '<td>' + formatTableCellHtml(row.certificate_of_origin || row.coo, "COO") + '</td>';
       html += '</tr>';
 
       // Mobile Card Item
