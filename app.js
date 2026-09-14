@@ -589,14 +589,14 @@ function renderComparisonTable(rows) {
     html += '<table class="data-table">';
     html += '<thead>';
     html += '<tr class="group-subheader-row">';
-    html += '<th class="col-item" style="width: 20%;">검토 항목</th>';
-    html += '<th class="col-result" style="width: 8%;">결과</th>';
-    html += '<th class="col-doc col-lc" style="width: 12%;"><i class="bi bi-file-earmark-text"></i> L/C</th>';
-    html += '<th class="col-doc col-inv" style="width: 12%;"><i class="bi bi-receipt"></i> 송장</th>';
-    html += '<th class="col-doc col-bl" style="width: 12%;"><i class="bi bi-water"></i> B/L</th>';
-    html += '<th class="col-doc col-pk" style="width: 12%;"><i class="bi bi-box-seam"></i> 포장</th>';
-    html += '<th class="col-doc col-ins" style="width: 12%;"><i class="bi bi-shield-check"></i> 보험</th>';
-    html += '<th class="col-doc col-coo" style="width: 12%;"><i class="bi bi-bank"></i> COO</th>';
+    html += '<th class="col-item" style="width: 22%;"><i class="bi bi-card-checklist"></i> 검토 항목</th>';
+    html += '<th class="col-result" style="width: 10%;"><i class="bi bi-shield-check"></i> 결과</th>';
+    html += '<th class="col-doc col-lc" style="width: 11.33%;"><i class="bi bi-file-earmark-text"></i> L/C</th>';
+    html += '<th class="col-doc col-inv" style="width: 11.33%;"><i class="bi bi-receipt"></i> 송장</th>';
+    html += '<th class="col-doc col-bl" style="width: 11.33%;"><i class="bi bi-water"></i> B/L</th>';
+    html += '<th class="col-doc col-pk" style="width: 11.33%;"><i class="bi bi-box-seam"></i> 포장</th>';
+    html += '<th class="col-doc col-ins" style="width: 11.33%;"><i class="bi bi-shield-check"></i> 보험</th>';
+    html += '<th class="col-doc col-coo" style="width: 11.33%;"><i class="bi bi-bank"></i> COO</th>';
     html += '</tr>';
     html += '</thead>';
     html += '<tbody>';
@@ -636,12 +636,9 @@ function renderComparisonTable(rows) {
       ];
 
       docs.forEach(function (d) {
-        var cleanV = formatDocValue(d.val);
-        var isMissing = cleanV === "미제출" || cleanV === "-" || cleanV === "";
-        var valClass = isMissing ? "doc-val-missing" : "doc-val-present";
         cardsHtml += '<div class="mobile-doc-item">';
         cardsHtml += '<span class="mobile-doc-tag">' + escapeHtml(d.label) + '</span>';
-        cardsHtml += '<span class="mobile-doc-val ' + valClass + '">' + escapeHtml(cleanV) + '</span>';
+        cardsHtml += '<div class="mobile-doc-val-wrap">' + formatTableCellHtml(d.val) + '</div>';
         cardsHtml += '</div>';
       });
 
