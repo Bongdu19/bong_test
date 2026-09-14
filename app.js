@@ -350,6 +350,8 @@ function clearResult() {
   if (els.usageCard) els.usageCard.style.display = "none";
   els.documentKeys.innerHTML = "결과 없음";
   if (els.dateTimeline) els.dateTimeline.innerHTML = "결과 없음";
+  var hb = document.getElementById("timelineHeaderBadge");
+  if (hb) hb.innerHTML = "";
   if (els.comparisonTableBody) els.comparisonTableBody.innerHTML = '<div class="empty-cell">결과 없음</div>';
   if (els.comparisonCardsContainer) els.comparisonCardsContainer.innerHTML = '<div class="empty-cell">결과 없음</div>';
   if (els.checklistTabs) els.checklistTabs.innerHTML = "";
@@ -449,29 +451,60 @@ function renderDateTimeline(dateChecks) {
   var item;
   var value;
   var statusClass = "badge-neutral";
+  var noteThemeClass = "timeline-note-neutral";
   var cleanedNotes = "";
+  var headerBadgeEl = document.getElementById("timelineHeaderBadge");
 
   if (!dateChecks || typeof dateChecks !== "object") {
     els.dateTimeline.innerHTML = "결과 없음";
+    if (headerBadgeEl) headerBadgeEl.innerHTML = "";
     return;
   }
 
-  if (dateChecks.date_sequence_status === "match") {
+  var st = String(dateChecks.date_sequence_status || "").toLowerCase();
+  if (
+    st.indexOf("일치") >= 0 ||
+    st.indexOf("구비") >= 0 ||
+    st === "match" ||
+    st === "ok" ||
+    st === "pass"
+  ) {
     statusClass = "badge-ok";
-  } else if (dateChecks.date_sequence_status === "mismatch") {
-    statusClass = "badge-crit";
+    noteThemeClass = "timeline-note-ok";
   } else if (
-    dateChecks.date_sequence_status === "missing" ||
-    dateChecks.date_sequence_status === "unclear"
+    st.indexOf("불일치") >= 0 ||
+    st.indexOf("보류") >= 0 ||
+    st === "mismatch" ||
+    st === "fail"
+  ) {
+    statusClass = "badge-crit";
+    noteThemeClass = "timeline-note-crit";
+  } else if (
+    st.indexOf("검토") >= 0 ||
+    st.indexOf("주의") >= 0 ||
+    st.indexOf("확인") >= 0 ||
+    st === "missing" ||
+    st === "unclear" ||
+    st === "warn"
   ) {
     statusClass = "badge-warn";
+    noteThemeClass = "timeline-note-warn";
+  }
+
+  if (headerBadgeEl) {
+    headerBadgeEl.innerHTML =
+      '<span class="badge ' +
+      statusClass +
+      '"><i class="bi bi-shield-check"></i> 종합 판정: ' +
+      escapeHtml(koreanStatus(dateChecks.date_sequence_status)) +
+      "</span>";
   }
 
   cleanedNotes = cleanText(dateChecks.date_sequence_notes || "날짜 흐름 설명 없음");
 
   if (cleanedNotes) {
-    html += '<div class="timeline-note-box">';
-    html += '<div><strong>날짜 순서 종합 판정 (<span class="badge ' + statusClass + '">' + escapeHtml(koreanStatus(dateChecks.date_sequence_status)) + '</span>):</strong> ' + escapeHtml(cleanedNotes) + '</div>';
+    html += '<div class="timeline-note-box ' + noteThemeClass + '">';
+    html += '<div>' + escapeHtml(cleanedNotes) + '</div>';
     html += '</div>';
   }
 

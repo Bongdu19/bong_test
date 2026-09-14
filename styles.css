@@ -695,8 +695,8 @@ details.api-settings-details[open] {
 .metric-desc.large {
   color: var(--text-main);
   font-weight: 700;
-  font-size: 20px;
-  line-height: 1.55;
+  font-size: 16.5px;
+  line-height: 1.5;
   background: var(--bg-primary);
   padding: 10px 12px;
   border-radius: 10px;
@@ -1253,17 +1253,20 @@ td.res-cell-neutral {
   background: var(--bg-primary);
   color: var(--text-main);
   border: 1px solid var(--border-color);
-  font-size: 11px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
   font-family: inherit;
-  word-break: break-all;
-  white-space: normal;
+  white-space: nowrap;
   border-radius: 5px;
-  padding: 2.5px 5px;
+  padding: 2px 4px;
   line-height: 1.25;
   display: inline-block;
   max-width: 100%;
   box-sizing: border-box;
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .group-icon {
@@ -1467,12 +1470,12 @@ tr.row-warn {
 
 /* Timeline Callout Note & Flow Grid */
 .timeline-note-box {
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  color: #92400e;
-  padding: 16px 18px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 14px 18px;
   border-radius: 12px;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
   line-height: 1.6;
   margin-bottom: 18px;
@@ -1486,16 +1489,46 @@ tr.row-warn {
   overflow-wrap: anywhere;
 }
 
+.timeline-note-box.timeline-note-ok {
+  background-color: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+.timeline-note-box.timeline-note-warn {
+  background-color: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+  color: #92400e !important;
+}
+
+.timeline-note-box.timeline-note-crit {
+  background-color: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #991b1b !important;
+}
+
 .timeline-note-box > div {
   min-width: 0;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
 
-[data-theme="dark"] .timeline-note-box {
-  background: #451a03;
-  border-color: #78350f;
-  color: #fde68a;
+[data-theme="dark"] .timeline-note-box.timeline-note-ok {
+  background-color: #14532d !important;
+  border-color: #22c55e !important;
+  color: #bbf7d0 !important;
+}
+
+[data-theme="dark"] .timeline-note-box.timeline-note-warn {
+  background-color: #78350f !important;
+  border-color: #f59e0b !important;
+  color: #fde68a !important;
+}
+
+[data-theme="dark"] .timeline-note-box.timeline-note-crit {
+  background-color: #7f1d1d !important;
+  border-color: #ef4444 !important;
+  color: #fecaca !important;
 }
 
 .timeline-note-icon {
